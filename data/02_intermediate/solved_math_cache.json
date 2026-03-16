@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "version": 1
+  },
+  "solved": {
+    "sha256:70ca590d692474cbf7275dd04d85e28b4e23026a86e81a1b533be858871bec88": {
+      "x_t": null,
+      "y_t": null,
+      "weierstrass_n": null,
+      "deepest_angle_den": null,
+      "eval_status": "not_implemented"
+    },
+    "sha256:91a43f1735acdbee5bb31ffc8d4c552ead6a4924bc911f5d94862e7626b7779d": {
+      "x_t": null,
+      "y_t": null,
+      "weierstrass_n": null,
+      "deepest_angle_den": null,
+      "eval_status": "not_implemented"
+    }
+  }
+}

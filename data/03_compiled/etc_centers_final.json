@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "version": 1
+  },
+  "centers": [
+    {
+      "center_id": "X1",
+      "x_t": null,
+      "y_t": null,
+      "weierstrass_n": null,
+      "eval_status": "not_implemented"
+    }
+  ]
+}
