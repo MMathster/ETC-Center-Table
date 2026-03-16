@@ -2,10 +2,21 @@
 
 This repository computes ETC-center parametric outputs (`x(t)`, `y(t)`) using a decoupled JSON pipeline so symbolic workloads are resumable and memory-safe outside a monolithic notebook runtime.
 
-## Current progress
+## Thales notebook (repository-bound)
 
-- The notebook (`ETC_Center_Table_Thales.ipynb`) is still present for research and validation.
-- A repository-first 3-phase pipeline now exists for production-scale runs.
+- **Primary notebook:** [`ETC_Center_Table_Thales.ipynb`](./ETC_Center_Table_Thales.ipynb)
+- The notebook must be run **from this repository context** because it depends on `scripts/`, `src/`, and `data/` paths.
+- Running a downloaded standalone `.ipynb` file in isolation is not supported.
+
+## Launch on MyBinder
+
+Use Binder to launch the notebook with repository files and environment together:
+
+[![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
+
+Direct Binder URL:
+
+`https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb`
 
 ## 3-phase JSON pipeline
 

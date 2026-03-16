@@ -1,0 +1,6 @@
+pandas
+sympy
+joblib
+ipywidgets
+notebook
+jupyterlab
