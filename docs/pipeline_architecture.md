@@ -1,54 +1,51 @@
 # ETC Center Table Decoupled Pipeline Plan
 
-## Why move away from monolithic notebooks
-Large SymPy workloads mixed with scraping/parsing in one Jupyter runtime can cause memory churn, slow garbage collection, and poor restartability. The repository should separate concerns into resumable phases with persistent JSON caches.
+## Objective
+Process large ETC barycentric catalogs without notebook memory saturation by splitting extraction, solving, and compilation into independent resumable scripts connected by JSON contracts.
 
-## Three-phase pipeline
+## Pipeline stages
 
-### Phase 1 — Extraction and deduplication (`scripts/01_extract_bary.py`)
-- Read/scrape ETC source pages.
-- Extract center IDs, barycentric expression lists, and custom function definitions.
-- Normalize/clean barycentric strings.
-- Deduplicate expression workloads using stable hashes.
-- Write:
-  - `data/02_intermediate/raw_centers.json`
-  - `data/02_intermediate/unique_math_tasks.json`
+### 1) Extraction & Registry (`scripts/01_run_extraction.py`)
+- Input: parsed center rows (example: `data/raw_html/parsed_centers.json`).
+- Responsibilities:
+  - normalize bary strings (`clean_bary`),
+  - deduplicate to unique expressions,
+  - produce center-to-expression index.
+- Outputs:
+  - `data/math_registry.json` (expression -> list of center ids),
+  - `data/center_index.json` (center -> expression list + funcs metadata).
 
-### Phase 2 — Symbolic compute engine (`scripts/02_compute_cartesian.py`)
-- Read `unique_math_tasks.json` only.
-- Compute `x(t)`, `y(t)` with Weierstrass policies and complexity tie-breaks.
-- Parallelize on deduplicated task list (loky-first fallback strategy).
-- Persist each solved task incrementally (resume-safe).
-- Write:
-  - `data/02_intermediate/solved_math_cache.json`
+### 2) Compute Engine (`scripts/02_run_computation.py`)
+- Input: `data/math_registry.json`.
+- Responsibilities:
+  - solve only unique expressions,
+  - persist solutions to JSON cache,
+  - support backend tuning for throughput and memory stability.
+- Output: `data/solution_cache.json`.
+- Runtime controls:
+  - `--backend loky|multiprocessing`
+  - `--batch-size` (loky dispatch granularity)
+  - `--maxtasksperchild` (multiprocessing worker reset cadence)
 
-### Phase 3 — Portfolio/table compiler (`scripts/03_build_final_tables.py`)
-- Join center-to-hash mappings with solved cache.
-- Build final compiled outputs for analytics + website loading.
-- Write:
+### 3) Final Compiler (`scripts/03_build_final_output.py`)
+- Inputs: `data/center_index.json`, `data/solution_cache.json`.
+- Responsibilities:
+  - assemble per-center chosen equations,
+  - export final JSON + CSV,
+  - generate chunked JSON for front-end loading.
+- Outputs:
   - `data/03_compiled/etc_centers_final.json`
   - `data/03_compiled/etc_centers_final.csv`
-  - optional chunked JSON files for front-end pagination/lazy loading.
+  - `data/03_compiled/chunks/etc_data_chunk_*.json`
 
-## Data contracts (JSON)
+## Why this architecture improves performance
+- **Memory isolation:** each stage exits and releases memory before the next stage starts.
+- **Dedup-first solving:** expensive symbolic work runs once per unique expression.
+- **Crash-safe resume:** `solution_cache.json` persists solved expressions between runs.
+- **Deploy-friendly outputs:** chunked JSON can be served directly by static hosting.
 
-### `raw_centers.json`
-Dictionary of center records with references to expression hashes and metadata.
-
-### `unique_math_tasks.json`
-Deduplicated expression task registry keyed by hash.
-
-### `solved_math_cache.json`
-Persistent solved equation cache keyed by hash, including diagnostics (`weierstrass_n`, evaluation status, timing).
-
-## Operational recommendations
-- Keep notebooks for exploration/validation only.
-- Run phase scripts from CLI with explicit I/O paths.
-- Save progress frequently in phase 2 to tolerate interruptions.
-- Add small monitoring stats (tasks/sec, cache hit rate, fail counts) to each phase log.
-
-## Next implementation steps
-1. Move reusable SymPy helpers from notebook into `src/geometry_core.py` and `src/weierstrass_solver.py`.
-2. Add unit tests for parsing + denominator detection.
-3. Add benchmark mode over a 500-task sample to tune backend/chunk size.
-4. Add chunked JSON compiler for the website data path.
+## Next migration milestones
+1. Port full Section 11 symbolic logic from notebook into `src/geometry_logic.py`.
+2. Port parsing/extraction logic into ingestion scripts for real ETC page snapshots.
+3. Add diagnostics: cache hit ratio, fail buckets, and tasks/sec per backend.
+4. Add regression tests for parsing and deterministic solver outputs.
