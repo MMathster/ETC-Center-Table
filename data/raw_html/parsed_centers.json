@@ -1,0 +1,7 @@
+{
+  "meta": {"version": 1},
+  "centers": [
+    {"center_id": "X1", "bary_list": ["sin(theta/2):cos(theta/2):1"]},
+    {"center_id": "X2", "bary_list": ["1:1:1"]}
+  ]
+}
