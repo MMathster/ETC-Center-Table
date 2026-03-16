@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "part": 2
+  },
+  "centers": [
+    {
+      "center_id": "X2",
+      "expression": "1:1:1",
+      "x_t": "0",
+      "y_t": "0",
+      "weierstrass_n": 1,
+      "chosen_weierstrass_angle": "theta/2",
+      "eval_status": "ok"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "version": 1,
+    "centers": 2
+  },
+  "centers": [
+    {
+      "center_id": "X1",
+      "expressions": [
+        "sin(theta/2):cos(theta/2):1"
+      ],
+      "funcs": {}
+    },
+    {
+      "center_id": "X2",
+      "expressions": [
+        "1:1:1"
+      ],
+      "funcs": {}
+    }
+  ]
+}

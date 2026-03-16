@@ -1,0 +1,3 @@
+center_id,expression,x_t,y_t,weierstrass_n,chosen_weierstrass_angle,eval_status
+X1,sin(theta/2):cos(theta/2):1,(1-t**2)/(1+t**2),2*t/(1+t**2),1,theta/2,ok
+X2,1:1:1,0,0,1,theta/2,ok

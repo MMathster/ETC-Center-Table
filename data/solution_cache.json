@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "version": 1,
+    "backend": "loky",
+    "batch_size": 10,
+    "maxtasksperchild": 50,
+    "last_run_seconds": 0.0,
+    "last_run_rate": 0.0
+  },
+  "solved": {
+    "sin(theta/2):cos(theta/2):1": {
+      "x_t": "(1-t**2)/(1+t**2)",
+      "y_t": "2*t/(1+t**2)",
+      "weierstrass_n": 1,
+      "chosen_weierstrass_angle": "theta/2",
+      "eval_status": "ok",
+      "seconds": 9.4e-05
+    },
+    "1:1:1": {
+      "x_t": "0",
+      "y_t": "0",
+      "weierstrass_n": 1,
+      "chosen_weierstrass_angle": "theta/2",
+      "eval_status": "ok",
+      "seconds": 7e-06
+    }
+  }
+}
