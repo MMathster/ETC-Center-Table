@@ -1,22 +1,20 @@
 # ETC Center Table
 
-This repository computes ETC-center parametric outputs (`x(t)`, `y(t)`) using a decoupled JSON pipeline so symbolic workloads are resumable and memory-safe outside a monolithic notebook runtime.
-
-## Thales notebook (repository-bound)
-
-- **Primary notebook:** [`ETC_Center_Table_Thales.ipynb`](./ETC_Center_Table_Thales.ipynb)
-- The notebook must be run **from this repository context** because it depends on `scripts/`, `src/`, and `data/` paths.
-- Running a downloaded standalone `.ipynb` file in isolation is not supported.
-
-## Launch on MyBinder
-
-Use Binder to launch the notebook with repository files and environment together:
-
 [![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
 
-Direct Binder URL:
+This repository computes ETC-center parametric outputs (`x(t)`, `y(t)`) using a decoupled JSON pipeline so symbolic workloads are resumable and memory-safe outside a monolithic notebook runtime.
 
-`https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb`
+## Run the Thales notebook with repository binding
+
+- **JupyterLab (Binder):** https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb
+- **Classic Notebook (Binder):** https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?filepath=ETC_Center_Table_Thales.ipynb
+
+> Important: run `ETC_Center_Table_Thales.ipynb` from this repository context (Binder or cloned repo root). Downloading and running the notebook in isolation will break imports/path-based access to `src/`, `scripts/`, and `data/`.
+
+## Current progress
+
+- The notebook (`ETC_Center_Table_Thales.ipynb`) is still present for research and validation.
+- A repository-first 3-phase pipeline now exists for production-scale runs.
 
 ## 3-phase JSON pipeline
 
@@ -40,6 +38,22 @@ Direct Binder URL:
      - `data/03_compiled/etc_centers_final.json`
      - `data/03_compiled/etc_centers_final.csv`
      - `data/03_compiled/chunks/etc_data_chunk_*.json`
+
+
+## Black-hole protections (stalled batch mitigation)
+
+`02_run_computation.py` now includes guardrails for pathological SymPy workloads:
+
+- `--timeout-seconds` sets a strict per-expression timeout (default `5.0`).
+- `--canary-limit` runs an early sequential canary probe and prints which expressions are being attempted.
+- Complexity ordering is enabled before dispatch (`bary_complexity`) so easier expressions can be solved and cached first.
+- `--maxtasksperchild` remains available for worker recycling in multiprocessing mode.
+
+Example:
+
+```bash
+python scripts/02_run_computation.py --backend loky --timeout-seconds 5 --canary-limit 20
+```
 
 ## Compatibility wrappers
 

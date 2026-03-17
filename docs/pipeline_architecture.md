@@ -49,3 +49,15 @@ Process large ETC barycentric catalogs without notebook memory saturation by spl
 2. Port parsing/extraction logic into ingestion scripts for real ETC page snapshots.
 3. Add diagnostics: cache hit ratio, fail buckets, and tasks/sec per backend.
 4. Add regression tests for parsing and deterministic solver outputs.
+
+
+## Anti-stall strategy for SymPy black holes
+
+Phase 2 includes explicit controls to prevent one pathological center from stalling the full run:
+
+- strict per-task timeout via `--timeout-seconds`,
+- optional canary mode (`--canary-limit`) for first-N sequential trace,
+- complexity-based ordering (`bary_complexity`) to solve/cache easy expressions first,
+- deterministic algebra policy (prefer `cancel`/rational forms; avoid global `simplify` loops in pipeline code).
+
+Conway helpers and rational Thales substitutions are hosted in `src/geometry_logic.py` (`to_conway`, `get_thales_funcs`) to support incremental migration of notebook Section 11 logic.
