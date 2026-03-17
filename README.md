@@ -28,7 +28,7 @@ This repository computes ETC-center parametric outputs (`x(t)`, `y(t)`) using a 
    - Input: `data/math_registry.json`
    - Output: `data/solution_cache.json` (persistent solved expression cache)
    - Supports:
-     - `--backend loky|multiprocessing`
+     - `--backend loky|multiprocessing|pebble`
      - `--batch-size` for loky throughput tuning
      - `--maxtasksperchild` for multiprocessing memory reset behavior
 
@@ -48,11 +48,12 @@ This repository computes ETC-center parametric outputs (`x(t)`, `y(t)`) using a 
 - `--canary-limit` runs an early sequential canary probe and prints which expressions are being attempted.
 - Complexity ordering is enabled before dispatch (`bary_complexity`) so easier expressions can be solved and cached first.
 - `--maxtasksperchild` remains available for worker recycling in multiprocessing mode.
+- On Windows, prefer `--backend pebble` for OS-level hard timeouts (thread-based timeouts can hang if SymPy gets stuck inside C-extensions).
 
 Example:
 
 ```bash
-python scripts/02_run_computation.py --backend loky --timeout-seconds 5 --canary-limit 20
+python scripts/02_run_computation.py --backend pebble --timeout-seconds 5 --canary-limit 20
 ```
 
 ## Compatibility wrappers
