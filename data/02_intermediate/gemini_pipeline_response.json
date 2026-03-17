@@ -1,0 +1,39 @@
+{
+  "source": "Gemini",
+  "topic": "ETC center decoupled computation pipeline",
+  "summary": {
+    "problem": "Monolithic notebook is memory-bound for 64k+ symbolic tasks",
+    "proposal": "Split extraction, symbolic compute, and final compilation into separate resumable scripts",
+    "benefits": [
+      "memory isolation",
+      "true deduplication",
+      "persistent cache and resume safety",
+      "front-end ready static outputs"
+    ]
+  },
+  "phases": [
+    {
+      "id": 1,
+      "name": "extract_and_deduplicate",
+      "output_files": [
+        "data/02_intermediate/raw_centers.json",
+        "data/02_intermediate/unique_math_tasks.json"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "compute_cartesian",
+      "output_files": [
+        "data/02_intermediate/solved_math_cache.json"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "compile_outputs",
+      "output_files": [
+        "data/03_compiled/etc_centers_final.json",
+        "data/03_compiled/etc_centers_final.csv"
+      ]
+    }
+  ]
+}
