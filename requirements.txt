@@ -4,3 +4,4 @@ joblib
 ipywidgets
 notebook
 jupyterlab
+tqdm
