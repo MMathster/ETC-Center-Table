@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import time
 import sys
+from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -15,8 +16,7 @@ from src.geometry_logic import solve_expression, bary_complexity
 from src.parallel_utils import loky_map, multiprocessing_map, strict_timeout
 
 
-@strict_timeout(seconds=5.0)
-def _timed_solve(expr: str):
+def _solve_payload(expr: str) -> dict:
     result = solve_expression(expr)
     return {
         "x_t": result.x_t,
@@ -27,12 +27,12 @@ def _timed_solve(expr: str):
     }
 
 
-def _worker(payload: tuple[str, float]) -> tuple[str, dict]:
+def _worker_soft_timeout(payload: tuple[str, float]) -> tuple[str, dict]:
+    """Legacy worker path: uses strict_timeout (SIGALRM on POSIX, threads on Windows)."""
     expr, timeout_seconds = payload
     t0 = time.perf_counter()
 
-    # bind timeout dynamically per invocation
-    timed = strict_timeout(seconds=timeout_seconds)(lambda e: _timed_solve.__wrapped__(e))
+    timed = strict_timeout(seconds=timeout_seconds)(_solve_payload)
     out = timed(expr)
 
     if isinstance(out, dict) and out.get("status") == "timeout":
@@ -55,15 +55,110 @@ def _worker(payload: tuple[str, float]) -> tuple[str, dict]:
             "seconds": round(time.perf_counter() - t0, 6),
         }
 
-    out["seconds"] = round(time.perf_counter() - t0, 6)
-    return expr, out
+    if isinstance(out, dict):
+        out["seconds"] = round(time.perf_counter() - t0, 6)
+        return expr, out
+
+    return expr, {
+        "x_t": None,
+        "y_t": None,
+        "weierstrass_n": None,
+        "chosen_weierstrass_angle": None,
+        "eval_status": "error:unexpected_return_type",
+        "seconds": round(time.perf_counter() - t0, 6),
+    }
+
+
+def _pebble_entry(expr: str) -> dict:
+    """Pure compute function for Pebble (must be picklable)."""
+    return _solve_payload(expr)
+
+
+def _run_pebble(
+    expressions: list[str],
+    timeout_seconds: float,
+    max_workers: int,
+    max_tasks: int,
+    flush_every: int,
+    solved: dict,
+    cache_path: Path,
+    base_meta: dict,
+) -> list[tuple[str, dict]]:
+    # Imported lazily so non-pebble usage doesn't require dependency.
+    from concurrent.futures import TimeoutError as FutureTimeoutError
+
+    from pebble import ProcessPool  # type: ignore
+    from tqdm import tqdm  # type: ignore
+
+    results: list[tuple[str, dict]] = []
+    pending = [e for e in expressions if e not in solved]
+    if not pending:
+        return results
+
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Create tasks one-by-one so results can stream back; a single pathological expr
+    # can't block returning earlier successes.
+    t_submit0 = time.perf_counter()
+    with ProcessPool(max_workers=max_workers, max_tasks=max_tasks) as pool:
+        futures = []
+        for expr in pending:
+            fut = pool.schedule(_pebble_entry, args=(expr,), timeout=timeout_seconds)
+            futures.append((expr, fut))
+
+        for i, (expr, fut) in enumerate(tqdm(futures, total=len(futures), desc="Computing expressions"), 1):
+            t0 = time.perf_counter()
+            try:
+                out = fut.result()
+                if not isinstance(out, dict):
+                    payload = {
+                        "x_t": None,
+                        "y_t": None,
+                        "weierstrass_n": None,
+                        "chosen_weierstrass_angle": None,
+                        "eval_status": "error:unexpected_return_type",
+                    }
+                else:
+                    payload = out
+            except FutureTimeoutError:
+                payload = {
+                    "x_t": None,
+                    "y_t": None,
+                    "weierstrass_n": None,
+                    "chosen_weierstrass_angle": None,
+                    "eval_status": "timeout",
+                }
+            except Exception as exc:
+                payload = {
+                    "x_t": None,
+                    "y_t": None,
+                    "weierstrass_n": None,
+                    "chosen_weierstrass_angle": None,
+                    "eval_status": f"error:{type(exc).__name__}:{exc}",
+                }
+
+            payload["seconds"] = round(time.perf_counter() - t0, 6)
+            solved[expr] = payload
+            results.append((expr, payload))
+
+            if flush_every > 0 and (i % flush_every == 0):
+                meta = dict(base_meta)
+                meta.update(
+                    {
+                        "last_flush_idx": i,
+                        "last_flush_seconds_since_submit": round(time.perf_counter() - t_submit0, 4),
+                    }
+                )
+                cache_path.write_text(json.dumps({"meta": meta, "solved": solved}, indent=2), encoding="utf-8")
+
+    return results
 
 
 def run_canary_test(expressions: list[str], timeout_seconds: float, limit: int = 20) -> None:
-    print(f"🚀 Starting Canary Test on first {min(limit, len(expressions))} expressions")
+    print(f"Starting Canary Test on first {min(limit, len(expressions))} expressions")
     for i, expr in enumerate(expressions[:limit], 1):
         print(f"[{i}] Attempting ({len(expr)} chars): {expr[:120]}", flush=True)
-        _, result = _worker((expr, timeout_seconds))
+        _, result = _worker_soft_timeout((expr, timeout_seconds))
         print(f"    -> {result.get('eval_status')} in {result.get('seconds')}s", flush=True)
 
 
@@ -71,12 +166,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Phase 2: Solve deduplicated expression registry")
     parser.add_argument("--registry", default="data/math_registry.json")
     parser.add_argument("--cache", default="data/solution_cache.json")
-    parser.add_argument("--backend", choices=["loky", "multiprocessing"], default="loky")
+    parser.add_argument("--backend", choices=["loky", "multiprocessing", "pebble"], default="loky")
     parser.add_argument("--batch-size", type=int, default=10)
     parser.add_argument("--maxtasksperchild", type=int, default=50)
     parser.add_argument("--timeout-seconds", type=float, default=5.0)
     parser.add_argument("--canary-limit", type=int, default=0)
     parser.add_argument("--descending-complexity", action="store_true")
+    parser.add_argument("--max-workers", type=int, default=0, help="Override worker count for pebble backend (0=auto)")
+    parser.add_argument("--pebble-max-tasks", type=int, default=50, help="Worker recycle threshold for pebble backend")
+    parser.add_argument("--flush-every", type=int, default=200, help="Write cache every N expressions (pebble backend)")
     args = parser.parse_args()
 
     reg = json.loads(Path(args.registry).read_text(encoding="utf-8"))
@@ -96,7 +194,7 @@ def main() -> None:
     print(f"Cache hits: {len(expressions) - len(pending)}")
     print(f"Pending: {len(pending)}")
 
-    if args.canary_limit > 0:
+    if args.canary_limit > 0 and pending:
         run_canary_test(pending, timeout_seconds=args.timeout_seconds, limit=args.canary_limit)
 
     t0 = time.perf_counter()
@@ -105,12 +203,43 @@ def main() -> None:
 
     if work_items:
         if args.backend == "loky":
-            results = loky_map(_worker, work_items, batch_size=args.batch_size)
+            results = loky_map(_worker_soft_timeout, work_items, batch_size=args.batch_size)
+            for expr, payload in results:
+                solved[expr] = payload
+        elif args.backend == "multiprocessing":
+            results = multiprocessing_map(_worker_soft_timeout, work_items, maxtasksperchild=args.maxtasksperchild)
+            for expr, payload in results:
+                solved[expr] = payload
         else:
-            results = multiprocessing_map(_worker, work_items, maxtasksperchild=args.maxtasksperchild)
+            try:
+                import os
 
-    for expr, payload in results:
-        solved[expr] = payload
+                max_workers = args.max_workers if args.max_workers > 0 else max(1, (os.cpu_count() or 8) - 1)
+            except Exception:
+                max_workers = 8
+
+            base_meta = {
+                "version": 2,
+                "backend": args.backend,
+                "batch_size": args.batch_size,
+                "maxtasksperchild": args.maxtasksperchild,
+                "timeout_seconds": args.timeout_seconds,
+                "descending_complexity": args.descending_complexity,
+                "max_workers": max_workers,
+                "pebble_max_tasks": args.pebble_max_tasks,
+                "flush_every": args.flush_every,
+            }
+
+            results = _run_pebble(
+                expressions=pending,
+                timeout_seconds=args.timeout_seconds,
+                max_workers=max_workers,
+                max_tasks=args.pebble_max_tasks,
+                flush_every=args.flush_every,
+                solved=solved,
+                cache_path=cache_path,
+                base_meta=base_meta,
+            )
 
     elapsed = max(time.perf_counter() - t0, 1e-9)
     rate = len(results) / elapsed
@@ -128,6 +257,9 @@ def main() -> None:
             "maxtasksperchild": args.maxtasksperchild,
             "timeout_seconds": args.timeout_seconds,
             "descending_complexity": args.descending_complexity,
+            "max_workers": args.max_workers,
+            "pebble_max_tasks": args.pebble_max_tasks,
+            "flush_every": args.flush_every,
             "last_run_seconds": round(elapsed, 4),
             "last_run_rate": round(rate, 4),
             "status_counts": status_counts,
