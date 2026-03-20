@@ -1,13 +1,30 @@
 # ETC Center Table
 
+## Motivation
+
+Inspired by my previous dual-role work at AiCure, I displayed interest to extract coordinates and symbolically analyze the locus for each triangle center $X_n$. The half-angle substitution, also known as the Weierstrass substitution, is $t = \tan\frac{\theta}{2}$, where
+
+$$
+\left( \cos\theta, \sin\theta \right) \mapsto \left( \dfrac{1 - t^2}{1 + t^2}, \dfrac{2t}{1 + t^2} \right)
+$$
+
+which transforms equations, containing $\sin\theta$ and $\cos\theta$, into rational expressions. Since triangle side lengths are of the form $\sin\frac{\theta}{2}$ and $\cos\frac{\theta}{2}$, we can apply that idea for greater powers of $2$'s i.e. $\sin\frac{\theta}{4}$ and $\cos\frac{\theta}{8}$. For instance, if the "deepest" angle factor detected in the expression $\sin\frac{\theta}{2}\cos\frac{\theta}{4}$ is $4$, then the substitution $t = \tan\frac{\theta}{4 \cdot 2} = \tan\frac{\theta}{8}$. Extending this to mixed angle denominators, we can deduce that for the general $t = \tan\left(\frac{\theta}{p}\right)$ where $p$ is an integer,
+
+- For angle powers of $2$'s only, $p = 2^{\mathrm{max} + 1}$, where $\max$ checks denominators. For instance, for expressions, like $\tan\frac{\theta}{4}\cos\frac{\theta}{2}$, we set $t = \tan\frac{\theta}{4 \cdot 2} = \tan\frac{\theta}{8}$.
+- Otherwise, for angle powers of different prime factors, $p$ takes the least common demoninator of angle denominators. For instance, for expressions, like $\tan\frac{\theta}{3}\cos\frac{\theta}{2}$, we set $t = \tan\frac{\theta}{6}$.
+
+## External Resources
+
 [![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
 
 This repository computes ETC-center parametric outputs (`x(t)`, `y(t)`) using a decoupled JSON pipeline so symbolic workloads are resumable and memory-safe outside a monolithic notebook runtime.
 
 ## Run the Thales notebook with repository binding
 
-- **JupyterLab (Binder):** https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb
-- **Classic Notebook (Binder):** https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?filepath=ETC_Center_Table_Thales.ipynb
+- **JupyterLab (Binder):**
+  [![View Notebook](https://img.shields.io/badge/Platform-Jupyter%20Labs-blue?logo=github)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
+- **Classic Notebook (Binder):**
+  [![View Notebook](https://img.shields.io/badge/GitHub-Notebook-blue?logo=github)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?filepath=ETC_Center_Table_Thales.ipynb)
 
 > Important: run `ETC_Center_Table_Thales.ipynb` from this repository context (Binder or cloned repo root). Downloading and running the notebook in isolation will break imports/path-based access to `src/`, `scripts/`, and `data/`.
 
