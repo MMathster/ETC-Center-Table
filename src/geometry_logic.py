@@ -15,7 +15,7 @@ from __future__ import annotations
 import math
 import re
 import warnings
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 import sympy as sp
@@ -554,17 +554,29 @@ def resolve_C(x_expr, y_expr):
     return x_expr, y_expr
 
 
-# Patch: _PARSE_LOCALS uses positive=True symbols for a,b,c,r.
-# Add them to geom_sub so substitution works regardless of assumptions.
-_a_pos = sp.Symbol('a', real=True, positive=True)
-_b_pos = sp.Symbol('b', real=True, positive=True)
-_c_pos = sp.Symbol('c', real=True, positive=True)
-_r_pos = sp.Symbol('r', real=True, positive=True)
-_R_pos = sp.Symbol('R', real=True, positive=True)
-geom_sub.update({
-    _a_pos: a_side, _b_pos: b_side, _c_pos: c_side,
-    _r_pos: r_val,  _R_pos: R_val,
-})
+# Patch: _PARSE_LOCALS uses assumption-carrying symbols that differ from the
+# bare symbols in geom_sub. Add all assumption variants so .subs(geom_sub)
+# works regardless of how the symbol was created by the parser.
+import sympy as _sp
+_sym_patches = {
+    # side lengths: positive=True in _PARSE_LOCALS
+    _sp.Symbol('a', real=True, positive=True): a_side,
+    _sp.Symbol('b', real=True, positive=True): b_side,
+    _sp.Symbol('c', real=True, positive=True): c_side,
+    # angles: real=True in _PARSE_LOCALS
+    _sp.Symbol('A', real=True): A_angle,
+    _sp.Symbol('B', real=True): B_angle,
+    # inradius / circumradius
+    _sp.Symbol('r', real=True, positive=True): r_val,
+    _sp.Symbol('R', real=True, positive=True): R_val,
+    # semiperimeter (occasionally parsed with real=True)
+    _sp.Symbol('s', real=True): s_val,
+    _sp.Symbol('sa', real=True): s_val - a_side,
+    _sp.Symbol('sb', real=True): s_val - b_side,
+    _sp.Symbol('sc', real=True): s_val - c_side,
+}
+geom_sub.update(_sym_patches)
+del _sp, _sym_patches
 
 # ═══════════════════════════════════════════════════════════════════
 # PIPELINE HELPERS — from notebook cell 23
@@ -627,7 +639,9 @@ def _normalize_funcs(funcs):
 
 def _geom_eval_triplet(uvw):
     # Light symbolic simplification first improves robustness before Weierstrass.
-    return tuple(sp.cancel(sp.expand_trig(sp.trigsimp(comp.subs(geom_sub)))) for comp in uvw)
+    # sp.trigsimp removed: causes GIL deadlocks on complex rational fractions.
+    # expand_trig + cancel is algebraically sufficient and safe.
+    return tuple(sp.cancel(sp.expand_trig(comp.subs(geom_sub))) for comp in uvw)
 
 
 def _contains_pole(uvw):
