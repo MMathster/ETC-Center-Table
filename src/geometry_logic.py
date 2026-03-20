@@ -15,7 +15,7 @@ from __future__ import annotations
 import math
 import re
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 import sympy as sp
@@ -115,6 +115,13 @@ Sw, s          = sp.symbols('Sw s',       real=True)
 sa, sb, sc     = sp.symbols('sa sb sc',   real=True)
 r, R           = sp.symbols('r R',        positive=True)
 
+# ── Extended geometric symbols ───────────────────────────────────────────────
+ha, hb, hc     = sp.symbols('ha hb hc',   positive=True)  # altitudes
+ra, rb, rc     = sp.symbols('ra rb rc',   positive=True)  # exradii
+ma, mb, mc     = sp.symbols('ma mb mc',   positive=True)  # medians
+wa_b, wb_b, wc_b = sp.symbols('wa wb wc', positive=True)  # angle bisectors
+K_area         = sp.Symbol('K',            positive=True)  # area (alt. notation)
+
 # ── Vertex angles ─────────────────────────────────────────────────────────────
 #   A=(1,0), B=(-1,0), C=(cos theta, sin theta) on the unit circumcircle
 #   By the inscribed-angle theorem:
@@ -175,10 +182,30 @@ geom_sub = {
     s: s_val,
     sa: s_val - a_side, sb: s_val - b_side, sc: s_val - c_side,
     r: r_val, R: R_val,
-    # Brocard angle: cot and tan substituted directly; sin/cos handled via w_val
+    # Brocard angle
     sp.cot(w_sym): cotw_val,
     sp.tan(w_sym): sp.Integer(1) / cotw_val,
     w_sym: w_val,
+
+    # ── Extended symbols (right triangle: C=pi/2, c=2, R=1) ──────────────────
+    # Altitudes: in right triangle with C=pi/2, ha=b, hb=a, hc=a*b/c=a*b/2
+    ha: b_side,
+    hb: a_side,
+    hc: (a_side * b_side) / c_side,   # = S/c = sin(theta)
+    # Exradii: r_i = Area / (s - side_i), Area = S/2
+    ra: (S_val / 2) / (s_val - a_side),
+    rb: (S_val / 2) / (s_val - b_side),
+    rc: (S_val / 2) / (s_val - c_side),
+    # Medians: mc to hypotenuse = R = 1 (nine-point circle property)
+    ma: sp.sqrt((2*b2 + 2*c2 - a2) / 4),
+    mb: sp.sqrt((2*a2 + 2*c2 - b2) / 4),
+    mc: sp.Integer(1),
+    # Angle bisectors
+    wa_b: (2 * b_side * c_side * sp.cos(A_angle / 2)) / (b_side + c_side),
+    wb_b: (2 * a_side * c_side * sp.cos(B_angle / 2)) / (a_side + c_side),
+    wc_b: (a_side * b_side * sp.sqrt(2)) / (a_side + b_side),
+    # Area alternative notation
+    K_area: S_val / 2,
 }
 
 # ── Rational parametrisation  t = tan(theta/4) ───────────────────────────────
@@ -341,6 +368,11 @@ _PARSE_LOCALS = {
     'S': S, 'Sw': Sw, 'SW': Sw,
     's': s, 'sa': sa, 'sb': sb, 'sc': sc,
     'r': r, 'R': R, 'w': w_sym,
+    'ha': ha, 'hb': hb, 'hc': hc,
+    'ra': ra, 'rb': rb, 'rc': rc,
+    'ma': ma, 'mb': mb, 'mc': mc,
+    'wa': wa_b, 'wb': wb_b, 'wc': wc_b,
+    'K': K_area,
     'sin': sp.sin, 'cos': sp.cos, 'tan': sp.tan,
     'cot': sp.cot, 'sec': sp.sec, 'csc': sp.csc,
     'sqrt': sp.sqrt, 'Abs': sp.Abs, 'exp': sp.exp, 'log': sp.log,
@@ -554,29 +586,17 @@ def resolve_C(x_expr, y_expr):
     return x_expr, y_expr
 
 
-# Patch: _PARSE_LOCALS uses assumption-carrying symbols that differ from the
-# bare symbols in geom_sub. Add all assumption variants so .subs(geom_sub)
-# works regardless of how the symbol was created by the parser.
-import sympy as _sp
-_sym_patches = {
-    # side lengths: positive=True in _PARSE_LOCALS
-    _sp.Symbol('a', real=True, positive=True): a_side,
-    _sp.Symbol('b', real=True, positive=True): b_side,
-    _sp.Symbol('c', real=True, positive=True): c_side,
-    # angles: real=True in _PARSE_LOCALS
-    _sp.Symbol('A', real=True): A_angle,
-    _sp.Symbol('B', real=True): B_angle,
-    # inradius / circumradius
-    _sp.Symbol('r', real=True, positive=True): r_val,
-    _sp.Symbol('R', real=True, positive=True): R_val,
-    # semiperimeter (occasionally parsed with real=True)
-    _sp.Symbol('s', real=True): s_val,
-    _sp.Symbol('sa', real=True): s_val - a_side,
-    _sp.Symbol('sb', real=True): s_val - b_side,
-    _sp.Symbol('sc', real=True): s_val - c_side,
-}
-geom_sub.update(_sym_patches)
-del _sp, _sym_patches
+# Patch: _PARSE_LOCALS uses positive=True symbols for a,b,c,r.
+# Add them to geom_sub so substitution works regardless of assumptions.
+_a_pos = sp.Symbol('a', real=True, positive=True)
+_b_pos = sp.Symbol('b', real=True, positive=True)
+_c_pos = sp.Symbol('c', real=True, positive=True)
+_r_pos = sp.Symbol('r', real=True, positive=True)
+_R_pos = sp.Symbol('R', real=True, positive=True)
+geom_sub.update({
+    _a_pos: a_side, _b_pos: b_side, _c_pos: c_side,
+    _r_pos: r_val,  _R_pos: R_val,
+})
 
 # ═══════════════════════════════════════════════════════════════════
 # PIPELINE HELPERS — from notebook cell 23
@@ -639,8 +659,8 @@ def _normalize_funcs(funcs):
 
 def _geom_eval_triplet(uvw):
     # Light symbolic simplification first improves robustness before Weierstrass.
-    # sp.trigsimp removed: causes GIL deadlocks on complex rational fractions.
-    # expand_trig + cancel is algebraically sufficient and safe.
+    # sp.trigsimp REMOVED — causes GIL deadlocks on complex ETC expressions.
+    # expand_trig + cancel handles all practical barycentric coordinates safely.
     return tuple(sp.cancel(sp.expand_trig(comp.subs(geom_sub))) for comp in uvw)
 
 
@@ -1009,3 +1029,7 @@ def _pebble_entry(expr: str) -> dict:
         "eval_status":            r.eval_status,
         "seconds":                r.seconds,
     }
+
+# Ensure A,B with real=True assumption are also mapped
+geom_sub[sp.Symbol('A', real=True)] = A_angle
+geom_sub[sp.Symbol('B', real=True)] = B_angle
