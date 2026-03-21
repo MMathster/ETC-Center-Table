@@ -28,13 +28,29 @@ $$
 \left( \cos\theta, \sin\theta \right) \mapsto \left( \dfrac{1 - t^2}{1 + t^2}, \dfrac{2t}{1 + t^2} \right)
 $$
 
-which transforms equations, containing $\sin\theta$ and $\cos\theta$, into rational expressions. The pipeline dynamically chooses the minimal $n$ (the "Weierstrass Depth") required to clear all half-angle or quarter-angle identities found in the ETC source.
+which transforms equations, containing $\sin\theta$ and $\cos\theta$, into rational expressions. In the similar manner, the substitution $t = \tan\frac{\theta}{2^{n}}$ produces the following pattern for powers of $2$'s:
 
-Since triangle side lengths are of the form $\sin\frac{\theta}{2}$ and $\cos\frac{\theta}{2}$, we can apply that idea for greater powers of $2$'s i.e. $\sin\frac{\theta}{4}$ and $\cos\frac{\theta}{8}$. For instance, if the "deepest" angle factor detected in the expression $\sin\frac{\theta}{2}\cos\frac{\theta}{4}$ is $4$, then the substitution $t = \tan\frac{\theta}{4 \cdot 2} = \tan\frac{\theta}{8}$. Extending this to mixed angle denominators, we can deduce that for the universal substitution $t = \tan\left(\frac{\theta}{p}\right)$ where $p$ is an integer,
+<div align="center">
+
+|**Cosine**|**$t$-Equation**|**Sine**|**$t$-Equation**|**Tangent**|**$t$-Equation**|
+|:---:|:---:|:---:|:---:|:---:|:---:|
+|$\cos\left(\dfrac{\theta}{2^{n - 1}}\right)$|$\dfrac{1 - t^2}{1 + t^2}$|$\sin\left(\dfrac{\theta}{2^{n - 1}}\right)$|$\dfrac{2t}{1 + t^2}$|$\tan\left(\dfrac{\theta}{2^{n - 1}}\right)$|$\dfrac{2t}{1 - t^2}$|
+|$\cos\left(\dfrac{\theta}{2^{n - 2}}\right)$|$\dfrac{1 - 6t^2 + t^4}{\left(1 + t^2\right)^2}$|$\sin\left(\dfrac{\theta}{2^{n - 2}}\right)$|$\dfrac{4t(1 - t^2)}{(1 + t^2)^2}$|$\tan\left(\dfrac{\theta}{2^{n - 2}}\right)$|$\dfrac{4t(1 - t^2)}{1 - 6t^2 + t^4}$|
+|$\cos\left(\dfrac{\theta}{2^{n - k}}\right)$|$\dfrac{1}{(1 + t^2)^{2k - 1}}\sum\limits_{j = 0}^{\infty} \left((-1)^{j}\dbinom{2^k}{2j}t^{2j}\right)$|$\sin\left(\dfrac{\theta}{2^{n - k}}\right)$|$\dfrac{1}{(1 + t^2)^{2k - 1}}\sum\limits_{j = 0}^{\infty}\left( (-1)^{j}\dbinom{2^k}{2j + 1}t^{2j + 1}\right)$|$\tan\left(\dfrac{\theta}{2^{n - k}}\right)$|$\dfrac{\sin\frac{\theta}{2^{n - k}}}{\cos\frac{\theta}{2^{n - k}}}$|
+</div>
+
+where $k$ is an integer. Above derivations follow that cosines and sines are related to the complex exponentials:
+
+$$
+\cos\left(\dfrac{\theta}{2^{n - k}}\right) = \dfrac{\mathrm{Re}\left(\left(1 + it\right)^{2^k}\right)}{(1 + t^2)^{2^{k - 1}}}, \qquad \sin\left(\dfrac{\theta}{2^{n - k}}\right) = \dfrac{\mathrm{Im}\left(\left(1 + it\right)^{2^k}\right)}{(1 + t^2)^{2^{k - 1}}}
+$$
+
+Since triangle side lengths are of the form $\sin\frac{\theta}{2}$ and $\cos\frac{\theta}{2}$, we can apply that idea for greater powers of $2$'s i.e. $\sin\frac{\theta}{4}$ and $\cos\frac{\theta}{8}$. For instance, if the "deepest" angle factor detected in the expression $\sin\frac{\theta}{2}\cos\frac{\theta}{4}$ is $4$, then the substitution $t = \tan\frac{\theta}{4 \cdot 2} = \tan\frac{\theta}{8}$. The pipeline dynamically chooses the minimal $n$ (the "Weierstrass Depth") required to clear all half-angle or quarter-angle identities found in the ETC source.
+
+Extending this to mixed angle denominators, we can deduce that for the universal substitution $t = \tan\left(\frac{\theta}{p}\right)$ where $p$ is an integer,
 
 - For angle powers of $2$'s only, $p = 2^{\mathrm{max} + 1}$, where $\max$ checks denominators. For instance, for expressions with the deepest factor $4$, like $\tan\frac{\theta}{4}\cos\frac{\theta}{2}$, we set $t = \tan\frac{\theta}{4 \cdot 2} = \tan\frac{\theta}{8}$.
 - Otherwise, for angle powers of different prime factors, $p$ takes the least common demoninator of angle denominators. For instance, for expressions, like $\tan\frac{\theta}{3}\cos\frac{\theta}{2}$, we set $t = \tan\frac{\theta}{6}$.
-
 ## Filtering & Classification
 
 The final stage of the repository allows for advanced querying of the generated dataset. Centers are not just listed; they are classified as searchable entities:
