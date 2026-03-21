@@ -126,7 +126,7 @@ Extending this to mixed angle denominators, we can deduce that for the universal
 
 ### 🖼️ Thales Configuration Gallery
 
-With more triangle centers to come and different geometrical compositions to discover, there are some fascinating discoveries, regarding how $\theta$ interacts with the orbiting point $C$.
+With more triangle centers to come and different geometrical compositions to discover, there are some fascinating discoveries, regarding how $\theta$ interacts with the triangle center $X_n$.
 
 <table>
   <tr>
@@ -134,11 +134,12 @@ With more triangle centers to come and different geometrical compositions to dis
       <img src="assets/images/x11_locus.gif" width="100%">
     </td>
     <td valign="top">
-      <h3>$X(11)$: Feuerbach Point</h3>
+      <h3>$X_{11}$: Feuerbach Point</h3>
       <p><b>Locus Type:</b> Rational Quartic Curve</p>
       <p><b>Trilinear Coordinates:</b> $1 - \cos (\beta - \gamma) : 1 - \cos (\gamma - \alpha) : 1 - \cos (\alpha - \beta)$</p>
       <p><b>Barycentric Coordinates:</b> $(s-a)(b-c)^2 : (s-b)(c-a)^2 : (s-c)(a-b)^2$</p>
-      <p><b>$t$-Substitution:</b> $\tan\frac{\theta}{4}$</p>
+      <p><b>Angle Substitution:</b> $\tan\frac{\theta}{4}$</p>
+      <p><b>Parametric Curve (upper plane):</b>$\left(\dfrac{1 - 4t + 3t^2 + 8t^3 - 13t^4 - 4t^5 + t^6}{(1 + t^2)^2(1 - 4t + 5t^2)}, \dfrac{2t(1 - t)(1 - 2t - t^2)^2}{(1 + t^2)^2(1 - 4t + 5t^2)}\right), \qquad 0 \leq t \leq 1$</p>
       <p><a href="https://www.geogebra.org/classic/uhu2ap6q">View on Geogebra →</a></p>
     </td>
   </tr>
