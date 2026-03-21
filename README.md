@@ -135,13 +135,13 @@ With more triangle centers to come and different geometrical compositions to dis
     <td valign="top">
       <table>
         <tr>
-          <th>**Category**</th>
-          <th>**Incenter**</th>
-          <th>**Centroid**</th>
-          <th>**Nagel Point**</th>
+          <th><b>Category</b></th>
+          <th><b>Incenter</b></th>
+          <th><b>Centroid</b></th>
+          <th><b>Nagel Point</b></th>
         </tr>
         <tr>
-          <td>**ETC Reference**</td>
+          <td><b>ETC Reference</b></td>
           <td>$X_1$</td>
           <td>$X_2$</td>
           <td>$X_8$</td>
