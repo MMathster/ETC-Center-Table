@@ -432,6 +432,25 @@ _FAST_SUB_N2 = {
     sp.cot(theta):    ((1 - _t_sq)**2 - 4*_t_sq) / (4*t*(1 - _t_sq)),
 }
 
+# ── Fast-path substitution dict for n=4  (t = tan(θ/8)) ─────────────────────
+# Speeds up half-angle centers like sin(A/2):sin(B/2):sin(C/2)
+_t4_sq = t**2; _d4 = 1 + _t4_sq
+_s4 = 2*t / _d4;                _c4 = (1 - _t4_sq) / _d4        # sin/cos(theta/4)
+_s2_4 = sp.cancel(2*_s4*_c4);  _c2_4 = sp.cancel(_c4**2 - _s4**2)  # sin/cos(theta/2)
+_s_4  = sp.cancel(2*_s2_4*_c2_4); _c_4 = sp.cancel(_c2_4**2 - _s2_4**2)  # sin/cos(theta)
+
+_FAST_SUB_N4 = {
+    sp.sin(theta/4): _s4,   sp.cos(theta/4): _c4,
+    sp.tan(theta/4): sp.cancel(_s4/_c4),
+    sp.cot(theta/4): sp.cancel(_c4/_s4),
+    sp.sin(theta/2): _s2_4, sp.cos(theta/2): _c2_4,
+    sp.tan(theta/2): sp.cancel(_s2_4/_c2_4),
+    sp.cot(theta/2): sp.cancel(_c2_4/_s2_4),
+    sp.sin(theta):   _s_4,  sp.cos(theta):   _c_4,
+    sp.tan(theta):   sp.cancel(_s_4/_c_4),
+    sp.cot(theta):   sp.cancel(_c_4/_s_4),
+}
+
 # ── Pre-computed Cx(t), Cy(t) ────────────────────────────────────────────────
 _CX_T = {}; _CY_T = {}
 
@@ -532,10 +551,17 @@ def _rationalize_one(expr, n):
     """Rationalize without cancel (caller decides when to cancel)."""
     if expr is None or not isinstance(expr, sp.Basic):
         return None
+    # Fast-path for n=2 (most common: polynomial and standard trig centers)
     if n == 2:
         r = expr.subs(_FAST_SUB_N2)
         if not r.has(TrigonometricFunction):
             return r
+    # Fast-path for n=4 (half-angle centers: sin(A/2), cos(A/2), etc.)
+    if n == 4 and '_FAST_SUB_N4' in dir():
+        r4 = expr.subs(_FAST_SUB_N4)
+        if not r4.has(TrigonometricFunction):
+            return r4
+    # General path: substitute theta = 2n*atan(t), expand, rewrite as rational in t
     THETA_T_n = sp.Integer(2)*n*sp.atan(t)
     sub = sp.expand_trig(expr.subs(theta, THETA_T_n))
     a2r = sub.rewrite(sp.tan).subs(sp.tan(sp.atan(t)), t)
