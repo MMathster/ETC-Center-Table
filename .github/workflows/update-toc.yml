@@ -1,0 +1,21 @@
+name: Update Table of Contents
+
+on:
+  push:
+    paths:
+      - 'README.md'
+    branches: [main]
+
+jobs:
+  update-toc:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run doctoc
+        uses: technote-space/toc-generator@v4
+        with:
+          TARGET_PATHS: README.md
+          COMMIT_MESSAGE: 'docs: auto-update Table of Contents'
