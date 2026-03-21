@@ -23,6 +23,19 @@
 
 # ETC Center Table
 
+[![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
+
+This repository computes ETC-center parametric outputs $(x(t),y(t))$, using a decoupled JSON pipeline so symbolic workloads are resumable and memory-safe outside a monolithic notebook runtime.
+
+## Run the Thales notebook with repository binding
+
+- **JupyterLab (Binder):**
+  [![View Notebook](https://img.shields.io/badge/Platform-Jupyter%20Labs-blue?logo=github)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
+- **Classic Notebook (Binder):**
+  [![View Notebook](https://img.shields.io/badge/GitHub-Notebook-blue?logo=github)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?filepath=ETC_Center_Table_Thales.ipynb)
+
+> Important: run `ETC_Center_Table_Thales.ipynb` from this repository context (Binder or cloned repo root). Downloading and running the notebook in isolation will break imports/path-based access to `src/`, `scripts/`, and `data/`.
+
 ## The Engineering Challenge: Optimization for Scale
 
 Processing the ETC is not merely a math problem; it is a systems engineering problem. A naive approach using standard trigonometric simplification fails due to the exponential complexity of deep-nested identities.
@@ -127,21 +140,6 @@ python scripts/analyze_cache.py
 # Expected Output:
 # 15000/62000 | ok=14850 | timeouts=150 | Rate: 2.15 tasks/sec
 ```
-
-## External Resources
-
-[![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
-
-This repository computes ETC-center parametric outputs (`x(t)`, `y(t)`) using a decoupled JSON pipeline so symbolic workloads are resumable and memory-safe outside a monolithic notebook runtime.
-
-## Run the Thales notebook with repository binding
-
-- **JupyterLab (Binder):**
-  [![View Notebook](https://img.shields.io/badge/Platform-Jupyter%20Labs-blue?logo=github)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
-- **Classic Notebook (Binder):**
-  [![View Notebook](https://img.shields.io/badge/GitHub-Notebook-blue?logo=github)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?filepath=ETC_Center_Table_Thales.ipynb)
-
-> Important: run `ETC_Center_Table_Thales.ipynb` from this repository context (Binder or cloned repo root). Downloading and running the notebook in isolation will break imports/path-based access to `src/`, `scripts/`, and `data/`.
 
 <hr>
 
