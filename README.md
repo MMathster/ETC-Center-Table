@@ -139,8 +139,8 @@ With more triangle centers to come and different geometrical compositions to dis
       <p><b>Barycentric Coordinates:</b> $(s-a)(b-c)^2 : (s-b)(c-a)^2 : (s-c)(a-b)^2$ with the semiperimeter $s = \dfrac{1}{2}(a + b + c)$</p>
       <p><b>Angle Substitution:</b> $t = \tan\frac{\theta}{4}$ with $0 \leq t < 1$</p>
       <p><b>Parametric Curve (upper plane):</b>$\left(\dfrac{1 - 4t + 3t^2 + 8t^3 - 13t^4 - 4t^5 + t^6}{(1 + t^2)^2(1 - 4t + 5t^2)}, \dfrac{2t(1 - t)(1 - 2t - t^2)^2}{(1 + t^2)^2(1 - 4t + 5t^2)}\right)$</p>
-      <p><b>View on Geogebra:</b>  
-        <a href="https://www.geogebra.org/classic/uhu2ap6q" target="_blank" class="glow-new-version">
+      <p><b>View on Geogebra:</b></p>
+      <p><a href="https://www.geogebra.org/classic/uhu2ap6q" target="_blank" class="glow-new-version">
      <img src="https://img.shields.io/badge/Open_Full_Screen-Geogebra-6557D2?style=for-the-badge&logo=geogebra&logoColor=black">
   </a></p>
     </td>
