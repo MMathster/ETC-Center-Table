@@ -5,14 +5,13 @@
 **Table of Contents**
 
 - [ETC Center Table](#etc-center-table)
+  - [Run the Thales notebook with repository binding](#run-the-thales-notebook-with-repository-binding)
   - [The Engineering Challenge: Optimization for Scale](#the-engineering-challenge-optimization-for-scale)
   - [Mathematical Background](#mathematical-background)
     - [The Thales-Right Configuration](#the-thales-right-configuration)
     - [Rational Representations](#rational-representations)
   - [Filtering & Classification](#filtering--classification)
   - [📈 Real-Time Monitoring](#-real-time-monitoring)
-  - [External Resources](#external-resources)
-  - [Run the Thales notebook with repository binding](#run-the-thales-notebook-with-repository-binding)
   - [Current progress](#current-progress)
   - [3-phase JSON pipeline](#3-phase-json-pipeline)
   - [Black-hole protections (stalled batch mitigation)](#black-hole-protections-stalled-batch-mitigation)
