@@ -4,7 +4,6 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-    - [$X_{11}$: Feuerbach Point](#x_11-feuerbach-point)
 - [🌟 ETC Center Table: The Geometry of the Loci](#-etc-center-table-the-geometry-of-the-loci)
   - [🚀 Run the Thales Notebook with Repository Binding](#-run-the-thales-notebook-with-repository-binding)
   - [🔧 The Engineering Challenge: Optimization for Scale](#-the-engineering-challenge-optimization-for-scale)
@@ -134,7 +133,7 @@ With more triangle centers to come and different geometrical compositions to dis
       <img src="assets/images/x11_locus.gif" width="100%">
     </td>
     <td valign="top">
-      <h3>$X_{11}$: Feuerbach Point</h3>
+      <p><b>$X_{11}$: Feuerbach Point</b></p>
       <p><b>Locus Type:</b> Rational Quartic Curve</p>
       <p><b>Barycentric Coordinates:</b> $(s-a)(b-c)^2 : (s-b)(c-a)^2 : (s-c)(a-b)^2$ with the semiperimeter $s = \dfrac{1}{2}(a + b + c)$</p>
       <p><b>Angle Substitution:</b> $\tan\frac{\theta}{4}$</p>
