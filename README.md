@@ -133,7 +133,6 @@ With more triangle centers to come and different geometrical compositions to dis
       <img src="assets/images/x8_locus.gif" width="100%">
     </td>
     <td valign="top">
-      <!-- Below is the subtable -->
       <table>
         <tr>
           <th></th>
@@ -147,7 +146,11 @@ With more triangle centers to come and different geometrical compositions to dis
           <td>$X_2$</td>
           <td>$X_8$</td>
         </tr>
-      <!-- Above is the subtable -->
+        <tr>
+          <td></td>
+          <td></td>
+          <td>
+        </tr>
     </td>
   </tr>
 </table>
