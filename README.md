@@ -139,7 +139,7 @@ With more triangle centers to come and different geometrical compositions to dis
       <p><b>Parametric Curve (upper plane):</b>
         $\begin{array}{rl}
         X_1(t) =& \left(\dfrac{1 - 2t - t^2}{1 + t^2}, \dfrac{2t(1 - t)}{1 + t^2}\right)\\
-        X_2(t) =& \left(\dfrac{1}{3} \cdot \dfrac{1 - 6t^2 + t^4}{(1 + t^2)^2}, \dfrac{1}{3} \cdot \dfrac{4t(1 - t^2)}{(1 + t^2)^2}\right)\\
+        X_2(t) =& \left(\dfrac{1}{3} \dfrac{1 - 6t^2 + t^4}{(1 + t^2)^2}, \dfrac{1}{3}\dfrac{4t(1 - t^2)}{(1 + t^2)^2}\right)\\
         X_8(t) =& \left(\dfrac{1 - 4t + 3t^2 + 8t^3 - 13t^4 - 4t^5 + t^6}{(1 + t^2)^2(1 - 4t + 5t^2)}, \dfrac{2t(1 - t)(1 - 2t - t^2)^2}{(1 + t^2)^2(1 - 4t + 5t^2)}\right)\end{equation}$</p>
       <p><b>View on Geogebra:</b>  <a href="https://www.geogebra.org/classic/jqnrskqw" target="_blank" class="glow-new-version">
      <img src="https://img.shields.io/badge/Open_Full_Screen-Geogebra-6557D2?style=for-the-badge&logo=geogebra&logoColor=black">
