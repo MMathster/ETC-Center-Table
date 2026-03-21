@@ -155,6 +155,8 @@ With more triangle centers to come and different geometrical compositions to dis
   </tr>
 </table>
 
+
+
 <table align="center">
   <tr>
     <td width="50%">
