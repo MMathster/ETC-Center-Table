@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [ETC Center Table](#etc-center-table)
+- [ETC Center Table: The Geometry of the Loci](#etc-center-table-the-geometry-of-the-loci)
   - [Run the Thales notebook with repository binding](#run-the-thales-notebook-with-repository-binding)
   - [The Engineering Challenge: Optimization for Scale](#the-engineering-challenge-optimization-for-scale)
   - [Mathematical Background](#mathematical-background)
