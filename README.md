@@ -132,7 +132,7 @@ With more triangle centers to come and different geometrical compositions to dis
 
   <!-- Image on top, centered -->
   <div style="text-align:center; padding:16px; border-bottom:1px solid #555;">
-    <img src="assets/images/x8_locus.gif" width="280px">
+    <img src="assets/images/x8_locus.gif" width="60%">
   </div>
 
   <!-- Comparison table on bottom -->
@@ -182,12 +182,12 @@ With more triangle centers to come and different geometrical compositions to dis
 
 </div>
 
-<!---Feuerbach Table--->
+<!---Feuerbach X11--->
 <div style="display:inline-block; border:1px solid #555; border-radius:8px; overflow:hidden; width:100%; max-width:600px;">
 
   <!-- Image on top, centered -->
   <div style="text-align:center; padding:16px; border-bottom:1px solid #555;">
-    <img src="assets/images/x11_locus.gif" width="75%">
+    <img src="assets/images/x11_locus.gif" width="60%">
   </div>
 
   <!-- Table on bottom -->
