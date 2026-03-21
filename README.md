@@ -133,12 +133,32 @@ With more triangle centers to come and different geometrical compositions to dis
       <img src="assets/images/x11_locus.gif" width="100%">
     </td>
     <td valign="top">
+      <p><b>Incenter, Centroid and Nagel Point</b></p>
+      <p><b>ETC Reference:</b>$X_1$, $X_2$ and $X_8$, respectively</p>
+      <p><b>Angle Substitution:</b>$t = \tan\frac{\theta}{4}$ with $0 \leq t \leq 1$</p>
+      <p><b>Parametric Curve (upper plane):</b>$\begin{array}{rl}
+        X_1(t) =& \left(\dfrac{1 - 2t - t^2}{1 + t^2}, \dfrac{2t(1 - t)}{1 + t^2}\right)\\
+        X_2(t) =& \left(\dfrac{1}{3} \cdot \dfrac{1 - 6t^2 + t^4}{(1 + t^2)^2}, \dfrac{1}{3} \cdot \dfrac{4t(1 - t^2)}{(1 + t^2)^2}\right)\\
+        X_8(t) =& \left(\dfrac{1 - 4t + 3t^2 + 8t^3 - 13t^4 - 4t^5 + t^6}{(1 + t^2)^2(1 - 4t + 5t^2)}, \dfrac{2t(1 - t)(1 - 2t - t^2)^2}{(1 + t^2)^2(1 - 4t + 5t^2)}\right)\end{array}$</p>
+      <p><b>View on Geogebra:</b>  <a href="https://www.geogebra.org/classic/jqnrskqw" target="_blank" class="glow-new-version">
+     <img src="https://img.shields.io/badge/Open_Full_Screen-Geogebra-6557D2?style=for-the-badge&logo=geogebra&logoColor=black">
+  </a></p>
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="assets/images/x11_locus.gif" width="100%">
+    </td>
+    <td valign="top">
       <p><b>Feuerbach Point</b></p>
       <p><b>ETC Reference:</b>$X_{11}$</p>
       <p><b>Locus Type:</b> Rational Quartic Curve</p>
       <p><b>Barycentric Coordinates:</b> $(s-a)(b-c)^2 : (s-b)(c-a)^2 : (s-c)(a-b)^2$ with the semiperimeter $s = \dfrac{1}{2}(a + b + c)$</p>
-      <p><b>Angle Substitution:</b> $\tan\frac{\theta}{4}$</p>
-      <p><b>Parametric Curve (upper plane):</b>$\left(\dfrac{1 - 4t + 3t^2 + 8t^3 - 13t^4 - 4t^5 + t^6}{(1 + t^2)^2(1 - 4t + 5t^2)}, \dfrac{2t(1 - t)(1 - 2t - t^2)^2}{(1 + t^2)^2(1 - 4t + 5t^2)}\right), \qquad 0 \leq t \leq 1$</p>
+      <p><b>Angle Substitution:</b> $t = \tan\frac{\theta}{4}$ with $0 \leq t < 1$</p>
+      <p><b>Parametric Curve (upper plane):</b>$\left(\dfrac{1 - 4t + 3t^2 + 8t^3 - 13t^4 - 4t^5 + t^6}{(1 + t^2)^2(1 - 4t + 5t^2)}, \dfrac{2t(1 - t)(1 - 2t - t^2)^2}{(1 + t^2)^2(1 - 4t + 5t^2)}\right)$</p>
       <p><b>View on Geogebra:</b>  <a href="https://www.geogebra.org/classic/uhu2ap6q" target="_blank" class="glow-new-version">
      <img src="https://img.shields.io/badge/Open_Full_Screen-Geogebra-6557D2?style=for-the-badge&logo=geogebra&logoColor=black">
   </a></p>
