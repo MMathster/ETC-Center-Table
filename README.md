@@ -124,7 +124,7 @@ Extending this to mixed angle denominators, we can deduce that for the universal
 - For angle powers of $2$'s only, $p = 2^{\mathrm{max} + 1}$, where $\max$ checks $2$-denominators.
 - Otherwise, for angle powers of different prime factors, $p$ takes the least common demoninator of existing angle denominators after the substitution. For instance, for expressions, like $\tan\frac{\theta}{3}\cos\frac{\theta}{2}$, we set $t = \tan\frac{\theta}{6}$.
 
-### Thales Configuration Gallery
+### 🖼️ Thales Configuration Gallery
 
 With more triangle centers to come and different geometrical compositions to discover, there are some fascinating discoveries, regarding how $\theta$ interacts with the orbiting point $C$.
 
@@ -136,8 +136,10 @@ With more triangle centers to come and different geometrical compositions to dis
     <td valign="top">
       <h3>$X(11)$: Feuerbach Point</h3>
       <p><b>Locus Type:</b> Rational Quartic Curve</p>
-      <p><b>Invariant:</b> Touches the Nine-Point Circle at all times.</p>
-      <p><a href="./docs/X11_analysis.md">View Derivation →</a></p>
+      <p><b>Trilinear Coordinates:</b> $1 - \cos (\beta - \gamma) : 1 - \cos (\gamma - \alpha) : 1 - \cos (\alpha - \beta)$</p>
+      <p><b>Barycentric Coordinates:</b> $(s-a)(b-c)^2 : (s-b)(c-a)^2 : (s-c)(a-b)^2$</p>
+      <p><b>$t$-Substitution:</b> $\tan\frac{\theta}{4}$</p>
+      <p><a href="https://www.geogebra.org/classic/uhu2ap6q">View on Geogebra →</a></p>
     </td>
   </tr>
 </table>
