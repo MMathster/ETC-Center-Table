@@ -127,7 +127,32 @@ Extending this to mixed angle denominators, we can deduce that for the universal
 
 With more triangle centers to come and different geometrical compositions to discover, there are some fascinating discoveries, regarding how $\theta$ interacts with the triangle center $X_n$.
 
-<table>
+<table align="center">
+  <tr>
+    <td width="50%">
+      <img src="assets/images/x8_locus.gif" width="100%">
+    </td>
+    <td valign="top">
+      <!-- Below is the subtable -->
+      <table>
+        <tr>
+          <th></th>
+          <th>**Incenter**</th>
+          <th>**Centroid**</th>
+          <th>**Nagel Point**</th>
+        </tr>
+        <tr>
+          <td>**ETC Reference**</td>
+          <td>$X_1$</td>
+          <td>$X_2$</td>
+          <td>$X_8$</td>
+        </tr>
+      <!-- Above is the subtable -->
+    </td>
+  </tr>
+</table>
+
+<table align="center">
   <tr>
     <td width="50%">
       <img src="assets/images/x11_locus.gif" width="100%">
