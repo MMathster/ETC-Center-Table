@@ -54,13 +54,45 @@ $$
 
 which transforms equations, containing $\sin\theta$ and $\cos\theta$, into rational expressions. In the similar manner, the substitution $t = \tan\frac{\theta}{2^{n}}$ produces the following pattern for powers of $2$'s:
 
-<div align="center">
-
-|**Cosine**|**$t$-Equation**|**Sine**|**$t$-Equation**|**Tangent**|**$t$-Equation**|
-|:---:|:---:|:---:|:---:|:---:|:---:|
-|$\cos\left(\dfrac{\theta}{2^{n - 1}}\right)$|$\dfrac{1 - t^2}{1 + t^2}$|$\sin\left(\dfrac{\theta}{2^{n - 1}}\right)$|$\dfrac{2t}{1 + t^2}$|$\tan\left(\dfrac{\theta}{2^{n - 1}}\right)$|$\dfrac{2t}{1 - t^2}$|
-|$\cos\left(\dfrac{\theta}{2^{n - 2}}\right)$|$\dfrac{1 - 6t^2 + t^4}{\left(1 + t^2\right)^2}$|$\sin\left(\dfrac{\theta}{2^{n - 2}}\right)$|$\dfrac{4t(1 - t^2)}{(1 + t^2)^2}$|$\tan\left(\dfrac{\theta}{2^{n - 2}}\right)$|$\dfrac{4t(1 - t^2)}{1 - 6t^2 + t^4}$|
-|$\cos\left(\dfrac{\theta}{2^{n - k}}\right)$|$\dfrac{1}{(1 + t^2)^{2k - 1}}\sum\limits_{j = 0}^{\infty} \left((-1)^{j}\dbinom{2^k}{2j}t^{2j}\right)$|$\sin\left(\dfrac{\theta}{2^{n - k}}\right)$|$\dfrac{1}{(1 + t^2)^{2k - 1}}\sum\limits_{j = 0}^{\infty}\left( (-1)^{j}\dbinom{2^k}{2j + 1}t^{2j + 1}\right)$|$\tan\left(\dfrac{\theta}{2^{n - k}}\right)$|$\dfrac{\sin\frac{\theta}{2^{n - k}}}{\cos\frac{\theta}{2^{n - k}}}$|
+<div style="overflow-x:auto;">
+<table style="margin:auto; border-collapse:collapse; text-align:center;">
+  <thead>
+    <tr>
+      <th style="padding:8px; border:1px solid #555;">Cosine</th>
+      <th style="padding:8px; border:1px solid #555;">$t$-Equation</th>
+      <th style="padding:8px; border:1px solid #555;">Sine</th>
+      <th style="padding:8px; border:1px solid #555;">$t$-Equation</th>
+      <th style="padding:8px; border:1px solid #555;">Tangent</th>
+      <th style="padding:8px; border:1px solid #555;">$t$-Equation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px; border:1px solid #555;">$\cos\!\left(\dfrac{\theta}{2^{n-1}}\right)$</td>
+      <td style="padding:8px; border:1px solid #555;">$\dfrac{1-t^2}{1+t^2}$</td>
+      <td style="padding:8px; border:1px solid #555;">$\sin\!\left(\dfrac{\theta}{2^{n-1}}\right)$</td>
+      <td style="padding:8px; border:1px solid #555;">$\dfrac{2t}{1+t^2}$</td>
+      <td style="padding:8px; border:1px solid #555;">$\tan\!\left(\dfrac{\theta}{2^{n-1}}\right)$</td>
+      <td style="padding:8px; border:1px solid #555;">$\dfrac{2t}{1-t^2}$</td>
+    </tr>
+    <tr>
+      <td style="padding:8px; border:1px solid #555;">$\cos\!\left(\dfrac{\theta}{2^{n-2}}\right)$</td>
+      <td style="padding:8px; border:1px solid #555;">$\dfrac{1-6t^2+t^4}{(1+t^2)^2}$</td>
+      <td style="padding:8px; border:1px solid #555;">$\sin\!\left(\dfrac{\theta}{2^{n-2}}\right)$</td>
+      <td style="padding:8px; border:1px solid #555;">$\dfrac{4t(1-t^2)}{(1+t^2)^2}$</td>
+      <td style="padding:8px; border:1px solid #555;">$\tan\!\left(\dfrac{\theta}{2^{n-2}}\right)$</td>
+      <td style="padding:8px; border:1px solid #555;">$\dfrac{4t(1-t^2)}{1-6t^2+t^4}$</td>
+    </tr>
+    <tr>
+      <td style="padding:8px; border:1px solid #555;">$\cos\!\left(\dfrac{\theta}{2^{n-k}}\right)$</td>
+      <td style="padding:8px; border:1px solid #555;">$\dfrac{1}{(1+t^2)^{2^k-1}}\displaystyle\sum_{j=0}^{\infty}(-1)^j\dbinom{2^k}{2j}t^{2j}$</td>
+      <td style="padding:8px; border:1px solid #555;">$\sin\!\left(\dfrac{\theta}{2^{n-k}}\right)$</td>
+      <td style="padding:8px; border:1px solid #555;">$\dfrac{1}{(1+t^2)^{2^k-1}}\displaystyle\sum_{j=0}^{\infty}(-1)^j\dbinom{2^k}{2j+1}t^{2j+1}$</td>
+      <td style="padding:8px; border:1px solid #555;">$\tan\!\left(\dfrac{\theta}{2^{n-k}}\right)$</td>
+      <td style="padding:8px; border:1px solid #555;">$\dfrac{\displaystyle\sum_{j=0}^{\infty}(-1)^j\binom{2^k}{2j+1}t^{2j+1}}{\displaystyle\sum_{j=0}^{\infty}(-1)^j\binom{2^k}{2j}t^{2j}}$</td>
+    </tr>
+  </tbody>
+</table>
 </div>
 
 where $k$ is an integer. Above derivations follow that cosines and sines are related to the complex exponentials:
