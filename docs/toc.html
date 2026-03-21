@@ -4,341 +4,451 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ETC Center Table — Navigation</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Cinzel:wght@600;900&display=swap" rel="stylesheet" />
+<!-- Figtree: closest free alternative to Soleil — rounded, humanist, warm -->
+<!-- Fraunces: optically-lively display serif for the title -->
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Fraunces:opsz,wght@9..144,700;9..144,900&display=swap" rel="stylesheet" />
 <style>
+  /* ─── Design tokens ─────────────────────────────── */
   :root {
-    --bg:       #06090f;
-    --surface:  #0c1220;
-    --border:   #1a2a45;
-    --accent:   #00d4ff;
-    --accent2:  #7b61ff;
-    --gold:     #f0c040;
-    --text:     #c8ddf5;
-    --muted:    #4a6080;
-    --glow-sm:  0 0 8px #00d4ff88, 0 0 20px #00d4ff33;
-    --glow-lg:  0 0 16px #00d4ffaa, 0 0 40px #00d4ff55, 0 0 80px #00d4ff22;
+    /* Base */
+    --bg:         #090c14;
+    --surface:    #0f1622;
+    --surface-hi: #141e30;
+    --border:     #1c2a40;
+
+    /* Palette — warm amber anchor, cool teal/mint accent */
+    --amber:      #f0a832;
+    --amber-lite: #ffd27a;
+    --amber-dim:  rgba(240,168,50,0.10);
+    --mint:       #34e8b4;
+    --mint-dim:   rgba(52,232,180,0.10);
+    --violet:     #9d7dff;
+    --violet-dim: rgba(157,125,255,0.10);
+
+    /* Text */
+    --text:       #dce8f5;
+    --text-soft:  #6e8aaa;
+    --text-dim:   #344d68;
+
+    /* Glows */
+    --glow-amber: 0 0 12px rgba(240,168,50,0.50), 0 0 36px rgba(240,168,50,0.20), 0 0 80px rgba(240,168,50,0.08);
+    --glow-mint:  0 0 12px rgba(52,232,180,0.44), 0 0 32px rgba(52,232,180,0.16);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; }
 
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Space Mono', monospace;
+    font-family: 'Figtree', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
   }
 
-  /* ── Grid background ── */
+  /* ── Dot-grid background ── */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image:
-      linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
+    background-image: radial-gradient(rgba(240,168,50,0.10) 1px, transparent 1px);
+    background-size: 28px 28px;
     pointer-events: none;
     z-index: 0;
   }
 
-  /* ── Radial ambient light ── */
-  body::after {
-    content: '';
+  /* ── Gradient mesh blobs ── */
+  .blob {
     position: fixed;
-    top: -30vh;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80vw;
-    height: 80vh;
-    background: radial-gradient(ellipse, #00d4ff0d 0%, transparent 70%);
+    border-radius: 50%;
     pointer-events: none;
     z-index: 0;
+    filter: blur(110px);
+  }
+  .blob-1 {
+    width: 720px; height: 480px;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at 40% 50%,
+      rgba(240,168,50,0.11) 0%,
+      rgba(157,125,255,0.06) 55%,
+      transparent 75%);
+  }
+  .blob-2 {
+    width: 500px; height: 500px;
+    bottom: -160px; right: -80px;
+    background: radial-gradient(ellipse,
+      rgba(52,232,180,0.09) 0%,
+      transparent 65%);
+  }
+  .blob-3 {
+    width: 300px; height: 300px;
+    bottom: 20%; left: -60px;
+    background: radial-gradient(ellipse,
+      rgba(157,125,255,0.07) 0%,
+      transparent 65%);
   }
 
   /* ── Layout ── */
   .wrapper {
     position: relative;
     z-index: 1;
-    max-width: 760px;
+    max-width: 700px;
     margin: 0 auto;
-    padding: 6rem 2rem 8rem;
+    padding: 5.5rem 2rem 7rem;
   }
 
   /* ── Header ── */
-  header {
-    text-align: center;
-    margin-bottom: 5rem;
-  }
+  header { margin-bottom: 4rem; }
 
   .eyebrow {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.3em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--accent);
-    opacity: 0.7;
-    margin-bottom: 1.2rem;
+    color: var(--amber);
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+  }
+  .eyebrow-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 6px var(--amber);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
   }
 
   h1 {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-size: clamp(2.4rem, 6vw, 3.8rem);
     font-weight: 900;
-    letter-spacing: 0.05em;
-    line-height: 1.1;
-    background: linear-gradient(135deg, #ffffff 30%, var(--accent) 70%, var(--accent2) 100%);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 1.2rem;
+  }
+  .title-etc {
+    display: block;
+    background: linear-gradient(110deg,
+      #ffffff 0%,
+      var(--amber-lite) 40%,
+      var(--amber) 65%,
+      var(--mint) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: none;
-    margin-bottom: 0.5rem;
+  }
+  .title-sub {
+    display: block;
+    font-family: 'Figtree', sans-serif;
+    font-weight: 500;
+    font-size: 0.38em;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    -webkit-text-fill-color: var(--text-soft);
+    color: var(--text-soft);
+    background: none;
+    margin-top: 0.8rem;
   }
 
   .subtitle {
-    font-size: 0.72rem;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-soft);
+    line-height: 1.8;
+    max-width: 460px;
+  }
+  .subtitle code {
+    font-family: 'Figtree', monospace;
+    font-weight: 600;
+    font-size: 0.85em;
+    color: var(--amber-lite);
+    background: var(--amber-dim);
+    padding: 0.1em 0.45em;
+    border-radius: 4px;
   }
 
-  /* ── Divider ── */
-  .divider {
+  /* stat pills */
+  .stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 2rem;
+  }
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.42em 1em;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    font-size: 0.71rem;
+    font-weight: 500;
+    color: var(--text-soft);
+  }
+  .stat-pill strong {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* ── Section header ── */
+  .section-header {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin: 3rem 0;
+    margin: 3rem 0 0.75rem;
   }
-  .divider::before, .divider::after {
-    content: '';
+  .section-tag {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .section-rule {
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
-  }
-  .divider-symbol {
-    font-size: 0.7rem;
-    color: var(--accent);
-    opacity: 0.5;
-    letter-spacing: 0.2em;
+    background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
   }
 
-  /* ── Section label ── */
-  .section-label {
-    font-size: 0.6rem;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 1.2rem;
-    padding-left: 1.2rem;
-    border-left: 2px solid var(--border);
-  }
-
-  /* ── TOC entries ── */
+  /* ── TOC cards ── */
   .toc-group {
-    margin-bottom: 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
   }
 
   .toc-item {
-    display: flex;
-    align-items: baseline;
-    gap: 0;
-    position: relative;
-    margin-bottom: 0.5rem;
     opacity: 0;
-    transform: translateX(-16px);
-    animation: slideIn 0.5s ease forwards;
+    transform: translateY(8px);
+    animation: fadeUp 0.42s cubic-bezier(0.22,1,0.36,1) forwards;
   }
-
-  @keyframes slideIn {
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  /* staggered delays */
-  .toc-item:nth-child(1)  { animation-delay: 0.05s; }
-  .toc-item:nth-child(2)  { animation-delay: 0.10s; }
-  .toc-item:nth-child(3)  { animation-delay: 0.15s; }
-  .toc-item:nth-child(4)  { animation-delay: 0.20s; }
-  .toc-item:nth-child(5)  { animation-delay: 0.25s; }
-  .toc-item:nth-child(6)  { animation-delay: 0.30s; }
-  .toc-item:nth-child(7)  { animation-delay: 0.35s; }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  .toc-item:nth-child(1) { animation-delay: 0.04s; }
+  .toc-item:nth-child(2) { animation-delay: 0.10s; }
+  .toc-item:nth-child(3) { animation-delay: 0.16s; }
+  .toc-item:nth-child(4) { animation-delay: 0.22s; }
+  .toc-item:nth-child(5) { animation-delay: 0.28s; }
+  .toc-item:nth-child(6) { animation-delay: 0.34s; }
+  .toc-item:nth-child(7) { animation-delay: 0.40s; }
 
   .toc-link {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
-    width: 100%;
-    padding: 0.85rem 1.2rem;
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 6px;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
     text-decoration: none;
     color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.82rem;
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
     transition:
-      background 0.25s,
-      border-color 0.25s,
-      color 0.25s,
-      box-shadow 0.25s,
-      transform 0.2s;
-    cursor: pointer;
+      background   0.22s ease,
+      border-color 0.22s ease,
+      box-shadow   0.28s ease,
+      transform    0.22s ease;
+  }
+
+  /* shimmer sweep */
+  .toc-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg,
+      transparent 20%,
+      rgba(240,168,50,0.05) 50%,
+      transparent 80%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
   }
 
   .toc-link:hover {
-    background: rgba(0, 212, 255, 0.05);
-    border-color: var(--accent);
-    color: #ffffff;
-    box-shadow: var(--glow-lg), inset 0 0 20px rgba(0,212,255,0.04);
-    transform: translateX(6px);
+    background: var(--surface-hi);
+    border-color: rgba(240,168,50,0.40);
+    box-shadow: var(--glow-amber);
+    transform: translateY(-2px) translateX(2px);
+    color: #fff;
   }
-
-  .toc-link:hover .num {
-    color: var(--accent);
-    text-shadow: var(--glow-sm);
-  }
-
-  .toc-link:hover .arrow {
-    opacity: 1;
-    transform: translateX(4px);
-    color: var(--accent);
-  }
+  .toc-link:hover::after { opacity: 1; }
+  .toc-link:hover .num   { color: var(--amber); text-shadow: 0 0 10px rgba(240,168,50,0.7); }
+  .toc-link:hover .arrow { opacity: 1; transform: translateX(5px); color: var(--amber); }
+  .toc-link:hover .icon  { opacity: 0.9; }
 
   .num {
-    font-size: 0.65rem;
-    color: var(--muted);
-    min-width: 1.5rem;
-    transition: color 0.25s, text-shadow 0.25s;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    min-width: 1.7rem;
     flex-shrink: 0;
+    transition: color 0.22s, text-shadow 0.22s;
   }
 
-  .label {
-    flex: 1;
-    line-height: 1.4;
+  .icon {
+    font-size: 0.88rem;
+    flex-shrink: 0;
+    opacity: 0.45;
+    transition: opacity 0.22s;
   }
+
+  .label { flex: 1; }
+
+  .label-main {
+    display: block;
+    line-height: 1.25;
+  }
+  .label-desc {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text-soft);
+    margin-top: 0.2rem;
+    transition: color 0.22s;
+  }
+  .toc-link:hover .label-desc { color: rgba(255,255,255,0.45); }
 
   .badge {
+    font-family: 'Figtree', sans-serif;
     font-size: 0.55rem;
+    font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    padding: 0.15em 0.55em;
-    border-radius: 3px;
+    padding: 0.25em 0.75em;
+    border-radius: 20px;
     flex-shrink: 0;
   }
-
-  .badge-new {
-    background: rgba(0, 212, 255, 0.12);
-    color: var(--accent);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-  }
-
-  .badge-wip {
-    background: rgba(240, 192, 64, 0.1);
-    color: var(--gold);
-    border: 1px solid rgba(240, 192, 64, 0.25);
-  }
+  .badge-live { background: var(--mint-dim);   color: var(--mint);   border: 1px solid rgba(52,232,180,0.30); }
+  .badge-wip  { background: var(--violet-dim); color: var(--violet); border: 1px solid rgba(157,125,255,0.28); }
 
   .arrow {
-    font-size: 0.7rem;
+    font-size: 0.82rem;
     opacity: 0;
     transform: translateX(0);
-    transition: opacity 0.2s, transform 0.2s, color 0.2s;
     flex-shrink: 0;
+    transition: opacity 0.2s, transform 0.22s, color 0.2s;
   }
 
-  /* Sub-items (h3) */
+  /* ── Sub-items ── */
+  .toc-item.sub { padding-left: 1.8rem; }
   .toc-item.sub .toc-link {
-    padding-left: 2.6rem;
-    font-size: 0.75rem;
-    color: var(--muted);
-    border-left: 1px solid var(--border);
-    border-radius: 0 6px 6px 0;
-    margin-left: 1.6rem;
+    background: rgba(255,255,255,0.018);
+    border: 1px solid transparent;
+    border-radius: 9px;
+    padding: 0.72rem 1rem;
+    font-size: 0.81rem;
+    font-weight: 400;
+    color: var(--text-soft);
   }
   .toc-item.sub .toc-link:hover {
+    background: var(--surface);
+    border-color: rgba(52,232,180,0.35);
+    box-shadow: var(--glow-mint);
     color: var(--text);
-    border-left-color: var(--accent2);
-    border-color: var(--accent2);
-    box-shadow: 0 0 12px #7b61ff44, 0 0 30px #7b61ff22;
-    transform: translateX(4px);
+    transform: translateY(-1px) translateX(2px);
   }
   .toc-item.sub .toc-link:hover .num {
-    color: var(--accent2);
-    text-shadow: 0 0 8px #7b61ff88;
+    color: var(--mint);
+    text-shadow: 0 0 8px rgba(52,232,180,0.65);
   }
-  .toc-item.sub .toc-link:hover .arrow {
-    color: var(--accent2);
-  }
+  .toc-item.sub .toc-link:hover .arrow { color: var(--mint); }
 
-  /* ── Footer link ── */
+  /* ── Footer ── */
+  .footer {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
   .back-link {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 4rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: var(--text-soft);
     text-decoration: none;
-    transition: color 0.2s;
+    transition: color 0.2s, text-shadow 0.2s;
   }
   .back-link:hover {
-    color: var(--accent);
-    text-shadow: var(--glow-sm);
+    color: var(--amber);
+    text-shadow: 0 0 12px rgba(240,168,50,0.5);
   }
-
-  /* ── Scan-line overlay ── */
-  .scanlines {
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.03) 2px,
-      rgba(0,0,0,0.03) 4px
-    );
-    pointer-events: none;
-    z-index: 999;
+  .version-tag {
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
   }
-
-  /* ── Corner decoration ── */
-  .corner {
-    position: fixed;
-    width: 60px;
-    height: 60px;
-    opacity: 0.25;
-  }
-  .corner--tl { top: 1.5rem; left: 1.5rem;
-    border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); }
-  .corner--br { bottom: 1.5rem; right: 1.5rem;
-    border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); }
 </style>
 </head>
 <body>
 
-<div class="scanlines"></div>
-<div class="corner corner--tl"></div>
-<div class="corner corner--br"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
 
 <div class="wrapper">
 
   <header>
-    <p class="eyebrow">Encyclopedia of Triangle Centers</p>
-    <h1>ETC Center Table</h1>
-    <p class="subtitle">// repository navigation · main branch</p>
+    <p class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      Encyclopedia of Triangle Centers
+    </p>
+    <h1>
+      <span class="title-etc">ETC Center Locus Table</span>
+      <span class="title-sub">Repository Navigation</span>
+    </h1>
+    <p class="subtitle">
+      The compilation of triangle center locus with parametric outputs <code>x(t)</code>, <code>y(t)</code> symbolically computed via a decoupled JSON pipeline —
+      symbolic workloads resumable and memory-safe outside a monolithic notebook runtime.
+    </p>
+    <div class="stat-row">
+      <span class="stat-pill"><strong>3</strong>&nbsp;pipeline phases</span>
+      <span class="stat-pill"><strong>JSON</strong>&nbsp;data format</span>
+      <span class="stat-pill"><strong>SymPy</strong>&nbsp;solver</span>
+      <span class="stat-pill"><strong>loky · pebble</strong>&nbsp;backends</span>
+    </div>
   </header>
 
-  <p class="section-label">Overview</p>
-
+  <!-- Overview -->
+  <div class="section-header">
+    <span class="section-tag">Overview</span>
+    <span class="section-rule"></span>
+  </div>
   <div class="toc-group">
     <div class="toc-item">
-      <a class="toc-link"
-         href="https://github.com/MMathster/ETC-Center-Table#readme">
+      <a class="toc-link" href="https://github.com/MMathster/ETC-Center-Table#readme">
         <span class="num">00</span>
-        <span class="label">Project Summary</span>
+        <span class="icon">◈</span>
+        <span class="label">
+          <span class="label-main">Project Summary</span>
+          <span class="label-desc">What this repository computes and why</span>
+        </span>
         <span class="arrow">→</span>
       </a>
     </div>
@@ -347,85 +457,105 @@
          href="https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb"
          target="_blank" rel="noopener">
         <span class="num">01</span>
-        <span class="label">Run Thales Notebook · Binder</span>
-        <span class="badge badge-new">live</span>
+        <span class="icon">⚡</span>
+        <span class="label">
+          <span class="label-main">Run Thales Notebook · Binder</span>
+          <span class="label-desc">Launch a live JupyterLab session in-browser</span>
+        </span>
+        <span class="badge badge-live">live</span>
         <span class="arrow">↗</span>
       </a>
     </div>
     <div class="toc-item">
-      <a class="toc-link"
-         href="https://github.com/MMathster/ETC-Center-Table#current-progress">
+      <a class="toc-link" href="https://github.com/MMathster/ETC-Center-Table#current-progress">
         <span class="num">02</span>
-        <span class="label">Current Progress</span>
+        <span class="icon">◎</span>
+        <span class="label">
+          <span class="label-main">Current Progress</span>
+          <span class="label-desc">Notebook validation + production pipeline status</span>
+        </span>
         <span class="badge badge-wip">wip</span>
         <span class="arrow">→</span>
       </a>
     </div>
   </div>
 
-  <div class="divider"><span class="divider-symbol">✦</span></div>
-  <p class="section-label">Pipeline</p>
-
+  <!-- Pipeline -->
+  <div class="section-header">
+    <span class="section-tag">Pipeline</span>
+    <span class="section-rule"></span>
+  </div>
   <div class="toc-group">
     <div class="toc-item">
-      <a class="toc-link"
-         href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
+      <a class="toc-link" href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
         <span class="num">03</span>
-        <span class="label">3-Phase JSON Pipeline</span>
+        <span class="icon">⬡</span>
+        <span class="label">
+          <span class="label-main">3-Phase JSON Pipeline</span>
+          <span class="label-desc">End-to-end architecture overview</span>
+        </span>
         <span class="arrow">→</span>
       </a>
     </div>
     <div class="toc-item sub">
-      <a class="toc-link"
-         href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
-        <span class="num">↳</span>
-        <span class="label">01 · Extraction / Registry</span>
+      <a class="toc-link" href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
+        <span class="num">↳ 1</span>
+        <span class="label"><span class="label-main">Extraction / Registry</span></span>
         <span class="arrow">→</span>
       </a>
     </div>
     <div class="toc-item sub">
-      <a class="toc-link"
-         href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
-        <span class="num">↳</span>
-        <span class="label">02 · Parallel Compute Engine</span>
+      <a class="toc-link" href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
+        <span class="num">↳ 2</span>
+        <span class="label"><span class="label-main">Parallel Compute Engine</span></span>
         <span class="arrow">→</span>
       </a>
     </div>
     <div class="toc-item sub">
-      <a class="toc-link"
-         href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
-        <span class="num">↳</span>
-        <span class="label">03 · Asset Compiler</span>
+      <a class="toc-link" href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
+        <span class="num">↳ 3</span>
+        <span class="label"><span class="label-main">Asset Compiler</span></span>
         <span class="arrow">→</span>
       </a>
     </div>
     <div class="toc-item">
-      <a class="toc-link"
-         href="https://github.com/MMathster/ETC-Center-Table#black-hole-protections-stalled-batch-mitigation">
+      <a class="toc-link" href="https://github.com/MMathster/ETC-Center-Table#black-hole-protections-stalled-batch-mitigation">
         <span class="num">04</span>
-        <span class="label">Black-Hole Protections</span>
+        <span class="icon">⊗</span>
+        <span class="label">
+          <span class="label-main">Black-Hole Protections</span>
+          <span class="label-desc">Timeout guards, canary probes &amp; complexity ordering</span>
+        </span>
         <span class="arrow">→</span>
       </a>
     </div>
     <div class="toc-item">
-      <a class="toc-link"
-         href="https://github.com/MMathster/ETC-Center-Table#compatibility-wrappers">
+      <a class="toc-link" href="https://github.com/MMathster/ETC-Center-Table#compatibility-wrappers">
         <span class="num">05</span>
-        <span class="label">Compatibility Wrappers</span>
+        <span class="icon">⇌</span>
+        <span class="label">
+          <span class="label-main">Compatibility Wrappers</span>
+          <span class="label-desc">Legacy script name aliases</span>
+        </span>
         <span class="arrow">→</span>
       </a>
     </div>
   </div>
 
-  <div class="divider"><span class="divider-symbol">✦</span></div>
-  <p class="section-label">Reference</p>
-
+  <!-- Reference -->
+  <div class="section-header">
+    <span class="section-tag">Reference</span>
+    <span class="section-rule"></span>
+  </div>
   <div class="toc-group">
     <div class="toc-item">
-      <a class="toc-link"
-         href="https://github.com/MMathster/ETC-Center-Table#notes">
+      <a class="toc-link" href="https://github.com/MMathster/ETC-Center-Table#notes">
         <span class="num">06</span>
-        <span class="label">Notes &amp; Architecture</span>
+        <span class="icon">✦</span>
+        <span class="label">
+          <span class="label-main">Notes &amp; Codex Corrections</span>
+          <span class="label-desc">Solver wiring, migration hints &amp; Codex change log</span>
+        </span>
         <span class="arrow">→</span>
       </a>
     </div>
@@ -434,16 +564,22 @@
          href="https://github.com/MMathster/ETC-Center-Table/blob/main/docs/pipeline_architecture.md"
          target="_blank" rel="noopener">
         <span class="num">07</span>
-        <span class="label">Pipeline Architecture Doc</span>
+        <span class="icon">⊞</span>
+        <span class="label">
+          <span class="label-main">Pipeline Architecture Doc</span>
+          <span class="label-desc">Full architecture &amp; migration plan</span>
+        </span>
         <span class="arrow">↗</span>
       </a>
     </div>
   </div>
 
-  <a class="back-link"
-     href="https://github.com/MMathster/ETC-Center-Table">
-    ← github.com/MMathster/ETC-Center-Table
-  </a>
+  <footer class="footer">
+    <a class="back-link" href="https://github.com/MMathster/ETC-Center-Table">
+      ← github.com/MMathster/ETC-Center-Table
+    </a>
+    <span class="version-tag">main · auto-generated toc</span>
+  </footer>
 
 </div>
 </body>
