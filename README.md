@@ -1,3 +1,6 @@
+<!-- START doctoc -->
+<!-- END doctoc -->
+
 # ETC Center Table
 
 ## The Engineering Challenge: Optimization for Scale
