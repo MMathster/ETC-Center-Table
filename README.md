@@ -20,7 +20,9 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# ETC Center Table
+# ETC Center Table: The Geometry of the Loci
+
+> A systematic investigation into the symbolic Cartesian loci of triangle centers within dynamic configurations.
 
 [![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
 
