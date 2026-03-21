@@ -147,7 +147,7 @@ python scripts/analyze_cache.py
 - The notebook (`ETC_Center_Table_Thales.ipynb`) is still present for research and validation.
 - A repository-first 3-phase pipeline now exists for production-scale runs.
 
-## 3-phase JSON pipeline
+### 3-phase JSON pipeline
 
 1. **Extraction/Registry**: `scripts/01_run_extraction.py`
    - Input: `data/raw_html/parsed_centers.json` (or your own parsed scrape output)
@@ -171,7 +171,7 @@ python scripts/analyze_cache.py
      - `data/03_compiled/chunks/etc_data_chunk_*.json`
 
 
-## Black-hole protections (stalled batch mitigation)
+### Black-hole protections (stalled batch mitigation)
 
 `02_run_computation.py` now includes guardrails for pathological SymPy workloads:
 
@@ -187,7 +187,7 @@ Example:
 python scripts/02_run_computation.py --backend pebble --timeout-seconds 5 --canary-limit 20
 ```
 
-## Compatibility wrappers
+### Compatibility wrappers
 
 The previous script names are kept as wrappers:
 
@@ -195,7 +195,7 @@ The previous script names are kept as wrappers:
 - `scripts/02_compute_cartesian.py` -> `02_run_computation.py`
 - `scripts/03_build_final_tables.py` -> `03_build_final_output.py`
 
-## Notes
+### Notes
 
 - The current solver in `src/geometry_logic.py` is intentionally minimal wiring; migrate the full Section 11 SymPy pipeline into this module incrementally.
 - See `docs/pipeline_architecture.md` for architecture and migration plan details.
