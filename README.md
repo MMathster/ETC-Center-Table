@@ -163,7 +163,7 @@ With more triangle centers to come and different geometrical compositions to dis
 
   <!-- Image on top, centered -->
   <div style="text-align:center; padding:16px; border-bottom:1px solid #555;">
-    <img src="assets/images/x11_locus.gif" width="280px">
+    <img src="assets/images/x11_locus.gif" width="100%">
   </div>
 
   <!-- Table on bottom -->
