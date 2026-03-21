@@ -159,56 +159,54 @@ With more triangle centers to come and different geometrical compositions to dis
   </tr>
 </table>
 
-<div style="display:flex; align-items:flex-start; gap:24px; flex-wrap:wrap;">
+<div style="display:inline-block; border:1px solid #555; border-radius:8px; overflow:hidden; width:100%; max-width:600px;">
 
-  <!-- Left: Image -->
-  <div style="flex:0 0 auto;">
-    <img src="assets/images/x11_locus.gif" width="300px">
+  <!-- Image on top, centered -->
+  <div style="text-align:center; padding:16px; border-bottom:1px solid #555;">
+    <img src="assets/images/x11_locus.gif" width="280px">
   </div>
 
-  <!-- Right: Content -->
-  <div style="flex:1 1 auto;">
-    <table style="border-collapse:collapse; text-align:left; width:100%;">
-      <tbody>
-        <tr>
-          <td style="padding:6px 10px; border:1px solid #555;"><strong>Name</strong></td>
-          <td style="padding:6px 10px; border:1px solid #555;">Feuerbach Point</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 10px; border:1px solid #555;"><strong>ETC Reference</strong></td>
-          <td style="padding:6px 10px; border:1px solid #555;">$X_{11}$</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 10px; border:1px solid #555;"><strong>Locus Type</strong></td>
-          <td style="padding:6px 10px; border:1px solid #555;">Rational Quartic Curve</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 10px; border:1px solid #555;"><strong>Barycentric Coordinates</strong></td>
-          <td style="padding:6px 10px; border:1px solid #555;">$(s-a)(b-c)^2 : (s-b)(c-a)^2 : (s-c)(a-b)^2$</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 10px; border:1px solid #555;"><strong>Semiperimeter</strong></td>
-          <td style="padding:6px 10px; border:1px solid #555;">$s = \dfrac{1}{2}(a + b + c)$</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 10px; border:1px solid #555;"><strong>Angle Substitution</strong></td>
-          <td style="padding:6px 10px; border:1px solid #555;">$t = \tan\dfrac{\theta}{4}$ with $0 \leq t < 1$</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 10px; border:1px solid #555;"><strong>Parametric Curve (upper plane)</strong></td>
-          <td style="padding:6px 10px; border:1px solid #555;">$\left(\dfrac{1 - 4t + 3t^2 + 8t^3 - 13t^4 - 4t^5 + t^6}{(1+t^2)^2(1 - 4t + 5t^2)}, \dfrac{2t(1-t)(1 - 2t - t^2)^2}{(1+t^2)^2(1 - 4t + 5t^2)}\right)$</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 10px; border:1px solid #555;"><strong>View on GeoGebra</strong></td>
-          <td style="padding:6px 10px; border:1px solid #555;">
-            <a href="https://www.geogebra.org/classic/uhu2ap6q" target="_blank" class="glow-new-version">
-              <img src="https://img.shields.io/badge/Open_Full_Screen-Geogebra-6557D2?style=for-the-badge&logo=geogebra&logoColor=black">
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <!-- Table on bottom -->
+  <table style="border-collapse:collapse; width:100%;">
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Name</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">Feuerbach Point</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>ETC Reference</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">$X_{11}$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Locus Type</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">Rational Quartic Curve</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Barycentric Coordinates</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">$(s-a)(b-c)^2 : (s-b)(c-a)^2 : (s-c)(a-b)^2$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Semiperimeter</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">$s = \dfrac{1}{2}(a + b + c)$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Angle Substitution</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">$t = \tan\dfrac{\theta}{4}$ with $0 \leq t < 1$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Parametric Curve (upper plane)</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">$\left(\dfrac{1 - 4t + 3t^2 + 8t^3 - 13t^4 - 4t^5 + t^6}{(1+t^2)^2(1 - 4t + 5t^2)},\ \dfrac{2t(1-t)(1 - 2t - t^2)^2}{(1+t^2)^2(1 - 4t + 5t^2)}\right)$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-right:1px solid #555; white-space:nowrap;"><strong>View on GeoGebra</strong></td>
+        <td style="padding:6px 10px;">
+          <a href="https://www.geogebra.org/classic/uhu2ap6q" target="_blank" class="glow-new-version">
+            <img src="https://img.shields.io/badge/Open_Full_Screen-Geogebra-6557D2?style=for-the-badge&logo=geogebra&logoColor=black">
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
 </div>
 
