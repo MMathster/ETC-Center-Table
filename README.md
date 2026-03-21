@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-    - [$X(11)$: Feuerbach Point](#x11-feuerbach-point)
+    - [$X_{11}$: Feuerbach Point](#x_11-feuerbach-point)
 - [🌟 ETC Center Table: The Geometry of the Loci](#-etc-center-table-the-geometry-of-the-loci)
   - [🚀 Run the Thales Notebook with Repository Binding](#-run-the-thales-notebook-with-repository-binding)
   - [🔧 The Engineering Challenge: Optimization for Scale](#-the-engineering-challenge-optimization-for-scale)
