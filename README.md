@@ -135,7 +135,7 @@ With more triangle centers to come and different geometrical compositions to dis
     <td valign="top">
       <table>
         <tr>
-          <th></th>
+          <th>**Category**</th>
           <th>**Incenter**</th>
           <th>**Centroid**</th>
           <th>**Nagel Point**</th>
