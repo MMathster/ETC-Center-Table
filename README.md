@@ -5,9 +5,9 @@
 Processing the ETC is not merely a math problem; it is a systems engineering problem. A naive approach using standard trigonometric simplification fails due to the exponential complexity of deep-nested identities.
 
 **The Architecture Transition**
-- **V1 (Baseline)**: Relied on sympy.trigsimp(). Throughput was ~0.01 centers/sec. Most tasks timed out or deadlocked the Python Global Interpreter Lock (GIL).
+- **V1 (Baseline)**: Relied on sympy.trigsimp(). Throughput was $\sim 0.01$ centers/sec. Most tasks timed out or deadlocked the Python Global Interpreter Lock (GIL).
 - **Current**: Implements a Zero-Trig Pipeline. By utilizing the Thales Configuration (mapping the triangle to a unit circumcircle with $C = \pi/2$) and Weierstrass Substitution, the pipeline bypasses trigonometry entirely.
-- **Performance**: Current benchmarks show 1.0 – 2.5 tasks/sec, a 250x improvement in throughput.
+- **Performance**: Current benchmarks show $1.0 – 2.5$ tasks/sec, a $250$x improvement in throughput.
 
 ## Mathematical Background
 
