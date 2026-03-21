@@ -130,23 +130,6 @@ With more triangle centers to come and different geometrical compositions to dis
 <table>
   <tr>
     <td width="50%">
-      <img src="assets/images/x8_locus.gif" width="100%">
-    </td>
-    <td valign="top">
-      |**Category**|**Incenter**|**Centroid**|**Nagel Point**|
-      |:---:|:---:|:---:|:---:|
-      |**ETC Reference**|$X_1$|$X_2$|$X_8$|
-      |**Parametric Curve (Upper Plane)**|$\left(\dfrac{1 - 2t - t^2}{1 + t^2}, \dfrac{2t(1 - t)}{1 + t^2}\right)$|\left(\dfrac{1}{3} \dfrac{1 - 6t^2 + t^4}{(1 + t^2)^2}, \dfrac{1}{3}\dfrac{4t(1 - t^2)}{(1 + t^2)^2}\right)$|$\left(\dfrac{1 - 4t + 3t^2 + 8t^3 - 13t^4 - 4t^5 + t^6}{(1 + t^2)^2(1 - 4t + 5t^2)}, \dfrac{2t(1 - t)(1 - 2t - t^2)^2}{(1 + t^2)^2(1 - 4t + 5t^2)}\right)$|
-      <p><b>View on Geogebra:</b>  <a href="https://www.geogebra.org/classic/jqnrskqw" target="_blank" class="glow-new-version">
-     <img src="https://img.shields.io/badge/Open_Full_Screen-Geogebra-6557D2?style=for-the-badge&logo=geogebra&logoColor=black">
-  </a></p>
-    </td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <td width="50%">
       <img src="assets/images/x11_locus.gif" width="100%">
     </td>
     <td valign="top">
