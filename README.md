@@ -177,6 +177,14 @@ With more triangle centers to come and different geometrical compositions to dis
         <td style="padding:6px 10px; border-right:1px solid #555; text-align:center;">$\left(\dfrac{1 - 6t^2 + t^4}{3(1 + t^2)^2},\ \dfrac{4t(1 - t^2)}{3(1 + t^2)^2}\right)$</td>
         <td style="padding:6px 10px; text-align:center;">$\left(\dfrac{(1 - 2t + 3t^2)(1 + 2t - 3t^2)}{(1 + t^2)^2},\ \dfrac{4t^2(1 - t)^2}{(1 + t^2)^2}\right)$</td>
       </tr>
+      <tr>
+        <td style="padding:6px 10px; border-right:1px solid #555; white-space:nowrap;"><strong>View on GeoGebra</strong></td>
+        <td style="padding:6px 10px;" colspan="3">
+          <a href="https://www.geogebra.org/classic/jqnrskqw" target="_blank" class="glow-new-version">
+            <img src="https://img.shields.io/badge/Open_Full_Screen-Geogebra-6557D2?style=for-the-badge&logo=geogebra&logoColor=black">
+          </a>
+        </td>
+      </tr>
     </tbody>
   </table>
 
