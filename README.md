@@ -119,7 +119,7 @@ Since triangle side lengths are of the form $\sin\frac{\theta}{2}$ and $\cos\fra
 
 Extending this to mixed angle denominators, we can deduce that for the universal substitution $t = \tan\left(\frac{\theta}{p}\right)$ where $p$ is an integer,
 
-- For angle powers of $2$'s only, $p = 2^{\mathrm{max} + 1}$, where $\max$ checks $2$-denominators. For instance, for expressions with the deepest factor $4$, like $\tan\frac{\theta}{4}\cos\frac{\theta}{2}$, we set $t = \tan\frac{\theta}{4 \cdot 2} = \tan\frac{\theta}{8}$.
+- For angle powers of $2$'s only, $p = 2^{\mathrm{max} + 1}$, where $\max$ checks $2$-denominators.
 - Otherwise, for angle powers of different prime factors, $p$ takes the least common demoninator of existing angle denominators after the substitution. For instance, for expressions, like $\tan\frac{\theta}{3}\cos\frac{\theta}{2}$, we set $t = \tan\frac{\theta}{6}$.
 
 ## 📚 Filtering & Classification
