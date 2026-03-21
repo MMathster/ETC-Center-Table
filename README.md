@@ -127,43 +127,67 @@ Extending this to mixed angle denominators, we can deduce that for the universal
 
 With more triangle centers to come and different geometrical compositions to discover, there are some fascinating discoveries, regarding how $\theta$ interacts with the triangle center $X_n$.
 
-<table align="center">
-  <tr>
-    <td width="50%">
-      <img src="assets/images/x8_locus.gif" width="100%">
-    </td>
-    <td valign="top">
-      <table>
-        <tr>
-          <th><b>Category</b></th>
-          <th><b>Incenter</b></th>
-          <th><b>Centroid</b></th>
-          <th><b>Nagel Point</b></th>
-        </tr>
-        <tr>
-          <td><b>ETC Reference</b></td>
-          <td>$X_1$</td>
-          <td>$X_2$</td>
-          <td>$X_8$</td>
-        </tr>
-        <tr>
-          <td><b>Locus Type</b></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td><b>Barycentric Coordinates</b></td>
-        </tr>
-    </td>
-  </tr>
-</table>
+<!---Three Points X1, X2, X8--->
+<div style="display:inline-block; border:1px solid #555; border-radius:8px; overflow:hidden; width:100%; max-width:700px;">
 
+  <!-- Image on top, centered -->
+  <div style="text-align:center; padding:16px; border-bottom:1px solid #555;">
+    <img src="assets/images/x8_locus.gif" width="280px">
+  </div>
+
+  <!-- Comparison table on bottom -->
+  <table style="border-collapse:collapse; width:100%;">
+    <thead>
+      <tr>
+        <th style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555;">Category</th>
+        <th style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; text-align:center;">Incenter</th>
+        <th style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; text-align:center;">Centroid</th>
+        <th style="padding:6px 10px; border-bottom:1px solid #555; text-align:center;">Nagel Point</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>ETC Reference</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; text-align:center;">$X_1$</td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; text-align:center;">$X_2$</td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; text-align:center;">$X_8$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Locus Type</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; text-align:center;">Rational Quartic</td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; text-align:center;">Rational Quadratic</td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; text-align:center;">Rational Quartic</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Barycentric Coordinates</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; text-align:center;">$a : b : c$</td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; text-align:center;">$\dfrac{1}{3} : \dfrac{1}{3} : \dfrac{1}{3}$</td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; text-align:center;">
+          $s - a : s - b : s - c$<br>
+          <small>with $s = \dfrac{1}{2}(a + b + c)$ the semiperimeter</small>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Angle Substitution</strong></td>
+        <td colspan="3" style="padding:6px 10px; border-bottom:1px solid #555; text-align:center;">$t = \tan\dfrac{\theta}{4}$ for $0 \leq t \leq 1$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-right:1px solid #555; white-space:nowrap;"><strong>Parametric Curve</strong></td>
+        <td style="padding:6px 10px; border-right:1px solid #555; text-align:center;">$\left(\dfrac{1 - 2t - t^2}{1 + t^2},\ \dfrac{2t(1 - t)}{1 + t^2}\right)$</td>
+        <td style="padding:6px 10px; border-right:1px solid #555; text-align:center;">$\left(\dfrac{1 - 6t^2 + t^4}{3(1 + t^2)^2},\ \dfrac{4t(1 - t^2)}{3(1 + t^2)^2}\right)$</td>
+        <td style="padding:6px 10px; text-align:center;">$\left(\dfrac{(1 - 2t + 3t^2)(1 + 2t - 3t^2)}{(1 + t^2)^2},\ \dfrac{4t^2(1 - t)^2}{(1 + t^2)^2}\right)$</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!---Feuerbach Table--->
 <div style="display:inline-block; border:1px solid #555; border-radius:8px; overflow:hidden; width:100%; max-width:600px;">
 
   <!-- Image on top, centered -->
   <div style="text-align:center; padding:16px; border-bottom:1px solid #555;">
-    <img src="assets/images/x11_locus.gif" width="100%">
+    <img src="assets/images/x11_locus.gif" width="75%">
   </div>
 
   <!-- Table on bottom -->
