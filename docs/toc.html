@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ETC Center Table — Navigation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Cinzel:wght@600;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:       #06090f;
+    --surface:  #0c1220;
+    --border:   #1a2a45;
+    --accent:   #00d4ff;
+    --accent2:  #7b61ff;
+    --gold:     #f0c040;
+    --text:     #c8ddf5;
+    --muted:    #4a6080;
+    --glow-sm:  0 0 8px #00d4ff88, 0 0 20px #00d4ff33;
+    --glow-lg:  0 0 16px #00d4ffaa, 0 0 40px #00d4ff55, 0 0 80px #00d4ff22;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid background ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Radial ambient light ── */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -30vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80vw;
+    height: 80vh;
+    background: radial-gradient(ellipse, #00d4ff0d 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Layout ── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 6rem 2rem 8rem;
+  }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.7;
+    margin-bottom: 1.2rem;
+  }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #ffffff 30%, var(--accent) 70%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    margin-top: 1rem;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 3rem 0;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+  .divider-symbol {
+    font-size: 0.7rem;
+    color: var(--accent);
+    opacity: 0.5;
+    letter-spacing: 0.2em;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+    padding-left: 1.2rem;
+    border-left: 2px solid var(--border);
+  }
+
+  /* ── TOC entries ── */
+  .toc-group {
+    margin-bottom: 1.6rem;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+    position: relative;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    transform: translateX(-16px);
+    animation: slideIn 0.5s ease forwards;
+  }
+
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* staggered delays */
+  .toc-item:nth-child(1)  { animation-delay: 0.05s; }
+  .toc-item:nth-child(2)  { animation-delay: 0.10s; }
+  .toc-item:nth-child(3)  { animation-delay: 0.15s; }
+  .toc-item:nth-child(4)  { animation-delay: 0.20s; }
+  .toc-item:nth-child(5)  { animation-delay: 0.25s; }
+  .toc-item:nth-child(6)  { animation-delay: 0.30s; }
+  .toc-item:nth-child(7)  { animation-delay: 0.35s; }
+
+  .toc-link {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    padding: 0.85rem 1.2rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    transition:
+      background 0.25s,
+      border-color 0.25s,
+      color 0.25s,
+      box-shadow 0.25s,
+      transform 0.2s;
+    cursor: pointer;
+  }
+
+  .toc-link:hover {
+    background: rgba(0, 212, 255, 0.05);
+    border-color: var(--accent);
+    color: #ffffff;
+    box-shadow: var(--glow-lg), inset 0 0 20px rgba(0,212,255,0.04);
+    transform: translateX(6px);
+  }
+
+  .toc-link:hover .num {
+    color: var(--accent);
+    text-shadow: var(--glow-sm);
+  }
+
+  .toc-link:hover .arrow {
+    opacity: 1;
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+
+  .num {
+    font-size: 0.65rem;
+    color: var(--muted);
+    min-width: 1.5rem;
+    transition: color 0.25s, text-shadow 0.25s;
+    flex-shrink: 0;
+  }
+
+  .label {
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .badge {
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.15em 0.55em;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .badge-new {
+    background: rgba(0, 212, 255, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+  }
+
+  .badge-wip {
+    background: rgba(240, 192, 64, 0.1);
+    color: var(--gold);
+    border: 1px solid rgba(240, 192, 64, 0.25);
+  }
+
+  .arrow {
+    font-size: 0.7rem;
+    opacity: 0;
+    transform: translateX(0);
+    transition: opacity 0.2s, transform 0.2s, color 0.2s;
+    flex-shrink: 0;
+  }
+
+  /* Sub-items (h3) */
+  .toc-item.sub .toc-link {
+    padding-left: 2.6rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    border-left: 1px solid var(--border);
+    border-radius: 0 6px 6px 0;
+    margin-left: 1.6rem;
+  }
+  .toc-item.sub .toc-link:hover {
+    color: var(--text);
+    border-left-color: var(--accent2);
+    border-color: var(--accent2);
+    box-shadow: 0 0 12px #7b61ff44, 0 0 30px #7b61ff22;
+    transform: translateX(4px);
+  }
+  .toc-item.sub .toc-link:hover .num {
+    color: var(--accent2);
+    text-shadow: 0 0 8px #7b61ff88;
+  }
+  .toc-item.sub .toc-link:hover .arrow {
+    color: var(--accent2);
+  }
+
+  /* ── Footer link ── */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 4rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-link:hover {
+    color: var(--accent);
+    text-shadow: var(--glow-sm);
+  }
+
+  /* ── Scan-line overlay ── */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── Corner decoration ── */
+  .corner {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    opacity: 0.25;
+  }
+  .corner--tl { top: 1.5rem; left: 1.5rem;
+    border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); }
+  .corner--br { bottom: 1.5rem; right: 1.5rem;
+    border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+<div class="corner corner--tl"></div>
+<div class="corner corner--br"></div>
+
+<div class="wrapper">
+
+  <header>
+    <p class="eyebrow">Euclidean Triangle Centers</p>
+    <h1>ETC Center Table</h1>
+    <p class="subtitle">// repository navigation · main branch</p>
+  </header>
+
+  <p class="section-label">Overview</p>
+
+  <div class="toc-group">
+    <div class="toc-item">
+      <a class="toc-link"
+         href="https://github.com/MMathster/ETC-Center-Table#readme">
+        <span class="num">00</span>
+        <span class="label">Project Summary</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+    <div class="toc-item">
+      <a class="toc-link"
+         href="https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb"
+         target="_blank" rel="noopener">
+        <span class="num">01</span>
+        <span class="label">Run Thales Notebook · Binder</span>
+        <span class="badge badge-new">live</span>
+        <span class="arrow">↗</span>
+      </a>
+    </div>
+    <div class="toc-item">
+      <a class="toc-link"
+         href="https://github.com/MMathster/ETC-Center-Table#current-progress">
+        <span class="num">02</span>
+        <span class="label">Current Progress</span>
+        <span class="badge badge-wip">wip</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="divider"><span class="divider-symbol">✦</span></div>
+  <p class="section-label">Pipeline</p>
+
+  <div class="toc-group">
+    <div class="toc-item">
+      <a class="toc-link"
+         href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
+        <span class="num">03</span>
+        <span class="label">3-Phase JSON Pipeline</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+    <div class="toc-item sub">
+      <a class="toc-link"
+         href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
+        <span class="num">↳</span>
+        <span class="label">01 · Extraction / Registry</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+    <div class="toc-item sub">
+      <a class="toc-link"
+         href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
+        <span class="num">↳</span>
+        <span class="label">02 · Parallel Compute Engine</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+    <div class="toc-item sub">
+      <a class="toc-link"
+         href="https://github.com/MMathster/ETC-Center-Table#3-phase-json-pipeline">
+        <span class="num">↳</span>
+        <span class="label">03 · Asset Compiler</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+    <div class="toc-item">
+      <a class="toc-link"
+         href="https://github.com/MMathster/ETC-Center-Table#black-hole-protections-stalled-batch-mitigation">
+        <span class="num">04</span>
+        <span class="label">Black-Hole Protections</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+    <div class="toc-item">
+      <a class="toc-link"
+         href="https://github.com/MMathster/ETC-Center-Table#compatibility-wrappers">
+        <span class="num">05</span>
+        <span class="label">Compatibility Wrappers</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="divider"><span class="divider-symbol">✦</span></div>
+  <p class="section-label">Reference</p>
+
+  <div class="toc-group">
+    <div class="toc-item">
+      <a class="toc-link"
+         href="https://github.com/MMathster/ETC-Center-Table#notes">
+        <span class="num">06</span>
+        <span class="label">Notes &amp; Architecture</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+    <div class="toc-item">
+      <a class="toc-link"
+         href="https://github.com/MMathster/ETC-Center-Table/blob/main/docs/pipeline_architecture.md"
+         target="_blank" rel="noopener">
+        <span class="num">07</span>
+        <span class="label">Pipeline Architecture Doc</span>
+        <span class="arrow">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <a class="back-link"
+     href="https://github.com/MMathster/ETC-Center-Table">
+    ← github.com/MMathster/ETC-Center-Table
+  </a>
+
+</div>
+</body>
+</html>
