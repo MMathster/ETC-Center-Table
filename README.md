@@ -1,4 +1,5 @@
-[![Navigation](https://img.shields.io/badge/📐_Navigation-View_ToC-00d4ff?style=for-the-badge&labelColor=06090f)](https://mmathster.github.io/ETC-Center-Table/toc)
+**Interactive Github ToC:**  
+  [![Navigation](https://img.shields.io/badge/📐_Navigation-View_ToC-00d4ff?style=for-the-badge&labelColor=06090f)](https://mmathster.github.io/ETC-Center-Table/toc)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
