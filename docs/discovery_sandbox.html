@@ -1,55 +1,67 @@
 <script>
-    // ... within the Nagel Board section ...
+    // --- Shared Setup ---
+    const setupBoard = (id) => JXG.JSXGraph.initBoard(id, {
+        boundingbox: [-1.5, 1.5, 1.5, -1.5], 
+        axis: true, 
+        showCopyright: false,
+        attributes: { pan: { enabled: true }, zoom: { enabled: true } }
+    });
+
+    // --- Nagel Board (X1, X2, X8) ---
     const b1 = setupBoard('nagel-box');
+    
+    // 1. Add Slider for Angle (0 to 2*Pi)
+    const s1 = b1.create('slider', [[-1.2, -1.2], [0.5, -1.2], [0, 0, 2 * Math.PI]], {name: '&alpha;'});
+    
     const A = b1.create('point', [-1, 0], {name: 'A', fixed: true, color: 'blue', size: 3});
     const B = b1.create('point', [1, 0], {name: 'B', fixed: true, color: 'blue', size: 3});
     const circ = b1.create('circle', [[0,0], 1], {strokeColor: '#ccc', dash: 2});
-    const C = b1.create('glider', [0.6, 0.8, circ], {name: 'C', color: 'blue'});
+    
+    // 2. Bind Point C to the Slider value
+    const C = b1.create('point', [
+        () => Math.cos(s1.Value()), 
+        () => Math.sin(s1.Value())
+    ], {name: 'C', color: 'blue'});
+
     b1.create('polygon', [A, B, C], {fillColor: '#ffff0011', border: {strokeColor: '#ccc'}});
 
-    // Create the Centers
     const X1 = b1.create('incenter', [A, B, C], {name: 'X1', color: 'red', size: 2});
     const X2 = b1.create('centroid', [A, B, C], {name: 'X2', color: 'orange', size: 2});
     const X8 = b1.create('nagelpoint', [A, B, C], {name: 'X8', color: 'purple', size: 2});
     
-    // Create the Loci
+    // Loci
     b1.create('locus', [X1], {strokeColor: 'red', strokeWidth: 1, dash: 1});
     b1.create('locus', [X2], {strokeColor: 'orange', strokeWidth: 1});
     b1.create('locus', [X8], {strokeColor: 'purple', strokeWidth: 1});
-    
-    // Connect them with the Nagel Line
-    b1.create('line', [X1, X8], {strokeColor: '#333', dash: 1, strokeWidth: 1});
-</script>
+    b1.create('line', [X1, X8], {strokeColor: '#333', dash: 1, strokeWidth: 0.5});
 
-<script>
-    // ... within the Feuerbach Board section ...
+    // --- Feuerbach Board (X11) ---
     const b2 = setupBoard('feuerbach-box');
-    // Using visible: true for context
-    const A2 = b2.create('point', [-1, 0], {name: 'A', fixed: true, color: '#bbb', size: 2});
-    const B2 = b2.create('point', [1, 0], {name: 'B', fixed: true, color: '#bbb', size: 2});
-    const circum2 = b2.create('circle', [[0,0], 1], {strokeColor: '#eee'});
-    const C2 = b2.create('glider', [0.5, 0.86, circum2], {name: 'C'});
     
-    // The Feuerbach Point (X11) Formula
+    // 1. Add Slider for Angle
+    const s2 = b2.create('slider', [[-1.2, -1.2], [0.5, -1.2], [0, 1.0, 2 * Math.PI]], {name: '&alpha;'});
+
+    const A2 = b2.create('point', [-1, 0], {fixed: true, visible: true, name:'A', size: 2, color: '#bbb'});
+    const B2 = b2.create('point', [1, 0], {fixed: true, visible: true, name:'B', size: 2, color: '#bbb'});
+    const circum2 = b2.create('circle', [[0,0], 1], {strokeColor: '#eee'});
+    
+    // 2. Bind Point C2 to Slider
+    const C2 = b2.create('point', [
+        () => Math.cos(s2.Value()), 
+        () => Math.sin(s2.Value())
+    ], {name: 'C', color: 'blue'});
+
     const getX11Coord = (idx) => {
         let a = JXG.Math.Geometry.distance(B2.coords.usrCoords, C2.coords.usrCoords);
         let b = JXG.Math.Geometry.distance(A2.coords.usrCoords, C2.coords.usrCoords);
         let c = JXG.Math.Geometry.distance(A2.coords.usrCoords, B2.coords.usrCoords);
-        
-        // Barycentric coordinates for X11: (s-a)(b-c)^2 : (s-b)(c-a)^2 : (s-c)(a-b)^2
         let s = (a + b + c) / 2;
-        let w1 = (s - a) * Math.pow(b - c, 2);
-        let w2 = (s - b) * Math.pow(c - a, 2);
-        let w3 = (s - c) * Math.pow(a - b, 2);
-        let total = w1 + w2 + w3;
-        
-        return (w1 * A2.coords.usrCoords[idx] + w2 * B2.coords.usrCoords[idx] + w3 * C2.coords.usrCoords[idx]) / total;
+        let w = [(s-a)*Math.pow(b-c,2), (s-b)*Math.pow(c-a,2), (s-c)*Math.pow(a-b,2)];
+        let total = w[0] + w[1] + w[2];
+        if (Math.abs(total) < 0.0001) return 0; // Avoid division by zero at endpoints
+        return (w[0]*A2.coords.usrCoords[idx] + w[1]*B2.coords.usrCoords[idx] + w[2]*C2.coords.usrCoords[idx]) / total;
     };
 
-    const X11 = b2.create('point', [() => getX11Coord(1), () => getX11Coord(2)], {
-        name: 'X11', color: 'green', size: 4
-    });
-    
-    // Generate the Locus for X11
+    const X11 = b2.create('point', [() => getX11Coord(1), () => getX11Coord(2)], {name: 'X11', color: 'green', size: 4});
     b2.create('locus', [X11], {strokeColor: 'green', strokeWidth: 2, opacity: 0.6});
 </script>
