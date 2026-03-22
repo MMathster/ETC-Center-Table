@@ -3,459 +3,814 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETC Loci Sandbox — Thales Configuration</title>
+<title>ETC Triangle Centers — Thales Loci</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraph.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraphcore.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraph.min.css">
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraphcore.min.js">
+</script>
 <style>
 :root {
-  --bg:      #0b0f1a;
-  --surface: #121828;
-  --surface2:#1a2236;
-  --border:  #2a3550;
-  --text:    #e8edf8;
-  --dim:     #8fa3c8;
-  --blue:    #4da6ff;
-  --gold:    #ffd166;
-  --green:   #06d6a0;
-  --orange:  #ff7043;
-  --purple:  #b388ff;
-  --font:    'Nunito', sans-serif;
-  --mono:    'JetBrains Mono', monospace;
+  --bg:#0d1117; --surface:#161b22; --border:#30363d;
+  --accent:#58a6ff; --gold:#f0b429; --green:#3fb950;
+  --red:#f78166; --euler:#a371f7; --text:#e6edf3; --muted:#8b949e;
+  --radius:8px; --mono:'JetBrains Mono','Fira Code',monospace;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: var(--bg); color: var(--text);
-  font-family: var(--font); padding: 1.2rem;
-  min-height: 100vh;
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  display:flex;flex-direction:column;align-items:center;
+  padding:1rem;min-height:100vh}
+.page{width:100%;max-width:900px}
+h1{font-size:1.3rem;color:var(--accent);margin-bottom:.2rem}
+.subtitle{font-size:.81rem;color:var(--muted);margin-bottom:.9rem}
+
+/* Board — square aspect so unit circle looks circular */
+.board-wrap{
+  width:100%;
+  /* Force a square container */
+  position:relative;
+  padding-bottom:100%;
+  max-height:600px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
 }
-h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2rem; }
-.subtitle { font-size: .83rem; color: var(--dim); margin-bottom: 1.1rem; max-width: 720px; line-height: 1.5; }
-.panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-@media (max-width: 720px) { .panels { grid-template-columns: 1fr; } }
-.panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
-.panel-head { padding: .65rem 1rem .5rem; border-bottom: 1px solid var(--border); }
-.panel-head h2 { font-size: 1rem; font-weight: 700; color: var(--text); }
-.panel-head p  { font-size: .74rem; color: var(--dim); margin-top: .15rem; }
-.board-wrap { position: relative; width: 100%; padding-bottom: 100%; background: #070b14; }
-.jxgbox { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; }
-.panel-ctrl {
-  display: flex; align-items: center; gap: .6rem;
-  padding: .55rem .8rem; border-top: 1px solid var(--border); flex-wrap: wrap;
+/* Cap height so it doesn't fill whole viewport on tall screens */
+@media(min-height:700px){.board-wrap{padding-bottom:min(100%,600px)}}
+#jxgbox{
+  position:absolute;inset:0;
+  background:#080c12;
 }
-.btn {
-  font-family: var(--font); font-size: .8rem; font-weight: 700;
-  border: none; border-radius: 6px; padding: .3rem .85rem;
-  cursor: pointer; user-select: none; transition: opacity .15s, transform .1s;
+
+/* Controls */
+.controls{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.6rem;
+  margin-top:.7rem;
 }
-.btn:active { transform: scale(.95); }
-.btn:disabled { opacity: .35; pointer-events: none; }
-.btn-go   { background: var(--green);  color: #071a14; }
-.btn-stop { background: var(--orange); color: #1a0a07; }
-.chips { display: flex; gap: .4rem; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
-.chip { display: flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 600; color: var(--dim); }
-.dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-/* Formula block */
-.fbox {
-  border-top: 1px solid var(--border); background: #0d1523;
-  font-family: var(--mono); font-size: .75rem; line-height: 1.75;
-  padding: .55rem .85rem;
+@media(max-width:560px){.controls{grid-template-columns:1fr}}
+.ctrl{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:.65rem .9rem;
 }
-.fbox-title {
-  font-family: var(--font); font-size: .7rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .07em;
-  color: var(--dim); margin-bottom: .3rem;
+.ctrl label{
+  display:block;font-size:.72rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:.45rem;
 }
-.frow { display: flex; gap: .6rem; align-items: baseline; }
-.fk   { color: var(--dim); font-size: .68rem; min-width: 1.6rem; }
-.fx   { color: #ffd166; }
-.fy   { color: #b388ff; }
-.fnote { font-size: .68rem; color: var(--dim); margin-top: .2rem; font-family: var(--font); }
-/* Theta info */
-.panel-info {
-  padding: .35rem .85rem; border-top: 1px solid var(--border);
-  font-size: .76rem; font-family: var(--mono); color: var(--dim); min-height: 1.5rem;
+select,input[type=range]{
+  width:100%;background:var(--bg);border:1px solid var(--border);
+  border-radius:5px;color:var(--text);font-size:.86rem;
+  padding:.35rem .55rem;outline:none;
 }
-.panel-info span { color: var(--gold); }
+select:focus{border-color:var(--accent)}
+input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
+.sub{font-size:.76rem;color:var(--gold);margin-top:.3rem;
+  font-family:var(--mono);min-height:1.1em;line-height:1.4}
+
+/* Info */
+.info{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:.65rem .9rem;margin-top:.7rem;
+  font-size:.8rem;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:.3rem 1.2rem;
+}
+.ir{display:flex;gap:.45rem;align-items:baseline}
+.ir .k{color:var(--muted);white-space:nowrap;min-width:60px}
+.ir .v{font-family:var(--mono);font-size:.74rem}
+.ir .v.hi{color:var(--gold)}
+
+/* Legend */
+.leg{display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.55rem;
+  font-size:.76rem;color:var(--muted)}
+.leg span{display:flex;align-items:center;gap:.3rem}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* ── Animation buttons ─────────────────────────────────────────── */
+.anim-btn {
+  font-family: var(--font);
+  font-size: .82rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 6px;
+  padding: .35rem .9rem;
+  cursor: pointer;
+  transition: opacity .15s, transform .1s;
+  user-select: none;
+}
+.anim-btn:active   { transform: scale(.96); }
+.anim-btn:disabled { opacity: .35; cursor: default; pointer-events: none; }
+.anim-go   { background: #06d6a0; color: #071a14; }
+.anim-stop { background: #ff7043; color: #1a0a07; }
+
 </style>
 </head>
 <body>
-
-<h1>ETC Loci Sandbox — Thales Configuration</h1>
+<div class="page">
+<h1>ETC Triangle Centers — Thales Configuration</h1>
 <p class="subtitle">
-  <b>A = (1,0)</b> and <b>B = (−1,0)</b> fixed. <b>C</b> moves on the unit circle.
-  Loci are drawn using the exact rational parametric forms
-  <b>x(t), y(t)</b> with <b>t = tan(θ/4)</b>,
-  obtained by normalising barycentric weights
-  ā = 1 − t², b̄ = 2t, c̄ = 1 + t², then substituting the Weierstrass half-angle identities.
+  A = (1,0) and B = (−1,0) are fixed. C moves on the unit circle
+  x²+y²=1. The locus of X<sub>n</sub> is drawn as C completes a
+  full revolution (θ: 0 → 2π). Barycentric weights are computed
+  from the side lengths a, b, c of the resulting triangle.
 </p>
 
-<div class="panels">
+<div class="board-wrap">
+  <div id="jxgbox"></div>
+</div>
 
-  <!-- Panel 1: X(1) · X(2) · X(8) -->
-  <div class="panel">
-    <div class="panel-head">
-      <h2>Incenter · Centroid · Nagel Point</h2>
-      <p>X(1) : X(2) : X(8)</p>
-    </div>
-    <div class="board-wrap"><div id="box1" class="jxgbox"></div></div>
-    <div class="panel-ctrl">
-      <button class="btn btn-go"   id="p1-start">▶ Start</button>
-      <button class="btn btn-stop" id="p1-stop" disabled>■ Stop</button>
-      <div class="chips">
-        <div class="chip"><div class="dot" style="background:#ff7043"></div>C</div>
-        <div class="chip"><div class="dot" style="background:#ffd166"></div>X(1)</div>
-        <div class="chip"><div class="dot" style="background:#b388ff"></div>X(2)</div>
-        <div class="chip"><div class="dot" style="background:#06d6a0"></div>X(8)</div>
-      </div>
-    </div>
-    <div class="panel-info" id="p1-info">θ = —</div>
-    <div class="fbox">
-      <div class="fbox-title">Parametric curves — t = tan(θ/4), t ∈ (0, 1)</div>
-      <div style="margin-bottom:.4rem">
-        <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(1) Incenter — degree 2</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">−(t² + 2t − 1) / (t² + 1)</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t) / (t² + 1)</span></div>
-      </div>
-      <div style="margin-bottom:.4rem">
-        <div style="color:#b388ff;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(2) Centroid — degree 4, locus is circle r = 1/3</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / [3(t²+1)²]</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">4t(1 − t²) / [3(t²+1)²]</span></div>
-      </div>
-      <div>
-        <div style="color:#06d6a0;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(8) Nagel — degree 4, y ≥ 0 for t ∈ (0,1)</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²+2t−1)(3t²−2t+1) / (t²+1)²</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">4t²(1 − t)² / (t²+1)²</span></div>
-      </div>
-    </div>
+<div class="controls">
+  <div class="ctrl">
+    <label>Triangle center X<sub>n</sub></label>
+    <select id="sel"></select>
+    <div class="sub" id="bary-disp"></div>
   </div>
-
-  <!-- Panel 2: X(5) · X(6) · X(11) -->
-  <div class="panel">
-    <div class="panel-head">
-      <h2>Nine-Point · Symmedian · Feuerbach</h2>
-      <p>X(5) : X(6) : X(11)</p>
+  <div class="ctrl">
+    <label>Angle θ — position of C</label>
+    <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.45rem">
+      <button id="btn-start" class="anim-btn anim-go">▶ Start</button>
+      <button id="btn-stop"  class="anim-btn anim-stop" disabled>■ Stop</button>
     </div>
-    <div class="board-wrap"><div id="box2" class="jxgbox"></div></div>
-    <div class="panel-ctrl">
-      <button class="btn btn-go"   id="p2-start">▶ Start</button>
-      <button class="btn btn-stop" id="p2-stop" disabled>■ Stop</button>
-      <div class="chips">
-        <div class="chip"><div class="dot" style="background:#ff7043"></div>C</div>
-        <div class="chip"><div class="dot" style="background:#ffd166"></div>X(5)</div>
-        <div class="chip"><div class="dot" style="background:#4da6ff"></div>X(6)</div>
-        <div class="chip"><div class="dot" style="background:#f78c6c"></div>X(11)</div>
-      </div>
-    </div>
-    <div class="panel-info" id="p2-info">θ = —</div>
-    <div class="fbox">
-      <div class="fbox-title">Parametric curves — t = tan(θ/4), t ∈ (0, 1)</div>
-      <div style="margin-bottom:.4rem">
-        <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(5) Nine-Point — degree 4, locus is circle r = 1/2</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / [2(t²+1)²]</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t²) / (t²+1)²</span></div>
-      </div>
-      <div style="margin-bottom:.4rem">
-        <div style="color:#4da6ff;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(6) Symmedian — degree 4, locus is unit circle (= C)</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / (t²+1)²</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t²) / (t²+1)²</span></div>
-        <div class="fnote">⟹ X(2), X(5), X(6) share the same numerator factor — Euler-line collinearity</div>
-      </div>
-      <div>
-        <div style="color:#f78c6c;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(11) Feuerbach — degree 6, smooth on t ∈ (0,1)</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²+2t−1)(t⁴−6t³+2t−1) / [(t²+1)²(5t²−4t+1)]</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1−t)(t²+2t−1)² / [(t²+1)²(5t²−4t+1)]</span></div>
-      </div>
-    </div>
+    <input type="range" id="sl-theta"
+           min="-3.1416" max="3.1416" step="0.005" value="-3.1416">
+    <div class="sub" id="theta-disp"></div>
   </div>
+</div>
 
-</div><!-- /panels -->
+<div class="info">
+  <div class="ir"><span class="k">C</span>
+    <span class="v hi" id="inf-C">—</span></div>
+  <div class="ir"><span class="k">X<sub>n</sub></span>
+    <span class="v hi" id="inf-Xn">—</span></div>
+  <div class="ir"><span class="k">a = |BC|</span>
+    <span class="v" id="inf-a">—</span></div>
+  <div class="ir"><span class="k">b = |CA|</span>
+    <span class="v" id="inf-b">—</span></div>
+  <div class="ir"><span class="k">∠A</span>
+    <span class="v" id="inf-A">—</span></div>
+  <div class="ir"><span class="k">∠B</span>
+    <span class="v" id="inf-B">—</span></div>
+</div>
+
+<div class="leg">
+  <span><span class="dot" style="background:#58a6ff"></span>A, B (fixed)</span>
+  <span><span class="dot" style="background:#f78166"></span>C (slider)</span>
+  <span><span class="dot" style="background:#f0b429"></span>X<sub>n</sub> &amp; locus</span>
+  <span><span class="dot" style="background:#3fb950"></span>Circumcircle</span>
+  <span><span class="dot" style="background:#a371f7"></span>Euler line (O–H)</span>
+</div>
+</div><!-- /page -->
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  Rational parametric formulas derived from t = tan(θ/4)
-//  Normalised weights: ā = 1−t², b̄ = 2t, c̄ = 1+t²
-//  cosθ = (t⁴−6t²+1)/(1+t²)²   sinθ = 4t(1−t²)/(1+t²)²
-//
-//  All formulas return [x, y] as JS numbers for a given t.
-//  t ∈ (0,1)  → upper half (θ ∈ (0,π),  sinθ > 0)
-//  t ∈ (-1,0) → lower half (θ ∈ (-π,0), sinθ < 0)
-// ═══════════════════════════════════════════════════════════════
-
-const XT = {
-
-  "X(1)": t => {
-    // x = −(t² + 2t − 1)/(t² + 1)
-    // y = 2t(1 − t)/(t² + 1)
-    const d = t*t + 1;
-    return [-(t*t + 2*t - 1) / d,
-              2*t*(1 - t) / d];
-  },
-
-  "X(2)": t => {
-    // x = (t²−2t−1)(t²+2t−1) / [3(t²+1)²]
-    // y = 4t(1−t²) / [3(t²+1)²]
-    const d = 3*(t*t + 1)*(t*t + 1);
-    return [(t*t - 2*t - 1)*(t*t + 2*t - 1) / d,
-              4*t*(1 - t*t) / d];
-  },
-
-  "X(5)": t => {
-    // x = (t²−2t−1)(t²+2t−1) / [2(t²+1)²]
-    // y = 2t(1−t²) / (t²+1)²
-    const d = (t*t + 1)*(t*t + 1);
-    return [(t*t - 2*t - 1)*(t*t + 2*t - 1) / (2*d),
-              2*t*(1 - t*t) / d];
-  },
-
-  "X(6)": t => {
-    // x = (t²−2t−1)(t²+2t−1) / (t²+1)²
-    // y = 2t(1−t²) / (t²+1)²
-    const d = (t*t + 1)*(t*t + 1);
-    return [(t*t - 2*t - 1)*(t*t + 2*t - 1) / d,
-              2*t*(1 - t*t) / d];
-  },
-
-  "X(8)": t => {
-    // x = (t²+2t−1)(3t²−2t+1) / (t²+1)²
-    // y = 4t²(1−t)² / (t²+1)²
-    const d = (t*t + 1)*(t*t + 1);
-    return [(t*t + 2*t - 1)*(3*t*t - 2*t + 1) / d,
-              4*t*t*(1 - t)*(1 - t) / d];
-  },
-
-  "X(11)": t => {
-    // x = (t²+2t−1)(t⁴−6t³+2t−1) / [(t²+1)²(5t²−4t+1)]
-    // y = 2t(1−t)(t²+2t−1)² / [(t²+1)²(5t²−4t+1)]
-    const d1 = (t*t + 1)*(t*t + 1);
-    const d2 = 5*t*t - 4*t + 1;          // no real roots → never zero on t∈(-1,1)
-    const d  = d1 * d2;
-    const A  = t*t + 2*t - 1;
-    return [A*(t*t*t*t - 6*t*t*t + 2*t - 1) / d,
-            2*t*(1 - t)*A*A / d];
-  },
-
-};
-
-// Convert state.angle (θ) to t = tan(θ/4), clipped away from singularities
-function tFromTheta(theta) {
-  return Math.tan(theta / 4);
+// ═══════════════════════════════════════════════════════════════════
+//  Triangle parameter helpers for Thales config
+//  A=(1,0), B=(-1,0), C=(cosθ,sinθ)   (θ=0 or π: degenerate)
+//  a=|BC|=2cos(θ/2)  b=|CA|=2|sin(θ/2)|  c=|AB|=2
+//  Conway: SA=(b²+c²-a²)/2  SB=(a²+c²-b²)/2  SC=0
+//  S=2|sinθ|  (twice area)
+// ═══════════════════════════════════════════════════════════════════
+function tri(t) {
+  const a = 2 * Math.abs(Math.cos(t / 2));
+  const b = 2 * Math.abs(Math.sin(t / 2));
+  const c = 2;
+  const a2 = a*a, b2 = b*b, c2 = c*c;
+  const sp = (a + b + c) / 2;    // semiperimeter
+  const SA = (b2 + c2 - a2) / 2;
+  const SB = (a2 + c2 - b2) / 2;
+  const SC = 0;
+  const S  = Math.abs(2 * Math.sin(t));   // 2·Area
+  return { a, b, c, a2, b2, c2, sp, SA, SB, SC, S };
 }
 
-// Evaluate a formula safely — return [NaN, NaN] if out of range
-function evalFormula(id, t) {
-  try {
-    const [x, y] = XT[id](t);
-    if (!isFinite(x) || !isFinite(y) || Math.abs(x) > 3 || Math.abs(y) > 3)
-      return [NaN, NaN];
-    return [x, y];
-  } catch(e) { return [NaN, NaN]; }
+// Convert barycentric (u,v,w) → Cartesian using triangle with angle θ
+// x = (u − v + w·cosθ) / (u+v+w)
+// y = (w·sinθ) / (u+v+w)
+function b2c(u, v, w, t) {
+  const s = u + v + w;
+  if (Math.abs(s) < 1e-10) return [NaN, NaN];
+  return [(u - v + w * Math.cos(t)) / s,
+          (w * Math.sin(t)) / s];
 }
 
-// Build locus point arrays for t ∈ (-1,0)∪(0,1), with NaN gaps at jumps
-function buildLocus(id) {
-  // t = tan(θ/4) is defined on (0, 1) for θ ∈ (0, π)  [upper semicircle].
-  // The lower half is obtained by reflecting y → −y, because:
-  //   • the formulas depend on side lengths a, b, c (symmetric in |θ|),
-  //   • sinθ changes sign while cosθ is unchanged when θ → −θ,
-  //   • so x(−θ) = x(θ)  and  y(−θ) = −y(θ)  for all six centers.
-  const xs = [], ys = [];
-  const STEPS   = 500;
-  const EPS     = 0.004;   // skip t near 0 (C→A) and t near 1 (C→B)
-  const MAX_JMP = 0.15;
-  let prevX = NaN, prevY = NaN;
+// ═══════════════════════════════════════════════════════════════════
+//  Center definitions — (id, name, bary description, uvw(θ) fn)
+//  Sources: ETC https://faculty.evansville.edu/ck6/encyclopedia/
+// ═══════════════════════════════════════════════════════════════════
+const CENTERS = (() => {
+  // Shorthand factory
+  const C = (id, name, bary, fn) => ({ id, name, bary, uvw: fn });
+  return [
 
-  // ── Collect upper-half points, t ∈ (EPS, 1−EPS) ──────────────
-  const upperPts = [];
+  // ── Classical centers ──────────────────────────────────────────
+  C("X(1)","Incenter","a : b : c",
+    t => { const {a,b,c} = tri(t); return [a,b,c]; }),
+  C("X(2)","Centroid","1 : 1 : 1",
+    _t => [1,1,1]),
+  C("X(3)","Circumcenter","sin 2A : sin 2B : sin 2C",
+    t => { const s=Math.abs(Math.sin(t)); return [s,s,0]; }),
+  C("X(4)","Orthocenter (= C here)","SA : SB : SC",
+    t => { const {SA,SB} = tri(t); return [SA,SB,0]; }),
+  C("X(5)","Nine-Point Center","cos(B-C):cos(C-A):cos(A-B)",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2, Cv=Math.PI/2;
+      return [Math.cos(B-Cv), Math.cos(Cv-A), Math.cos(A-B)];
+    }),
+  C("X(6)","Symmedian Point","a² : b² : c²",
+    t => { const {a2,b2,c2} = tri(t); return [a2,b2,c2]; }),
+  C("X(7)","Gergonne Point","1/(s-a) : 1/(s-b) : 1/(s-c)",
+    t => { const {a,b,c,sp} = tri(t);
+           return [1/(sp-a), 1/(sp-b), 1/(sp-c)]; }),
+  C("X(8)","Nagel Point","b+c-a : c+a-b : a+b-c",
+    t => { const {a,b,c} = tri(t); return [b+c-a,c+a-b,a+b-c]; }),
+  C("X(9)","Mittenpunkt","a(b+c-a):b(c+a-b):c(a+b-c)",
+    t => { const {a,b,c} = tri(t);
+           return [a*(b+c-a), b*(c+a-b), c*(a+b-c)]; }),
+  C("X(10)","Spieker Center","b+c : c+a : a+b",
+    t => { const {a,b,c} = tri(t); return [b+c,c+a,a+b]; }),
+  C("X(11)","Feuerbach Point","(b-c)²(b+c-a):…",
+    t => { const {a,b,c} = tri(t);
+           return [(b-c)**2*(b+c-a),(c-a)**2*(c+a-b),(a-b)**2*(a+b-c)]; }),
+  C("X(12)","Extouchpoint-midpoint","a/(b+c+a)²:…",
+    t => { const {a,b,c} = tri(t);
+           const s=a+b+c;
+           return [a/((b+c-a)*s**2), b/((c+a-b)*s**2), c/((a+b-c)*s**2)]; }),
+  C("X(13)","Fermat Point 1 (isog conj X14)","1/(SA+√3·S):…",
+    t => { const {SA,SB,SC,S} = tri(t); const r3=Math.sqrt(3);
+           return [1/(SA+r3*S), 1/(SB+r3*S), 1/(SC+r3*S+1e-9)]; }),
+  C("X(14)","Fermat Point 2","1/(SA-√3·S):…",
+    t => { const {SA,SB,SC,S} = tri(t); const r3=Math.sqrt(3);
+           const d0=SA-r3*S, d1=SB-r3*S, d2=SC-r3*S;
+           if(Math.abs(d0)<1e-8||Math.abs(d1)<1e-8) return [0,0,0];
+           return [1/d0, 1/d1, 1/(d2||1e-9)]; }),
+  C("X(15)","Isogonic Point 1","sin(A+π/3):sin(B+π/3):sin(C+π/3)",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2, Cv=Math.PI/2, p3=Math.PI/3;
+      return [Math.sin(A+p3), Math.sin(B+p3), Math.sin(Cv+p3)]; }),
+  C("X(16)","Isogonic Point 2","sin(A-π/3):sin(B-π/3):sin(C-π/3)",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2, Cv=Math.PI/2, p3=Math.PI/3;
+      return [Math.sin(A-p3), Math.sin(B-p3), Math.sin(Cv-p3)]; }),
+  C("X(17)","Napoleon Pt 1","1/(SA+√3·S):… (=X13 variant)",
+    t => { const {SA,SB,S} = tri(t); const r3=Math.sqrt(3);
+           return [SA+r3*S, SB+r3*S, r3*S]; }),
+  C("X(18)","Napoleon Pt 2","SA-√3·S:…",
+    t => { const {SA,SB,S} = tri(t); const r3=Math.sqrt(3);
+           const u=SA-r3*S, v=SB-r3*S;
+           return [u,v,Math.max(-r3*S,1e-9)]; }),
+  C("X(19)","Clawson Point (isog conj X63)","tan A:tan B:tan C",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2;
+      // tan C = tan(π/2) = ∞ → project to (tanA·cosC:tanB·cosC:sinC)
+      return [Math.tan(A), Math.tan(B), 1e6]; }),
+  C("X(20)","de Longchamps Point","-SA·(SB-SC)²+…  ≈ SA+SB+3SC variant",
+    t => { const {SA,SB} = tri(t); return [-SA,SB,SA+SB]; }),
+  C("X(21)","Schiffler Point","1/(b+c):…",
+    t => { const {a,b,c} = tri(t);
+           return [a/(b+c), b/(c+a), c/(a+b)]; }),
+  C("X(22)","Exeter Point","a²(b⁴+c⁴-a⁴):…",
+    t => { const {a2,b2,c2} = tri(t);
+           return [a2*(b2*b2+c2*c2-a2*a2),
+                   b2*(c2*c2+a2*a2-b2*b2),
+                   c2*(a2*a2+b2*b2-c2*c2)]; }),
+  C("X(23)","Far-Out Point","a²(a⁴-b²c²):…",
+    t => { const {a2,b2,c2} = tri(t);
+           return [a2*(a2*a2-b2*c2),
+                   b2*(b2*b2-c2*a2),
+                   c2*(c2*c2-a2*b2)]; }),
+  C("X(24)","Perspector of ABC and orthic-of-orthic",
+    "a²(SA²-SB·SC):…",
+    t => { const {a2,b2,c2,SA,SB,SC} = tri(t);
+           return [a2*(SA*SA-SB*SC), b2*(SB*SB-SC*SA), c2*(SC*SC-SA*SB)]; }),
+  C("X(25)","Homothetic Center (orthic and tangential)","a²/SA:…",
+    t => { const {a2,b2,c2,SA,SB} = tri(t);
+           return [a2/(SA+1e-9), b2/(SB+1e-9), c2/1e9]; }),
+
+  // ── More classical ────────────────────────────────────────────
+  C("X(31)","2nd Power Point","a³:b³:c³ (trilinear a²:…)",
+    t => { const {a,b,c} = tri(t); return [a**3,b**3,c**3]; }),
+  C("X(32)","3rd Power Point","a⁴:b⁴:c⁴",
+    t => { const {a2,b2,c2} = tri(t); return [a2*a2,b2*b2,c2*c2]; }),
+  C("X(35)","Intersection AP₁ with BC … isog 1st isog of X36","a²(b²+c²-a²-bc):…",
+    t => { const {a2,b2,c2,a,b,c} = tri(t);
+           return [a2*(b2+c2-a2-b*c), b2*(c2+a2-b2-c*a), c2*(a2+b2-c2-a*b)]; }),
+  C("X(36)","Inverse of Incenter in circumcircle","a(a²-b²-bc-c²):…  simplified",
+    t => { const {a,b,c,a2,b2,c2} = tri(t);
+           return [a*(a2-b2-b*c-c2), b*(b2-c2-c*a-a2), c*(c2-a2-a*b-b2)]; }),
+  C("X(37)","Crosspoint of X1,X2 (harmonic mean)","ab+ac : bc+ba : ca+cb",
+    t => { const {a,b,c} = tri(t); return [a*(b+c), b*(c+a), c*(a+b)]; }),
+  C("X(39)","Brocard Midpoint (X3 of medial)","a²(b²+c²):…",
+    t => { const {a2,b2,c2} = tri(t);
+           return [a2*(b2+c2), b2*(c2+a2), c2*(a2+b2)]; }),
+  C("X(40)","Bevan Point (circumcenter of excentral)","−a(b²+c²−a²−2bc):…",
+    t => { const {a,b,c,a2,b2,c2} = tri(t);
+           return [-a*(b2+c2-a2-2*b*c), -b*(c2+a2-b2-2*c*a), -c*(a2+b2-c2-2*a*b)]; }),
+  C("X(41)","Crosspoint of X1 and X6","a²(b+c-a):…",
+    t => { const {a,b,c,a2} = tri(t);
+           return [a2*(b+c-a), (tri(t).b2)*(c+a-b), (tri(t).c2)*(a+b-c)]; }),
+  C("X(42)","Crosssum of X1 and X2","a(b+c):…",
+    t => { const {a,b,c} = tri(t); return [a*(b+c), b*(c+a), c*(a+b)]; }),
+  C("X(43)","X(1) of medial triangle","bc(b+c-a):…",
+    t => { const {a,b,c} = tri(t); return [b*c*(b+c-a), c*a*(c+a-b), a*b*(a+b-c)]; }),
+  C("X(44)","X(1)-beth conjugate of X(44)","a(b+c-2a):…",
+    t => { const {a,b,c} = tri(t); return [a*(b+c-2*a), b*(c+a-2*b), c*(a+b-2*c)]; }),
+  C("X(45)","Complement of X(44)","a(2b+2c-a):…",
+    t => { const {a,b,c} = tri(t); return [a*(2*b+2*c-a), b*(2*c+2*a-b), c*(2*a+2*b-c)]; }),
+  C("X(46)","X(4) of excentral triangle","a(cos B cos C - cos A):…",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2, Cv=Math.PI/2;
+      const {a,b,c} = tri(t);
+      return [a*(Math.cos(B)*Math.cos(Cv)-Math.cos(A)),
+              b*(Math.cos(Cv)*Math.cos(A)-Math.cos(B)),
+              c*(Math.cos(A)*Math.cos(B)-Math.cos(Cv))]; }),
+  C("X(55)","Insimilicenter of circumcircle and incircle","a(b+c-a):…",
+    t => { const {a,b,c} = tri(t); return [a*(b+c-a), b*(c+a-b), c*(a+b-c)]; }),
+  C("X(56)","Exsimilicenter (isog conj X55)","a/(b+c-a):…",
+    t => { const {a,b,c} = tri(t);
+           const d0=b+c-a, d1=c+a-b, d2=a+b-c;
+           if(d0<=1e-9||d1<=1e-9||d2<=1e-9) return [1,1,1];
+           return [a/d0, b/d1, c/d2]; }),
+  C("X(57)","Isogonal conj of X9","1/(b+c-a):…",
+    t => { const {a,b,c} = tri(t);
+           const d0=b+c-a, d1=c+a-b, d2=a+b-c;
+           if(d0<=1e-9||d1<=1e-9||d2<=1e-9) return [1,1,1];
+           return [1/d0, 1/d1, 1/d2]; }),
+  C("X(58)","Isogonal conj of X10","a²/(b+c):…",
+    t => { const {a,b,c,a2,b2,c2} = tri(t);
+           return [a2/(b+c), b2/(c+a), c2/(a+b)]; }),
+  C("X(59)","Isogonal conj of X11","a/((s-b)(s-c)):…",
+    t => { const {a,b,c,sp} = tri(t);
+           const sb=sp-b, sc=sp-c, sa=sp-a;
+           if(sb<=0||sc<=0||sa<=0) return [1,1,1];
+           return [a/(sb*sc), b/(sc*sa), c/(sa*sb)]; }),
+  C("X(63)","Isogonal conj of X19","a/tan A:…  = a cos A:…",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2;
+      const {a,b,c} = tri(t);
+      return [a*Math.cos(A), b*Math.cos(B), 0]; }),
+  C("X(65)","Isogonal conj of X21","a/(tan B+tan C):…",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2;
+      const {a,b,c} = tri(t); const tA=Math.tan(A), tB=Math.tan(B);
+      return [a/(tB+1e6), b/(1e6+tA), c/(tA+tB)]; }),
+  C("X(69)","Isotomic conj of X25  (symmedian point of anticomp)","b²c²(b²+c²-a²):…",
+    t => { const {a2,b2,c2,SA,SB} = tri(t);
+           return [b2*c2*SA, c2*a2*SB, a2*b2*0.001]; }),
+  C("X(75)","Isotomic conj of X31","bc:ca:ab",
+    t => { const {a,b,c} = tri(t); return [b*c, c*a, a*b]; }),
+  C("X(76)","Isotomic conj of X32","b²c²:c²a²:a²b²",
+    t => { const {a2,b2,c2} = tri(t); return [b2*c2, c2*a2, a2*b2]; }),
+  C("X(79)","Isogonal conj of X35","1/(2SA+bc):…",
+    t => { const {SA,SB,a,b,c} = tri(t);
+           return [1/(2*SA+b*c+1e-9), 1/(2*SB+c*a+1e-9), 1/(a*b+1e-9)]; }),
+  C("X(80)","Reflection of X1 in X11 variant","(b+c-a)/(b-a+c):…  simplified",
+    t => { const {a,b,c} = tri(t);
+           return [(b+c-a)**2, (c+a-b)**2, (a+b-c)**2]; }),
+  C("X(81)","Isogonal conj of X42","b+c:c+a:a+b → reciprocal of…  a/(b+c):…",
+    t => { const {a,b,c} = tri(t); return [a/(b+c), b/(c+a), c/(a+b)]; }),
+  C("X(82)","Isogonal conj of X38","a/(b²+c²):…",
+    t => { const {a,b2,c2,b,c,a2} = tri(t);
+           return [a/(b2+c2), b/(c2+a2), c/(a2+b2)]; }),
+  C("X(83)","Isogonal conj of X39","1/(b²+c²):…",
+    t => { const {a2,b2,c2} = tri(t); return [1/(b2+c2), 1/(c2+a2), 1/(a2+b2)]; }),
+  C("X(85)","Isotomic conj of X41","bc/(b+c-a):…",
+    t => { const {a,b,c} = tri(t);
+           const d0=b+c-a, d1=c+a-b, d2=a+b-c;
+           if(d0<=0||d1<=0||d2<=0) return [1,1,1];
+           return [b*c/d0, c*a/d1, a*b/d2]; }),
+  C("X(86)","Isotomic conj of X42","bc(b+c):…",
+    t => { const {a,b,c} = tri(t); return [b*c*(b+c), c*a*(c+a), a*b*(a+b)]; }),
+  C("X(88)","Isogonal conj of X44","a/(2a-b-c):…",
+    t => { const {a,b,c} = tri(t);
+           const d0=2*a-b-c, d1=2*b-c-a, d2=2*c-a-b;
+           if(Math.abs(d0)<.01||Math.abs(d1)<.01||Math.abs(d2)<.01) return [1,1,1];
+           return [a/d0, b/d1, c/d2]; }),
+  C("X(89)","Isogonal conj of X45","a/(2b+2c-a):…",
+    t => { const {a,b,c} = tri(t);
+           return [a/(2*b+2*c-a), b/(2*c+2*a-b), c/(2*a+2*b-c)]; }),
+  C("X(98)","Tarry Point (isog conj of Steiner)","SA(SB-SC)²:…",
+    t => { const {SA,SB,SC} = tri(t);
+           return [SA*(SB-SC)**2, SB*(SC-SA)**2, SC*(SA-SB)**2||1e-9]; }),
+  C("X(99)","Steiner Point","1/(b²-c²):…",
+    t => { const {a2,b2,c2} = tri(t);
+           const d0=b2-c2, d1=c2-a2, d2=a2-b2;
+           if(Math.abs(d0)<.001||Math.abs(d1)<.001||Math.abs(d2)<.001) return [1,0,0];
+           return [1/d0, 1/d1, 1/d2]; }),
+  C("X(100)","Anticomplement of Feuerbach","1/(b-c):…",
+    t => { const {a,b,c} = tri(t);
+           const d0=b-c, d1=c-a, d2=a-b;
+           if(Math.abs(d0)<.001||Math.abs(d1)<.001||Math.abs(d2)<.001) return [1,0,0];
+           return [1/d0, 1/d1, 1/d2]; }),
+  C("X(101)","Isog conj of X514 (trilinear: a/(b-c))","a²/(b-c):…",
+    t => { const {a,b,c,a2,b2,c2} = tri(t);
+           const d0=b-c, d1=c-a, d2=a-b;
+           if(Math.abs(d0)<.001||Math.abs(d1)<.001||Math.abs(d2)<.001) return [1,0,0];
+           return [a2/d0, b2/d1, c2/d2]; }),
+  C("X(105)","Isog conj of X518","1/(a(b+c)-b²-c²):…",
+    t => { const {a,b,c} = tri(t);
+           const d0=a*(b+c)-b*b-c*c, d1=b*(c+a)-c*c-a*a, d2=c*(a+b)-a*a-b*b;
+           return [1/(d0||1e-9), 1/(d1||1e-9), 1/(d2||1e-9)]; }),
+  C("X(110)","Focus of Kiepert parabola","a²/(b²-c²):…",
+    t => { const {a2,b2,c2} = tri(t);
+           const d0=b2-c2, d1=c2-a2, d2=a2-b2;
+           if(Math.abs(d0)<.001) return [0,1/(d1||1e-9),1/(d2||1e-9)];
+           return [a2/d0, b2/(d1||1e-9), c2/(d2||1e-9)]; }),
+  C("X(111)","Parry Point","a²/(2a²-b²-c²):…",
+    t => { const {a2,b2,c2} = tri(t);
+           const d0=2*a2-b2-c2, d1=2*b2-c2-a2, d2=2*c2-a2-b2;
+           if(Math.abs(d0)<.001||Math.abs(d1)<.001||Math.abs(d2)<.001) return [1,1,1];
+           return [a2/d0, b2/d1, c2/d2]; }),
+  C("X(114)","Center of Kiepert hyperbola","SA(SB-SC)²+…  midpoint X113 X4",
+    t => { const {SA,SB} = tri(t); return [SA*(SA+SB), SB*(SB+SA), (SA+SB)*SA*0]; }),
+  C("X(115)","Center of Kiepert circumconic","(b²-c²)²:…",
+    t => { const {a2,b2,c2} = tri(t);
+           return [(b2-c2)**2, (c2-a2)**2, (a2-b2)**2]; }),
+  C("X(116)","Tripole of Euler line","(SB-SC)²:…",
+    t => { const {SA,SB,SC} = tri(t);
+           return [(SB-SC)**2, (SC-SA)**2, (SA-SB)**2]; }),
+  C("X(119)","Complement of X(11)","(b+c-a)(b²+c²-a²):…",
+    t => { const {a,b,c,SA,SB,SC} = tri(t);
+           return [(b+c-a)*SA, (c+a-b)*SB, (a+b-c)*SC||.001]; }),
+  C("X(120)","Complement of X(105)","b²+c²-a(b+c):…",
+    t => { const {a,b,c,a2,b2,c2} = tri(t);
+           return [b2+c2-a*(b+c), c2+a2-b*(c+a), a2+b2-c*(a+b)]; }),
+  C("X(121)","Complement of X(106)","bc(b+c-a-bc/a):…  → a(b+c-2a)²:…",
+    t => { const {a,b,c} = tri(t);
+           return [a*(b+c-2*a)**2, b*(c+a-2*b)**2, c*(a+b-2*c)**2]; }),
+  C("X(125)","Center of Jerabek hyperbola","a²(b²-c²)²·SA:…",
+    t => { const {a2,b2,c2,SA,SB} = tri(t);
+           return [a2*(b2-c2)**2*SA, b2*(c2-a2)**2*SB, c2*(a2-b2)**2*.001]; }),
+  C("X(126)","Midpoint of X3 and X111","a²(2a²-b²-c²):…",
+    t => { const {a2,b2,c2} = tri(t);
+           return [a2*(2*a2-b2-c2), b2*(2*b2-c2-a2), c2*(2*c2-a2-b2)]; }),
+  C("X(127)","Midpoint X3 and X112","a²·SA(SB-SC)²:…",
+    t => { const {a2,b2,c2,SA,SB} = tri(t);
+           return [a2*SA*(SB**2), b2*SB*(SA**2), c2*.001]; }),
+  C("X(140)","Complement of X5","a²(b²+c²)+bc(b²+c²-a²):…",
+    t => { const {a2,b2,c2,a,b,c,SA,SB} = tri(t);
+           return [a2*(b2+c2)+b*c*SA, b2*(c2+a2)+c*a*SB, c2*(a2+b2)+0]; }),
+  C("X(141)","Complement of X6","b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)",
+    t => { const {SA,SB} = tri(t); return [SA, SB, 0.01]; }),
+  C("X(142)","Complement of X7","(b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…",
+    t => { const {a,b,c} = tri(t); return [b*c*(a+b-c), c*a*(b+c-a), a*b*(c+a-b)]; }),
+  C("X(144)","Anticomplement of X7","(b-c)²+a(b+c-2a):…",
+    t => { const {a,b,c} = tri(t);
+           return [(b-c)**2+a*(b+c-2*a), (c-a)**2+b*(c+a-2*b), (a-b)**2+c*(a+b-2*c)]; }),
+  C("X(145)","Anticomplement of X8","(b+c-3a):…",
+    t => { const {a,b,c} = tri(t); return [b+c-3*a, c+a-3*b, a+b-3*c]; }),
+  C("X(162)","Isog conj of X525 (trilinear:a/(b²-c²))","a³/(b²-c²):…",
+    t => { const {a,b,c,a2,b2,c2} = tri(t);
+           const d0=b2-c2, d1=c2-a2, d2=a2-b2;
+           if(Math.abs(d0)<.001) return [0,1,1];
+           return [a2*a/d0, b2*b/(d1||1e-9), c2*c/(d2||1e-9)]; }),
+  C("X(174)","Isog conj of X175 (midcircle)","sin(A/2):sin(B/2):sin(C/2)",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2, Cv=Math.PI/2;
+      return [Math.sin(A/2), Math.sin(B/2), Math.sin(Cv/2)]; }),
+  C("X(175)","Isog conj of X174","1/sin(A/2):…",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2, Cv=Math.PI/2;
+      return [1/Math.sin(A/2), 1/Math.sin(B/2), 1/Math.sin(Cv/2)]; }),
+  C("X(176)","Isotomic conj X174","bc/sin(A/2):…",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2, Cv=Math.PI/2;
+      const {a,b,c} = tri(t);
+      return [b*c/Math.sin(A/2), c*a/Math.sin(B/2), a*b/Math.sin(Cv/2)]; }),
+  C("X(178)","Midcircle of incircle and A-excircle (approx)","cos(A/2):cos(B/2):cos(C/2)",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2, Cv=Math.PI/2;
+      return [Math.cos(A/2), Math.cos(B/2), Math.cos(Cv/2)]; }),
+  C("X(181)","Isog conj of X314","a²/((b+c)(s-a)):…",
+    t => { const {a,b,c,a2,b2,c2,sp} = tri(t);
+           const sa=sp-a, sb=sp-b, sc=sp-c;
+           if(sa<=0||sb<=0||sc<=0) return [1,1,1];
+           return [a2/((b+c)*sa), b2/((c+a)*sb), c2/((a+b)*sc)]; }),
+  C("X(182)","Midpoint of X3 and X6","a²(b²+c²-a²):…",
+    t => { const {a2,b2,c2} = tri(t);
+           return [a2*(b2+c2-a2), b2*(c2+a2-b2), c2*(a2+b2-c2)]; }),
+  C("X(184)","Crosssum of X3 and X6","a⁴(b²+c²-a²):…",
+    t => { const {a2,b2,c2} = tri(t);
+           return [a2*a2*(b2+c2-a2), b2*b2*(c2+a2-b2), c2*c2*(a2+b2-c2)]; }),
+  C("X(186)","Inverse of X4 in circumcircle","a²(a⁴-b⁴-c⁴+b²c²):…",
+    t => { const {a2,b2,c2} = tri(t);
+           return [a2*(a2*a2-b2*b2-c2*c2+b2*c2),
+                   b2*(b2*b2-c2*c2-a2*a2+c2*a2),
+                   c2*(c2*c2-a2*a2-b2*b2+a2*b2)]; }),
+  C("X(187)","Schoute Center","a²(2a²-b²-c²):…",
+    t => { const {a2,b2,c2} = tri(t);
+           return [a2*(2*a2-b2-c2), b2*(2*b2-c2-a2), c2*(2*c2-a2-b2)]; }),
+  C("X(190)","Isotomic conj of X44","bc(b+c-2a):…",
+    t => { const {a,b,c} = tri(t);
+           return [b*c*(b+c-2*a), c*a*(c+a-2*b), a*b*(a+b-2*c)]; }),
+  C("X(192)","Crosspoint of X1 and X75","bc(c+a-b):…  variant",
+    t => { const {a,b,c} = tri(t); return [b*c*(c+a-b), c*a*(a+b-c), a*b*(b+c-a)]; }),
+  C("X(193)","Isotomic conj of X69","a²(b²+c²)-b²c²:…  = a²SA:…",
+    t => { const {a2,b2,c2,SA,SB} = tri(t);
+           return [a2*SA, b2*SB, c2*0.001]; }),
+  C("X(200)","Isog conj X269 (Mittenpunkt variant)","a(b+c-a)²:…",
+    t => { const {a,b,c} = tri(t);
+           return [a*(b+c-a)**2, b*(c+a-b)**2, c*(a+b-c)**2]; }),
+  C("X(210)","Isog conj X1170","a(b+c-a)²:…  (same as X200 up to sign — see ETC)",
+    t => { const {a,b,c,sp} = tri(t);
+           return [(sp-a)**2*(a), (sp-b)**2*(b), (sp-c)**2*(c)]; }),
+  C("X(213)","Crosspoint X1,X42","a²(b+c):…",
+    t => { const {a,b,c,a2,b2,c2} = tri(t); return [a2*(b+c), b2*(c+a), c2*(a+b)]; }),
+  C("X(214)","Harmonic conjugate of X1 wrt X11 X12","a²(b+c-a)²:…",
+    t => { const {a,b,c,a2,b2,c2} = tri(t);
+           return [a2*(b+c-a)**2, b2*(c+a-b)**2, c2*(a+b-c)**2]; }),
+  C("X(216)","Kosnita's theorem point","SA(SB·SC):…  → SA·SB:…",
+    t => { const {SA,SB} = tri(t); return [SA*SB, SB*SA, SA*SB*.001]; }),
+  C("X(218)","Isog conj X1445","a²(b+c-a)(a(b+c)-bc):…",
+    t => { const {a,b,c,a2,b2,c2} = tri(t);
+           return [a2*(b+c-a)*(a*(b+c)-b*c),
+                   b2*(c+a-b)*(b*(c+a)-c*a),
+                   c2*(a+b-c)*(c*(a+b)-a*b)]; }),
+  C("X(220)","Isog conj X279","a²(b+c-a)²/(bc):…",
+    t => { const {a,b,c,a2,b2,c2} = tri(t);
+           return [a2*(b+c-a)**2/(b*c+1e-9),
+                   b2*(c+a-b)**2/(c*a+1e-9),
+                   c2*(a+b-c)**2/(a*b+1e-9)]; }),
+  C("X(222)","Isog conj X281 (3rd Conway pt)","a·cos²(A/2)/(b+c-a):…",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2,B=Math.abs(t)/2;
+      const {a,b,c} = tri(t);
+      const d0=b+c-a,d1=c+a-b,d2=a+b-c;
+      if(d0<=0||d1<=0||d2<=0) return [1,1,1];
+      return [a*Math.cos(A/2)**2/d0, b*Math.cos(B/2)**2/d1, c*Math.cos(Math.PI/4)**2/d2];
+    }),
+  C("X(223)","Isog conj X282","a(b+c-a)/(b²+c²-a²):…",
+    t => { const {a,b,c,SA,SB} = tri(t);
+           return [a*(b+c-a)/(SA+1e-9), b*(c+a-b)/(SB+1e-9), c*(a+b-c)*0.001]; }),
+  C("X(226)","Isog conj X284","bc/(b+c-a):…",
+    t => { const {a,b,c} = tri(t);
+           const d0=b+c-a, d1=c+a-b, d2=a+b-c;
+           if(d0<=0||d1<=0||d2<=0) return [1,1,1];
+           return [b*c/d0, c*a/d1, a*b/d2]; }),
+  C("X(230)","Crossdiff X2,X6 (Euler-line tripole)","SA·SB:SB·SC:SC·SA → simplified",
+    t => { const {a2,b2,c2,SA,SB} = tri(t); return [a2*SA, b2*SB, c2*.001]; }),
+  C("X(232)","Crossdiff X3,X6","a²·SA(SB-SC)²:…",
+    t => { const {a2,b2,c2,SA,SB,SC} = tri(t);
+           return [a2*SA*(SB-SC)**2, b2*SB*(SC-SA)**2, c2*(SA-SB)**2*.001]; }),
+  C("X(233)","Nine-point circle inverse of X5","a⁴(b²-c²)²:…",
+    t => { const {a2,b2,c2} = tri(t);
+           return [a2*a2*(b2-c2)**2, b2*b2*(c2-a2)**2, c2*c2*(a2-b2)**2]; }),
+  C("X(236)","Midpoint X175 X176","cos(A/2)+cos(B/2)+cos(C/2):…  variant",
+    t => {
+      const A=(Math.PI-Math.abs(t))/2, B=Math.abs(t)/2, Cv=Math.PI/2;
+      return [Math.cos(A/2)+Math.cos(B/2),
+              Math.cos(B/2)+Math.cos(Cv/2),
+              Math.cos(Cv/2)+Math.cos(A/2)]; }),
+
+  ]; // end CENTERS
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+//  Compute locus over full circle θ ∈ (ε, 2π-ε)
+//  Upper half (0,π) + lower half via vertical reflection
+//  of the upper-half points (because barycentric coords are
+//  computed with |sinθ|, so the locus is symmetric about x-axis).
+// ═══════════════════════════════════════════════════════════════════
+const STEPS = 300;
+
+function computeLocus(center) {
+  // MAX_JUMP: if consecutive sampled points are farther apart than this,
+  // a NaN gap is inserted. JSXGraph treats NaN as a path break — no line
+  // is drawn across the discontinuity, eliminating the "linear skip" artifact.
+  const MAX_JUMP = 0.15;
+  const eps = 0.05, pi = Math.PI;
+
+  // Collect points for one half, inserting NaN where jumps occur.
+  function halfPoints(tValues) {
+    const px = [], py = [];
+    let prevX = NaN, prevY = NaN;
+    for (const t of tValues) {
+      const [u, v, w] = center.uvw(t);
+      const [x, y]    = b2c(u, v, w, t);
+      const valid = isFinite(x) && isFinite(y)
+                 && Math.abs(x) <= 2.2 && Math.abs(y) <= 2.2;
+      if (valid) {
+        const jump = isFinite(prevX) &&
+                     Math.hypot(x - prevX, y - prevY) > MAX_JUMP;
+        if (jump) { px.push(NaN); py.push(NaN); }
+        px.push(x); py.push(y);
+        prevX = x; prevY = y;
+      } else {
+        // Point out of range — treat as a break too
+        if (isFinite(prevX)) { px.push(NaN); py.push(NaN); }
+        prevX = NaN; prevY = NaN;
+      }
+    }
+    return [px, py];
+  }
+
+  // Build θ sample arrays
+  const upperT = [], lowerT = [];
   for (let i = 0; i <= STEPS; i++) {
-    const t = EPS + (1 - 2*EPS) * i / STEPS;
-    upperPts.push(evalFormula(id, t));
+    const t = eps + (pi - 2 * eps) * i / STEPS;
+    upperT.push(t);
+    lowerT.push(-t);
   }
 
-  // Push upper half with NaN gap detection
-  for (const [x, y] of upperPts) {
-    if (isFinite(x) && isFinite(y)) {
-      if (isFinite(prevX) && Math.hypot(x-prevX, y-prevY) > MAX_JMP) {
-        xs.push(NaN); ys.push(NaN);
-      }
-      xs.push(x); ys.push(y);
-      prevX = x; prevY = y;
-    } else {
-      if (isFinite(prevX)) { xs.push(NaN); ys.push(NaN); }
-      prevX = NaN; prevY = NaN;
-    }
-  }
+  const [uxs, uys] = halfPoints(upperT);
+  const [lxs, lys] = halfPoints(lowerT);
 
-  // Gap separating the two halves
-  xs.push(NaN); ys.push(NaN);
-  prevX = NaN; prevY = NaN;
-
-  // ── Reflect upper half: y → −y, traverse in reverse so the path
-  //    continues smoothly from where the upper half ended ────────
-  for (let i = upperPts.length - 1; i >= 0; i--) {
-    const [x, y] = upperPts[i];
-    if (isFinite(x) && isFinite(y)) {
-      const yr = -y;   // reflection about x-axis
-      if (isFinite(prevX) && Math.hypot(x-prevX, yr-prevY) > MAX_JMP) {
-        xs.push(NaN); ys.push(NaN);
-      }
-      xs.push(x); ys.push(yr);
-      prevX = x; prevY = yr;
-    } else {
-      if (isFinite(prevX)) { xs.push(NaN); ys.push(NaN); }
-      prevX = NaN; prevY = NaN;
-    }
-  }
+  // Merge: upper half, then a NaN gap, then lower half
+  const xs = [...uxs, NaN, ...lxs];
+  const ys = [...uys, NaN, ...lys];
 
   return [xs, ys];
 }
 
-// ── JSXGraph board factory ────────────────────────────────────────
-function makeBoard(id) {
-  return JXG.JSXGraph.initBoard(id, {
-    boundingbox: [-1.6, 1.6, 1.6, -1.6],
-    keepaspectratio: true,
-    axis: true, grid: true,
-    showCopyright: false, showNavigation: false,
-    defaultAxes: {
-      x: { strokeColor: '#2a3550', ticks: { label: { fontSize: 9, fillColor: '#8fa3c8' } } },
-      y: { strokeColor: '#2a3550', ticks: { label: { fontSize: 9, fillColor: '#8fa3c8' } } },
-    },
-  });
-}
+// ═══════════════════════════════════════════════════════════════════
+//  JSXGraph — square bounding box so unit circle is circular
+// ═══════════════════════════════════════════════════════════════════
+const board = JXG.JSXGraph.initBoard("jxgbox", {
+  boundingbox: [-1.75, 1.75, 1.75, -1.75],   // SQUARE → circle not ellipse
+  axis: true,
+  grid: true,
+  showCopyright: false,
+  showNavigation: true,
+  pan:  { enabled: true },
+  zoom: { enabled: true, wheel: true },
+  defaultAxes: {
+    x: { ticks: { label: { fontSize: 9 } } },
+    y: { ticks: { label: { fontSize: 9 } } },
+  },
+  keepaspectratio: true,    // critical: maintain 1:1 ratio
+});
 
-// ── Thales geometry (fixed elements) ─────────────────────────────
-function addThalesGeometry(board, state) {
-  board.create('circle', [[0,0],[1,0]], {
-    strokeColor: '#06d6a0', strokeWidth: 2,
-    fixed: true, highlight: false, name: '',
-  });
-  const ptA = board.create('point', [-1, 0], {
-    name: 'A', fixed: true,
-    fillColor: '#4da6ff', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
-             color: '#4da6ff', offset: [-18, -14] },
-  });
-  const ptB = board.create('point', [1, 0], {
-    name: 'B', fixed: true,
-    fillColor: '#4da6ff', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
-             color: '#4da6ff', offset: [8, -14] },
-  });
-  board.create('point', [0, 0], {
-    name: 'O', fixed: true,
-    fillColor: '#8fa3c8', strokeColor: '#8fa3c8', size: 3,
-    label: { fontSize: 10, color: '#8fa3c8', offset: [5, -12] },
-  });
-  const ptC = board.create('point',
-    [() => Math.cos(state.angle), () => Math.sin(state.angle)],
-    { name: 'C', fixed: true,
-      fillColor: '#ff7043', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-      label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
-               color: '#ff7043', offset: [7, 9] },
+// ── Fixed geometry ────────────────────────────────────────────────
+board.create("circle", [[0,0],[1,0]], {
+  strokeColor:"#06d6a0", strokeWidth:2,
+  fixed:true, highlight:false, name:"",
+});
+const ptA = board.create("point",[1,0],{
+  name:"A",fixed:true,fillColor:"#58a6ff",strokeColor:"#58a6ff",size:5,
+  label:{fontSize:12,color:"#58a6ff",offset:[6,-14]},
+});
+const ptB = board.create("point",[-1,0],{
+  name:"B",fixed:true,fillColor:"#58a6ff",strokeColor:"#58a6ff",size:5,
+  label:{fontSize:12,color:"#58a6ff",offset:[-16,-14]},
+});
+board.create("point",[0,0],{
+  name:"O",fixed:true,fillColor:"#8b949e",strokeColor:"#8b949e",size:3,
+  label:{fontSize:10,color:"#8b949e",offset:[4,-12]},
+});
+
+// ── Dynamic state ─────────────────────────────────────────────────
+let theta = parseFloat(document.getElementById("sl-theta").value);
+
+const ptC = board.create("point",
+  [()=>Math.cos(theta), ()=>Math.sin(theta)],
+  {name:"C",fixed:true,fillColor:"#f78166",strokeColor:"#f78166",size:5,
+   label:{fontSize:12,color:"#f78166",offset:[6,8]}});
+
+board.create("segment",[ptA,ptB],{strokeColor:"#4da6ff",strokeWidth:2,opacity:0.7});
+board.create("segment",[ptA,ptC],{strokeColor:"#4da6ff",strokeWidth:2,opacity:0.7});
+board.create("segment",[ptB,ptC],{strokeColor:"#4da6ff",strokeWidth:2,opacity:0.7});
+
+// Euler line: through O=(0,0) and C (and also H=C for right-angle Thales)
+board.create("line",[[0,0],[()=>Math.cos(theta),()=>Math.sin(theta)]],{
+  strokeColor:"#a371f7",strokeWidth:1.2,dash:3,
+  highlight:false,name:"",
+});
+
+// ── Center point + locus ──────────────────────────────────────────
+let locusObj=null, centerPt=null, currentCenter=CENTERS[0];
+
+function drawCenter(c) {
+  if(locusObj){board.removeObject(locusObj);locusObj=null}
+  if(centerPt){board.removeObject(centerPt);centerPt=null}
+
+  const[xs,ys]=computeLocus(c);
+  if(xs.length>2){
+    locusObj=board.create("curve",[xs,ys],{
+      strokeColor:"#f0b429",strokeWidth:2.2,
+      highlight:false,name:"",
     });
-  board.create('segment', [ptA, ptB], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
-  board.create('segment', [ptA, ptC], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
-  board.create('segment', [ptB, ptC], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
-  board.create('line', [[0,0],[()=>Math.cos(state.angle),()=>Math.sin(state.angle)]], {
-    strokeColor: '#b388ff', strokeWidth: 1.5, dash: 3, highlight: false, name: '',
-  });
-  return ptC;
-}
+  }
+  centerPt=board.create("point",[
+    ()=>{const[x]=b2c(...c.uvw(theta),theta);return isFinite(x)?x:0},
+    ()=>{const[,y]=b2c(...c.uvw(theta),theta);return isFinite(y)?y:0},
+  ],{name:c.id,fillColor:"#f0b429",strokeColor:"#f0b429",size:6,
+     label:{fontSize:11,color:"#f0b429",offset:[8,6]}});
 
-// ── Add one center: locus curve + moving dot ──────────────────────
-// Locus is built from the exact rational formula via buildLocus().
-// Moving dot evaluates the formula at the current t = tan(state.angle/4).
-function addCenter(board, state, formulaId, color, label) {
-  // Pre-computed locus curve
-  const [xs, ys] = buildLocus(formulaId);
-  board.create('curve', [xs, ys], {
-    strokeColor: color, strokeWidth: 2.5,
-    highlight: false, name: '',
-  });
+  document.getElementById("bary-disp").textContent=c.bary;
 
-  // Moving dot: re-evaluated on every board.update()
-  board.create('point', [
-    () => { const t = tFromTheta(state.angle);
-            const [x] = evalFormula(formulaId, t); return isFinite(x) ? x : 0; },
-    () => { const t = tFromTheta(state.angle);
-            const [,y] = evalFormula(formulaId, t); return isFinite(y) ? y : 0; },
-  ], {
-    name: label, fixed: true,
-    fillColor: color, strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 11, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
-             color, offset: [8, 6] },
-  });
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  Panel 1 — X(1) Incenter, X(2) Centroid, X(8) Nagel
-// ══════════════════════════════════════════════════════════════════
-const st1 = { angle: Math.PI / 3 };
-const b1  = makeBoard('box1');
-addThalesGeometry(b1, st1);
-addCenter(b1, st1, 'X(1)', '#ffd166', 'X(1)');
-addCenter(b1, st1, 'X(2)', '#b388ff', 'X(2)');
-addCenter(b1, st1, 'X(8)', '#06d6a0', 'X(8)');
-
-// ══════════════════════════════════════════════════════════════════
-//  Panel 2 — X(5) Nine-Point, X(6) Symmedian, X(11) Feuerbach
-// ══════════════════════════════════════════════════════════════════
-const st2 = { angle: Math.PI / 2 };
-const b2  = makeBoard('box2');
-addThalesGeometry(b2, st2);
-addCenter(b2, st2, 'X(5)', '#ffd166', 'X(5)');
-addCenter(b2, st2, 'X(6)', '#4da6ff', 'X(6)');
-addCenter(b2, st2, 'X(11)', '#f78c6c', 'X(11)');
-
-// ══════════════════════════════════════════════════════════════════
-//  Animation engine — shared factory
-// ══════════════════════════════════════════════════════════════════
-function makeAnimator(state, board, infoId, startId, stopId) {
-  let animId  = null;
-  let lastTs  = null;
-  const SPEED = 0.9;   // rad/s
-  const PI    = Math.PI;
-
-  function step(ts) {
-    if (lastTs === null) lastTs = ts;
-    const dt = Math.min((ts - lastTs) / 1000, 0.1);
-    lastTs = ts;
-
-    state.angle += SPEED * dt;
-    if (state.angle > PI)  state.angle -= 2 * PI;  // wrap π → −π
-
-    board.update();
-
-    const deg = (state.angle * 180 / PI).toFixed(1);
-    const t_val = Math.tan(state.angle / 4).toFixed(4);
-    document.getElementById(infoId).innerHTML =
-      `&theta; = <span>${state.angle.toFixed(3)}</span> rad &nbsp;|&nbsp; ` +
-      `t = tan(&theta;/4) = <span>${t_val}</span>`;
-
-    animId = requestAnimationFrame(step);
+  // ── Start marker: θ = −π+ε  (C near B, upper) ───────────────
+  const tS = -Math.PI + 0.08;
+  const [su,sv,sw] = c.uvw(tS);
+  const [sx,sy]    = b2c(su,sv,sw,tS);
+  if (isFinite(sx) && Math.abs(sx)<=2.2 && isFinite(sy) && Math.abs(sy)<=2.2) {
+    startPt = board.create("point",[sx,sy],{
+      name:"start", fixed:true,
+      fillColor:"#06d6a0", strokeColor:"#ffffff", strokeWidth:1.5, size:5,
+      label:{fontSize:10,fontFamily:"Nunito,sans-serif",fontWeight:700,
+             color:"#06d6a0",offset:[7,-14]},
+    });
   }
 
-  document.getElementById(startId).addEventListener('click', () => {
-    if (animId) return;
-    lastTs = null;
-    animId = requestAnimationFrame(step);
-    document.getElementById(startId).disabled = true;
-    document.getElementById(stopId).disabled  = false;
-  });
+  // ── Finish marker: θ = π−ε  (C near B, also upper) ──────────
+  const tF = Math.PI - 0.08;
+  const [fu,fv,fw] = c.uvw(tF);
+  const [fx,fy]    = b2c(fu,fv,fw,tF);
+  if (isFinite(fx) && Math.abs(fx)<=2.2 && isFinite(fy) && Math.abs(fy)<=2.2) {
+    finishPt = board.create("point",[fx,fy],{
+      name:"end", fixed:true,
+      fillColor:"#ffd166", strokeColor:"#ffffff", strokeWidth:1.5, size:5,
+      label:{fontSize:10,fontFamily:"Nunito,sans-serif",fontWeight:700,
+             color:"#ffd166",offset:[7,8]},
+    });
+  }
 
-  document.getElementById(stopId).addEventListener('click', () => {
-    if (animId) { cancelAnimationFrame(animId); animId = null; }
-    lastTs = null;
-    document.getElementById(startId).disabled = false;
-    document.getElementById(stopId).disabled  = true;
-  });
+  updateInfo();
+  board.update();
 }
 
-makeAnimator(st1, b1, 'p1-info', 'p1-start', 'p1-stop');
-makeAnimator(st2, b2, 'p2-info', 'p2-start', 'p2-stop');
+// ── Info panel ────────────────────────────────────────────────────
+function updateInfo(){
+  const r=tri(theta);
+  const[xn,yn]=b2c(...currentCenter.uvw(theta),theta);
+  document.getElementById("inf-C").textContent=
+    `(${Math.cos(theta).toFixed(4)}, ${Math.sin(theta).toFixed(4)})`;
+  document.getElementById("inf-Xn").textContent=
+    (isFinite(xn)&&Math.abs(xn)<=5)?`(${xn.toFixed(4)}, ${yn.toFixed(4)})`:"undefined";
+  document.getElementById("inf-a").textContent=r.a.toFixed(4);
+  document.getElementById("inf-b").textContent=r.b.toFixed(4);
+  const rad=t=>t*(180/Math.PI);
+  document.getElementById("inf-A").textContent=
+    `${rad((Math.PI-Math.abs(theta))/2).toFixed(1)}°`;
+  document.getElementById("inf-B").textContent=
+    `${rad(Math.abs(theta)/2).toFixed(1)}°`;
+  document.getElementById("theta-disp").textContent=
+    `θ = ${theta.toFixed(3)} rad  (${rad(theta).toFixed(1)}°)`;
+}
+
+// ── Populate dropdown ─────────────────────────────────────────────
+const sel=document.getElementById("sel");
+CENTERS.forEach((c,i)=>{
+  const o=document.createElement("option");
+  o.value=i;
+  o.textContent=`${c.id} — ${c.name}`;
+  sel.appendChild(o);
+});
+sel.addEventListener("change",()=>{
+  currentCenter=CENTERS[parseInt(sel.value)];
+  drawCenter(currentCenter);
+});
+
+// ── Slider: manual drag ─────────────────────────────────────────
+const sliderEl = document.getElementById("sl-theta");
+const btnStart = document.getElementById("btn-start");
+const btnStop  = document.getElementById("btn-stop");
+
+sliderEl.addEventListener("input", e => {
+  theta = parseFloat(e.target.value);
+  board.update();
+  updateInfo();
+});
+
+// ── Animation ────────────────────────────────────────────────────
+// θ increases at SPEED rad/s. On reaching π it wraps to −π (not oscillation).
+let animId   = null;
+let lastTime = null;
+const SPEED  = 0.9;   // radians per second
+
+function animStep(timestamp) {
+  if (lastTime === null) lastTime = timestamp;
+  const dt = Math.min((timestamp - lastTime) / 1000, 0.1);  // cap at 100ms
+  lastTime = timestamp;
+
+  theta += SPEED * dt;
+  if (theta > Math.PI) theta -= 2 * Math.PI;   // wrap π → −π seamlessly
+
+  sliderEl.value = theta;
+  board.update();
+  updateInfo();
+  animId = requestAnimationFrame(animStep);
+}
+
+btnStart.addEventListener("click", () => {
+  if (animId) return;
+  lastTime = null;
+  animId   = requestAnimationFrame(animStep);
+  btnStart.disabled = true;
+  btnStop.disabled  = false;
+});
+
+btnStop.addEventListener("click", () => {
+  if (animId) { cancelAnimationFrame(animId); animId = null; }
+  lastTime          = null;
+  btnStart.disabled = false;
+  btnStop.disabled  = true;
+});
+
+// ── Init ─────────────────────────────────────────────────────────
+drawCenter(currentCenter);
 </script>
 </body>
 </html>
