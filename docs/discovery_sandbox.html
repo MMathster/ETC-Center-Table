@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETC Locus Discovery Sandbox</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.6; color: #24292f; max-width: 1000px; margin: 0 auto; padding: 2rem; background: #f6f8fa; }
+        h1 { border-bottom: 1px solid #d0d7de; padding-bottom: 0.3em; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .card { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 1rem; box-shadow: 0 1px 3px rgba(27,31,35,0.12); }
+        .jxgbox { width: 100%; height: 450px; border-radius: 4px; margin-bottom: 1rem; }
+        .controls { display: flex; align-items: center; justify-content: space-between; }
+        button { background-color: #2da44e; color: white; border: 1px solid rgba(27,31,35,0.15); border-radius: 6px; padding: 5px 16px; font-weight: 500; cursor: pointer; transition: 0.2s; }
+        button:hover { background-color: #2c974b; }
+        button.paused { background-color: #cf222e; }
+        .badge { font-size: 12px; font-weight: 500; padding: 2px 7px; border-radius: 10px; background: #afb8c133; }
+    </style>
+</head>
+<body>
+
+    <h1>📐 ETC-Center-Table Discovery Sandbox</h1>
+    <p>Exploring the kinematics of triangle centers within the <b>Thales Configuration</b>. Vertex A and B are fixed at (-1, 0) and (1, 0), while C traverses the circumcircle.</p>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Nagel Line Invariant <span class="badge">X1, X2, X8</span></h3>
+            <div id="nagel-box" class="jxgbox"></div>
+            <div class="controls">
+                <span>Collinearity of Incenter, Centroid, and Nagel point.</span>
+                <button onclick="toggleAnimation('nagel')" id="nagelBtn">Play</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Feuerbach Locus <span class="badge">X11</span></h3>
+            <div id="feuerbach-box" class="jxgbox"></div>
+            <div class="controls">
+                <span>The "Butterfly" quartic trace of point of tangency.</span>
+                <button onclick="toggleAnimation('feuerbach')" id="fBtn">Play</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Shared Setup ---
+        const setupBoard = (id) => JXG.JSXGraph.initBoard(id, {boundingbox: [-1.5, 1.5, 1.5, -1.5], axis: true, showCopyright: false});
+
+        // --- Nagel Board ---
+        const b1 = setupBoard('nagel-box');
+        const A = b1.create('point', [-1, 0], {name: 'A', fixed: true, color: 'blue', size: 3});
+        const B = b1.create('point', [1, 0], {name: 'B', fixed: true, color: 'blue', size: 3});
+        const circ = b1.create('circle', [[0,0], 1], {strokeColor: '#ccc', dash: 2});
+        const C = b1.create('glider', [0.6, 0.8, circ], {name: 'C', color: 'blue'});
+        b1.create('polygon', [A, B, C], {fillColor: '#ffff0011', border: {strokeColor: '#ccc'}});
+
+        const X1 = b1.create('incenter', [A, B, C], {name: 'X1', color: 'red', size: 2});
+        const X2 = b1.create('centroid', [A, B, C], {name: 'X2', color: 'orange', size: 2});
+        const X8 = b1.create('nagelpoint', [A, B, C], {name: 'X8', color: 'purple', size: 2});
+        b1.create('line', [X1, X8], {strokeColor: '#333', dash: 1, strokeWidth: 1});
+
+        // --- Feuerbach Board ---
+        const b2 = setupBoard('feuerbach-box');
+        const A2 = b2.create('point', [-1, 0], {fixed: true, visible: false});
+        const B2 = b2.create('point', [1, 0], {fixed: true, visible: false});
+        const circum2 = b2.create('circle', [[0,0], 1], {strokeColor: '#eee'});
+        const C2 = b2.create('glider', [0.5, 0.86, circum2], {name: 'C'});
+        b2.create('polygon', [A2, B2, C2], {fillColor: '#00ff0005', border: {strokeColor: '#eee'}});
+
+        const getX11Coord = (idx) => {
+            let a = JXG.Math.Geometry.distance(B2.coords.usrCoords, C2.coords.usrCoords);
+            let b = JXG.Math.Geometry.distance(A2.coords.usrCoords, C2.coords.usrCoords);
+            let c = JXG.Math.Geometry.distance(A2.coords.usrCoords, B2.coords.usrCoords);
+            let s = (a + b + c) / 2;
+            let w = [(s-a)*Math.pow(b-c,2), (s-b)*Math.pow(c-a,2), (s-c)*Math.pow(a-b,2)];
+            let total = w[0] + w[1] + w[2];
+            return (w[0]*A2.coords.usrCoords[idx] + w[1]*B2.coords.usrCoords[idx] + w[2]*C2.coords.usrCoords[idx]) / total;
+        };
+
+        const X11 = b2.create('point', [() => getX11Coord(1), () => getX11Coord(2)], {name: 'X11', color: 'green', size: 4});
+        b2.create('locus', [X11], {strokeColor: 'green', strokeWidth: 2, opacity: 0.6});
+
+        // --- Animation Management ---
+        let timers = { nagel: null, feuerbach: null };
+        let angles = { nagel: 0.9, feuerbach: 1.0 };
+
+        function toggleAnimation(type) {
+            const btnId = type === 'nagel' ? 'nagelBtn' : 'fBtn';
+            const btn = document.getElementById(btnId);
+            const glider = type === 'nagel' ? C : C2;
+
+            if (timers[type]) {
+                clearInterval(timers[type]);
+                timers[type] = null;
+                btn.innerHTML = "Play";
+                btn.classList.remove('paused');
+            } else {
+                timers[type] = setInterval(() => {
+                    angles[type] += 0.012;
+                    glider.moveTo([Math.cos(angles[type]), Math.sin(angles[type])]);
+                }, 20);
+                btn.innerHTML = "Pause";
+                btn.classList.add('paused');
+            }
+        }
+    </script>
+</body>
+</html>
