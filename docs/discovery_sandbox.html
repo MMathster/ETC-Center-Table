@@ -3,16 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETC Loci Sandbox — Two Panels</title>
+<title>ETC Loci Sandbox — Thales Configuration</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraph.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraphcore.min.js"></script>
 <style>
 :root {
   --bg:      #0b0f1a;
   --surface: #121828;
+  --surface2:#1a2236;
   --border:  #2a3550;
   --text:    #e8edf8;
   --dim:     #8fa3c8;
@@ -25,113 +26,79 @@
   --mono:    'JetBrains Mono', monospace;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
-  padding: 1.2rem;
+  background: var(--bg); color: var(--text);
+  font-family: var(--font); padding: 1.2rem;
   min-height: 100vh;
 }
-
 h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2rem; }
-.subtitle { font-size: .83rem; color: var(--dim); margin-bottom: 1.1rem; max-width: 700px; line-height: 1.5; }
-
-/* Two-panel grid */
-.panels {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
+.subtitle { font-size: .83rem; color: var(--dim); margin-bottom: 1.1rem; max-width: 720px; line-height: 1.5; }
+.panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media (max-width: 720px) { .panels { grid-template-columns: 1fr; } }
-
-.panel {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.panel-head {
-  padding: .65rem 1rem .5rem;
-  border-bottom: 1px solid var(--border);
-}
+.panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+.panel-head { padding: .65rem 1rem .5rem; border-bottom: 1px solid var(--border); }
 .panel-head h2 { font-size: 1rem; font-weight: 700; color: var(--text); }
-.panel-head p  { font-size: .76rem; color: var(--dim); margin-top: .15rem; font-family: var(--mono); }
-
-/* Board — square so circle looks circular */
-.board-wrap {
-  position: relative;
-  width: 100%;
-  padding-bottom: 100%;
-  background: #070b14;
-}
-.jxgbox {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* Controls */
+.panel-head p  { font-size: .74rem; color: var(--dim); margin-top: .15rem; }
+.board-wrap { position: relative; width: 100%; padding-bottom: 100%; background: #070b14; }
+.jxgbox { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; }
 .panel-ctrl {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  padding: .55rem .8rem;
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
+  display: flex; align-items: center; gap: .6rem;
+  padding: .55rem .8rem; border-top: 1px solid var(--border); flex-wrap: wrap;
 }
 .btn {
-  font-family: var(--font);
-  font-size: .8rem;
-  font-weight: 700;
-  border: none;
-  border-radius: 6px;
-  padding: .3rem .85rem;
-  cursor: pointer;
-  user-select: none;
-  transition: opacity .15s, transform .1s;
+  font-family: var(--font); font-size: .8rem; font-weight: 700;
+  border: none; border-radius: 6px; padding: .3rem .85rem;
+  cursor: pointer; user-select: none; transition: opacity .15s, transform .1s;
 }
-.btn:active   { transform: scale(.95); }
+.btn:active { transform: scale(.95); }
 .btn:disabled { opacity: .35; pointer-events: none; }
 .btn-go   { background: var(--green);  color: #071a14; }
 .btn-stop { background: var(--orange); color: #1a0a07; }
-
-/* Legend chips */
 .chips { display: flex; gap: .4rem; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
-.chip {
-  display: flex; align-items: center; gap: 5px;
-  font-size: .72rem; font-weight: 600; color: var(--dim);
-}
+.chip { display: flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 600; color: var(--dim); }
 .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-
-/* Info row */
-.panel-info {
-  padding: .4rem .8rem;
-  font-size: .76rem;
-  font-family: var(--mono);
-  color: var(--dim);
-  border-top: 1px solid var(--border);
-  min-height: 1.6rem;
+/* Formula block */
+.fbox {
+  border-top: 1px solid var(--border); background: #0d1523;
+  font-family: var(--mono); font-size: .75rem; line-height: 1.75;
+  padding: .55rem .85rem;
 }
-.panel-info span { color: var(--gold); font-weight: 500; }
+.fbox-title {
+  font-family: var(--font); font-size: .7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em;
+  color: var(--dim); margin-bottom: .3rem;
+}
+.frow { display: flex; gap: .6rem; align-items: baseline; }
+.fk   { color: var(--dim); font-size: .68rem; min-width: 1.6rem; }
+.fx   { color: #ffd166; }
+.fy   { color: #b388ff; }
+.fnote { font-size: .68rem; color: var(--dim); margin-top: .2rem; font-family: var(--font); }
+/* Theta info */
+.panel-info {
+  padding: .35rem .85rem; border-top: 1px solid var(--border);
+  font-size: .76rem; font-family: var(--mono); color: var(--dim); min-height: 1.5rem;
+}
+.panel-info span { color: var(--gold); }
 </style>
 </head>
 <body>
 
 <h1>ETC Loci Sandbox — Thales Configuration</h1>
 <p class="subtitle">
-  A = (1,0) and B = (−1,0) are fixed. C slides on the unit circumcircle.
-  Loci use JSXGraph's native tracing. Drag C or press Start to animate.
+  <b>A = (1,0)</b> and <b>B = (−1,0)</b> fixed. <b>C</b> moves on the unit circle.
+  Loci are drawn using the exact rational parametric forms
+  <b>x(t), y(t)</b> with <b>t = tan(θ/4)</b>,
+  obtained by normalising barycentric weights
+  ā = 1 − t², b̄ = 2t, c̄ = 1 + t², then substituting the Weierstrass half-angle identities.
 </p>
 
 <div class="panels">
 
-  <!-- ── Panel 1: Classical triad X1 · X2 · X8 ── -->
-  <div class="panel" id="panel-1">
+  <!-- Panel 1: X(1) · X(2) · X(8) -->
+  <div class="panel">
     <div class="panel-head">
-      <h2>Classical Centers — Incenter · Centroid · Nagel</h2>
-      <p>X(1): a:b:c &nbsp;|&nbsp; X(2): 1:1:1 &nbsp;|&nbsp; X(8): b+c−a : c+a−b : a+b−c</p>
+      <h2>Incenter · Centroid · Nagel Point</h2>
+      <p>X(1) : X(2) : X(8)</p>
     </div>
     <div class="board-wrap"><div id="box1" class="jxgbox"></div></div>
     <div class="panel-ctrl">
@@ -145,13 +112,31 @@ h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2
       </div>
     </div>
     <div class="panel-info" id="p1-info">θ = —</div>
+    <div class="fbox">
+      <div class="fbox-title">Parametric curves — t = tan(θ/4), t ∈ (0, 1)</div>
+      <div style="margin-bottom:.4rem">
+        <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(1) Incenter — degree 2</div>
+        <div class="frow"><span class="fk">x =</span><span class="fx">−(t² + 2t − 1) / (t² + 1)</span></div>
+        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t) / (t² + 1)</span></div>
+      </div>
+      <div style="margin-bottom:.4rem">
+        <div style="color:#b388ff;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(2) Centroid — degree 4, locus is circle r = 1/3</div>
+        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / [3(t²+1)²]</span></div>
+        <div class="frow"><span class="fk">y =</span><span class="fy">4t(1 − t²) / [3(t²+1)²]</span></div>
+      </div>
+      <div>
+        <div style="color:#06d6a0;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(8) Nagel — degree 4, y ≥ 0 for t ∈ (0,1)</div>
+        <div class="frow"><span class="fk">x =</span><span class="fx">(t²+2t−1)(3t²−2t+1) / (t²+1)²</span></div>
+        <div class="frow"><span class="fk">y =</span><span class="fy">4t²(1 − t)² / (t²+1)²</span></div>
+      </div>
+    </div>
   </div>
 
-  <!-- ── Panel 2: Advanced triad X5 · X6 · X11 ── -->
-  <div class="panel" id="panel-2">
+  <!-- Panel 2: X(5) · X(6) · X(11) -->
+  <div class="panel">
     <div class="panel-head">
-      <h2>Advanced Centers — 9-Pt · Symmedian · Feuerbach</h2>
-      <p>X(5): cos(B−C):… &nbsp;|&nbsp; X(6): a²:b²:c² &nbsp;|&nbsp; X(11): (b−c)²(b+c−a):…</p>
+      <h2>Nine-Point · Symmedian · Feuerbach</h2>
+      <p>X(5) : X(6) : X(11)</p>
     </div>
     <div class="board-wrap"><div id="box2" class="jxgbox"></div></div>
     <div class="panel-ctrl">
@@ -165,41 +150,175 @@ h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2
       </div>
     </div>
     <div class="panel-info" id="p2-info">θ = —</div>
+    <div class="fbox">
+      <div class="fbox-title">Parametric curves — t = tan(θ/4), t ∈ (0, 1)</div>
+      <div style="margin-bottom:.4rem">
+        <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(5) Nine-Point — degree 4, locus is circle r = 1/2</div>
+        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / [2(t²+1)²]</span></div>
+        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t²) / (t²+1)²</span></div>
+      </div>
+      <div style="margin-bottom:.4rem">
+        <div style="color:#4da6ff;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(6) Symmedian — degree 4, locus is unit circle (= C)</div>
+        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / (t²+1)²</span></div>
+        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t²) / (t²+1)²</span></div>
+        <div class="fnote">⟹ X(2), X(5), X(6) share the same numerator factor — Euler-line collinearity</div>
+      </div>
+      <div>
+        <div style="color:#f78c6c;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(11) Feuerbach — degree 6, smooth on t ∈ (0,1)</div>
+        <div class="frow"><span class="fk">x =</span><span class="fx">(t²+2t−1)(t⁴−6t³+2t−1) / [(t²+1)²(5t²−4t+1)]</span></div>
+        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1−t)(t²+2t−1)² / [(t²+1)²(5t²−4t+1)]</span></div>
+      </div>
+    </div>
   </div>
 
 </div><!-- /panels -->
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-//  Shared helpers
+//  Rational parametric formulas derived from t = tan(θ/4)
+//  Normalised weights: ā = 1−t², b̄ = 2t, c̄ = 1+t²
+//  cosθ = (t⁴−6t²+1)/(1+t²)²   sinθ = 4t(1−t²)/(1+t²)²
+//
+//  All formulas return [x, y] as JS numbers for a given t.
+//  t ∈ (0,1)  → upper half (θ ∈ (0,π),  sinθ > 0)
+//  t ∈ (-1,0) → lower half (θ ∈ (-π,0), sinθ < 0)
 // ═══════════════════════════════════════════════════════════════
 
-// Barycentric (u,v,w) from board points → Cartesian [x, y]
-function bary(A, B, C, u, v, w) {
-  const s = u + v + w;
-  if (Math.abs(s) < 1e-10) return [0, 0];
-  return [
-    (u * A.X() + v * B.X() + w * C.X()) / s,
-    (u * A.Y() + v * B.Y() + w * C.Y()) / s,
-  ];
+const XT = {
+
+  "X(1)": t => {
+    // x = −(t² + 2t − 1)/(t² + 1)
+    // y = 2t(1 − t)/(t² + 1)
+    const d = t*t + 1;
+    return [-(t*t + 2*t - 1) / d,
+              2*t*(1 - t) / d];
+  },
+
+  "X(2)": t => {
+    // x = (t²−2t−1)(t²+2t−1) / [3(t²+1)²]
+    // y = 4t(1−t²) / [3(t²+1)²]
+    const d = 3*(t*t + 1)*(t*t + 1);
+    return [(t*t - 2*t - 1)*(t*t + 2*t - 1) / d,
+              4*t*(1 - t*t) / d];
+  },
+
+  "X(5)": t => {
+    // x = (t²−2t−1)(t²+2t−1) / [2(t²+1)²]
+    // y = 2t(1−t²) / (t²+1)²
+    const d = (t*t + 1)*(t*t + 1);
+    return [(t*t - 2*t - 1)*(t*t + 2*t - 1) / (2*d),
+              2*t*(1 - t*t) / d];
+  },
+
+  "X(6)": t => {
+    // x = (t²−2t−1)(t²+2t−1) / (t²+1)²
+    // y = 2t(1−t²) / (t²+1)²
+    const d = (t*t + 1)*(t*t + 1);
+    return [(t*t - 2*t - 1)*(t*t + 2*t - 1) / d,
+              2*t*(1 - t*t) / d];
+  },
+
+  "X(8)": t => {
+    // x = (t²+2t−1)(3t²−2t+1) / (t²+1)²
+    // y = 4t²(1−t)² / (t²+1)²
+    const d = (t*t + 1)*(t*t + 1);
+    return [(t*t + 2*t - 1)*(3*t*t - 2*t + 1) / d,
+              4*t*t*(1 - t)*(1 - t) / d];
+  },
+
+  "X(11)": t => {
+    // x = (t²+2t−1)(t⁴−6t³+2t−1) / [(t²+1)²(5t²−4t+1)]
+    // y = 2t(1−t)(t²+2t−1)² / [(t²+1)²(5t²−4t+1)]
+    const d1 = (t*t + 1)*(t*t + 1);
+    const d2 = 5*t*t - 4*t + 1;          // no real roots → never zero on t∈(-1,1)
+    const d  = d1 * d2;
+    const A  = t*t + 2*t - 1;
+    return [A*(t*t*t*t - 6*t*t*t + 2*t - 1) / d,
+            2*t*(1 - t)*A*A / d];
+  },
+
+};
+
+// Convert state.angle (θ) to t = tan(θ/4), clipped away from singularities
+function tFromTheta(theta) {
+  return Math.tan(theta / 4);
 }
 
-// Side lengths from board points
-function sides(A, B, C) {
-  const a = B.Dist(C), b = A.Dist(C), c = A.Dist(B);
-  const sp = (a + b + c) / 2;
-  return { a, b, c, sp };
+// Evaluate a formula safely — return [NaN, NaN] if out of range
+function evalFormula(id, t) {
+  try {
+    const [x, y] = XT[id](t);
+    if (!isFinite(x) || !isFinite(y) || Math.abs(x) > 3 || Math.abs(y) > 3)
+      return [NaN, NaN];
+    return [x, y];
+  } catch(e) { return [NaN, NaN]; }
 }
 
-// Create a board that looks like the main viewer
+// Build locus point arrays for t ∈ (-1,0)∪(0,1), with NaN gaps at jumps
+function buildLocus(id) {
+  // t = tan(θ/4) is defined on (0, 1) for θ ∈ (0, π)  [upper semicircle].
+  // The lower half is obtained by reflecting y → −y, because:
+  //   • the formulas depend on side lengths a, b, c (symmetric in |θ|),
+  //   • sinθ changes sign while cosθ is unchanged when θ → −θ,
+  //   • so x(−θ) = x(θ)  and  y(−θ) = −y(θ)  for all six centers.
+  const xs = [], ys = [];
+  const STEPS   = 500;
+  const EPS     = 0.004;   // skip t near 0 (C→A) and t near 1 (C→B)
+  const MAX_JMP = 0.15;
+  let prevX = NaN, prevY = NaN;
+
+  // ── Collect upper-half points, t ∈ (EPS, 1−EPS) ──────────────
+  const upperPts = [];
+  for (let i = 0; i <= STEPS; i++) {
+    const t = EPS + (1 - 2*EPS) * i / STEPS;
+    upperPts.push(evalFormula(id, t));
+  }
+
+  // Push upper half with NaN gap detection
+  for (const [x, y] of upperPts) {
+    if (isFinite(x) && isFinite(y)) {
+      if (isFinite(prevX) && Math.hypot(x-prevX, y-prevY) > MAX_JMP) {
+        xs.push(NaN); ys.push(NaN);
+      }
+      xs.push(x); ys.push(y);
+      prevX = x; prevY = y;
+    } else {
+      if (isFinite(prevX)) { xs.push(NaN); ys.push(NaN); }
+      prevX = NaN; prevY = NaN;
+    }
+  }
+
+  // Gap separating the two halves
+  xs.push(NaN); ys.push(NaN);
+  prevX = NaN; prevY = NaN;
+
+  // ── Reflect upper half: y → −y, traverse in reverse so the path
+  //    continues smoothly from where the upper half ended ────────
+  for (let i = upperPts.length - 1; i >= 0; i--) {
+    const [x, y] = upperPts[i];
+    if (isFinite(x) && isFinite(y)) {
+      const yr = -y;   // reflection about x-axis
+      if (isFinite(prevX) && Math.hypot(x-prevX, yr-prevY) > MAX_JMP) {
+        xs.push(NaN); ys.push(NaN);
+      }
+      xs.push(x); ys.push(yr);
+      prevX = x; prevY = yr;
+    } else {
+      if (isFinite(prevX)) { xs.push(NaN); ys.push(NaN); }
+      prevX = NaN; prevY = NaN;
+    }
+  }
+
+  return [xs, ys];
+}
+
+// ── JSXGraph board factory ────────────────────────────────────────
 function makeBoard(id) {
   return JXG.JSXGraph.initBoard(id, {
     boundingbox: [-1.6, 1.6, 1.6, -1.6],
     keepaspectratio: true,
-    axis: true,
-    grid: true,
-    showCopyright: false,
-    showNavigation: false,
+    axis: true, grid: true,
+    showCopyright: false, showNavigation: false,
     defaultAxes: {
       x: { strokeColor: '#2a3550', ticks: { label: { fontSize: 9, fillColor: '#8fa3c8' } } },
       y: { strokeColor: '#2a3550', ticks: { label: { fontSize: 9, fillColor: '#8fa3c8' } } },
@@ -207,22 +326,19 @@ function makeBoard(id) {
   });
 }
 
-// Add fixed Thales geometry to a board; return {A, B, C, slider}
-function addThalesSetup(board, startAngle) {
-  // Circumcircle
-  board.create('circle', [[0, 0], [1, 0]], {
+// ── Thales geometry (fixed elements) ─────────────────────────────
+function addThalesGeometry(board, state) {
+  board.create('circle', [[0,0],[1,0]], {
     strokeColor: '#06d6a0', strokeWidth: 2,
     fixed: true, highlight: false, name: '',
   });
-
-  // A, B fixed
-  const A = board.create('point', [-1, 0], {
+  const ptA = board.create('point', [-1, 0], {
     name: 'A', fixed: true,
     fillColor: '#4da6ff', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
     label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
              color: '#4da6ff', offset: [-18, -14] },
   });
-  const B = board.create('point', [1, 0], {
+  const ptB = board.create('point', [1, 0], {
     name: 'B', fixed: true,
     fillColor: '#4da6ff', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
     label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
@@ -233,169 +349,75 @@ function addThalesSetup(board, startAngle) {
     fillColor: '#8fa3c8', strokeColor: '#8fa3c8', size: 3,
     label: { fontSize: 10, color: '#8fa3c8', offset: [5, -12] },
   });
-
-  // Internal angle state — using a plain object so the slider can share it
-  const state = { angle: startAngle };
-
-  // C on the circumcircle — driven by state.angle
-  const C = board.create('point',
+  const ptC = board.create('point',
     [() => Math.cos(state.angle), () => Math.sin(state.angle)],
-    {
-      name: 'C', fixed: true,
+    { name: 'C', fixed: true,
       fillColor: '#ff7043', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
       label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
                color: '#ff7043', offset: [7, 9] },
     });
-
-  // Triangle sides — all same weight as circumcircle
-  board.create('segment', [A, B], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
-  board.create('segment', [A, C], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
-  board.create('segment', [B, C], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
-
-  // Euler line through O and C (circumcenter=O, orthocenter=C for right-∠ at C)
-  board.create('line', [[0, 0], [() => Math.cos(state.angle), () => Math.sin(state.angle)]], {
-    strokeColor: '#b388ff', strokeWidth: 1.5, dash: 3,
-    highlight: false, name: '',
+  board.create('segment', [ptA, ptB], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
+  board.create('segment', [ptA, ptC], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
+  board.create('segment', [ptB, ptC], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
+  board.create('line', [[0,0],[()=>Math.cos(state.angle),()=>Math.sin(state.angle)]], {
+    strokeColor: '#b388ff', strokeWidth: 1.5, dash: 3, highlight: false, name: '',
   });
-
-  return { A, B, C, state };
+  return ptC;
 }
 
-// Create a moving center point that traces its locus
-function addCenter(board, A, B, C, color, label, uvwFn) {
-  // The locus is computed using JSXGraph's native mechanism:
-  // we make a dependent point and use board.create('locus', …).
-  const pt = board.create('point', [
-    () => { const [x] = bary(A,B,C,...uvwFn(A,B,C)); return x; },
-    () => { const [,y] = bary(A,B,C,...uvwFn(A,B,C)); return y; },
-  ], {
-    name: label,
-    fillColor: color, strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: {
-      fontSize: 11, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
-      color, offset: [8, 6],
-    },
-  });
-
-  // Manually collect locus points by sampling the full circle at setup
-  // (JSXGraph's native locus requires the point to depend on a glider,
-  //  but our point depends on state.angle indirectly through C — not a
-  //  direct glider — so we pre-sample and draw a curve instead.)
-  const STEPS = 350, eps = 0.06, pi = Math.PI, MAX_JUMP = 0.18;
-  const xs = [], ys = [];
-  let prevX = NaN, prevY = NaN;
-
-  for (let half = 0; half < 2; half++) {
-    for (let i = 0; i <= STEPS; i++) {
-      const raw = eps + (pi - 2 * eps) * i / STEPS;
-      const t   = half === 0 ? raw : -raw;           // upper then lower half
-      // Temporarily evaluate uvwFn with synthetic A, B, C proxies
-      const synC = { X: () => Math.cos(t), Y: () => Math.sin(t) };
-      const synA = { X: () => -1, Y: () => 0, Dist: (p) => Math.hypot(p.X()+1, p.Y()) };
-      const synB = { X: () =>  1, Y: () => 0, Dist: (p) => Math.hypot(p.X()-1, p.Y()) };
-      synA.Dist = (p) => Math.hypot(p.X() - synA.X(), p.Y() - synA.Y());
-      synB.Dist = (p) => Math.hypot(p.X() - synB.X(), p.Y() - synB.Y());
-      synC.Dist = (p) => Math.hypot(p.X() - synC.X(), p.Y() - synC.Y());
-
-      try {
-        const [u, v, w] = uvwFn(synA, synB, synC);
-        const [x, y]   = bary(synA, synB, synC, u, v, w);
-        const valid = isFinite(x) && isFinite(y)
-                   && Math.abs(x) <= 2.2 && Math.abs(y) <= 2.2;
-        if (valid) {
-          const jump = isFinite(prevX) && Math.hypot(x - prevX, y - prevY) > MAX_JUMP;
-          if (jump) { xs.push(NaN); ys.push(NaN); }
-          xs.push(x); ys.push(y);
-          prevX = x; prevY = y;
-        } else {
-          if (isFinite(prevX)) { xs.push(NaN); ys.push(NaN); }
-          prevX = NaN; prevY = NaN;
-        }
-      } catch(e) {
-        if (isFinite(prevX)) { xs.push(NaN); ys.push(NaN); }
-        prevX = NaN; prevY = NaN;
-      }
-    }
-    // Gap between upper and lower half
-    xs.push(NaN); ys.push(NaN);
-    prevX = NaN; prevY = NaN;
-  }
-
+// ── Add one center: locus curve + moving dot ──────────────────────
+// Locus is built from the exact rational formula via buildLocus().
+// Moving dot evaluates the formula at the current t = tan(state.angle/4).
+function addCenter(board, state, formulaId, color, label) {
+  // Pre-computed locus curve
+  const [xs, ys] = buildLocus(formulaId);
   board.create('curve', [xs, ys], {
     strokeColor: color, strokeWidth: 2.5,
     highlight: false, name: '',
   });
 
-  return pt;
+  // Moving dot: re-evaluated on every board.update()
+  board.create('point', [
+    () => { const t = tFromTheta(state.angle);
+            const [x] = evalFormula(formulaId, t); return isFinite(x) ? x : 0; },
+    () => { const t = tFromTheta(state.angle);
+            const [,y] = evalFormula(formulaId, t); return isFinite(y) ? y : 0; },
+  ], {
+    name: label, fixed: true,
+    fillColor: color, strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
+    label: { fontSize: 11, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
+             color, offset: [8, 6] },
+  });
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
 //  Panel 1 — X(1) Incenter, X(2) Centroid, X(8) Nagel
-// ═══════════════════════════════════════════════════════════════
-const board1 = makeBoard('box1');
-const { A: A1, B: B1, C: C1, state: st1 } = addThalesSetup(board1, Math.PI / 3);
+// ══════════════════════════════════════════════════════════════════
+const st1 = { angle: Math.PI / 3 };
+const b1  = makeBoard('box1');
+addThalesGeometry(b1, st1);
+addCenter(b1, st1, 'X(1)', '#ffd166', 'X(1)');
+addCenter(b1, st1, 'X(2)', '#b388ff', 'X(2)');
+addCenter(b1, st1, 'X(8)', '#06d6a0', 'X(8)');
 
-addCenter(board1, A1, B1, C1, '#ffd166', 'X(1)',
-  (A, B, C) => {
-    const a = B.Dist(C), b = A.Dist(C), c = A.Dist(B);
-    return [a, b, c];
-  });
-
-addCenter(board1, A1, B1, C1, '#b388ff', 'X(2)',
-  () => [1, 1, 1]);
-
-addCenter(board1, A1, B1, C1, '#06d6a0', 'X(8)',
-  (A, B, C) => {
-    const a = B.Dist(C), b = A.Dist(C), c = A.Dist(B);
-    const sp = (a + b + c) / 2;
-    return [sp - a, sp - b, sp - c];
-  });
-
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
 //  Panel 2 — X(5) Nine-Point, X(6) Symmedian, X(11) Feuerbach
-// ═══════════════════════════════════════════════════════════════
-const board2 = makeBoard('box2');
-const { A: A2, B: B2, C: C2, state: st2 } = addThalesSetup(board2, Math.PI / 2);
+// ══════════════════════════════════════════════════════════════════
+const st2 = { angle: Math.PI / 2 };
+const b2  = makeBoard('box2');
+addThalesGeometry(b2, st2);
+addCenter(b2, st2, 'X(5)', '#ffd166', 'X(5)');
+addCenter(b2, st2, 'X(6)', '#4da6ff', 'X(6)');
+addCenter(b2, st2, 'X(11)', '#f78c6c', 'X(11)');
 
-addCenter(board2, A2, B2, C2, '#ffd166', 'X(5)',
-  (A, B, C) => {
-    // cos(B-C):cos(C-A):cos(A-B) using law-of-cosines angles
-    const a = B.Dist(C), b = A.Dist(C), c = A.Dist(B);
-    const cosA = (b*b + c*c - a*a) / (2*b*c + 1e-12);
-    const cosB = (a*a + c*c - b*b) / (2*a*c + 1e-12);
-    const cosC = (a*a + b*b - c*c) / (2*a*b + 1e-12);
-    const sinA = Math.sqrt(Math.max(0, 1 - cosA*cosA));
-    const sinB = Math.sqrt(Math.max(0, 1 - cosB*cosB));
-    const sinC = Math.sqrt(Math.max(0, 1 - cosC*cosC));
-    const u = cosB * cosC - sinB * sinC; // cos(B-C)
-    const v = cosC * cosA - sinC * sinA; // cos(C-A)
-    const w = cosA * cosB - sinA * sinB; // cos(A-B)
-    return [u, v, w];
-  });
-
-addCenter(board2, A2, B2, C2, '#4da6ff', 'X(6)',
-  (A, B, C) => {
-    const a = B.Dist(C), b = A.Dist(C), c = A.Dist(B);
-    return [a*a, b*b, c*c];
-  });
-
-addCenter(board2, A2, B2, C2, '#f78c6c', 'X(11)',
-  (A, B, C) => {
-    const a = B.Dist(C), b = A.Dist(C), c = A.Dist(B);
-    return [
-      (b-c)*(b-c)*(b+c-a),
-      (c-a)*(c-a)*(c+a-b),
-      (a-b)*(a-b)*(a+b-c),
-    ];
-  });
-
-// ═══════════════════════════════════════════════════════════════
-//  Animation engine (shared for both panels)
-// ═══════════════════════════════════════════════════════════════
-function makeAnimator(state, board, infoId, btnStart, btnStop) {
+// ══════════════════════════════════════════════════════════════════
+//  Animation engine — shared factory
+// ══════════════════════════════════════════════════════════════════
+function makeAnimator(state, board, infoId, startId, stopId) {
   let animId  = null;
   let lastTs  = null;
-  const SPEED = 0.9; // rad/s
+  const SPEED = 0.9;   // rad/s
+  const PI    = Math.PI;
 
   function step(ts) {
     if (lastTs === null) lastTs = ts;
@@ -403,35 +425,37 @@ function makeAnimator(state, board, infoId, btnStart, btnStop) {
     lastTs = ts;
 
     state.angle += SPEED * dt;
-    if (state.angle > Math.PI) state.angle -= 2 * Math.PI;
+    if (state.angle > PI)  state.angle -= 2 * PI;  // wrap π → −π
 
     board.update();
 
-    const deg = (state.angle * 180 / Math.PI).toFixed(1);
+    const deg = (state.angle * 180 / PI).toFixed(1);
+    const t_val = Math.tan(state.angle / 4).toFixed(4);
     document.getElementById(infoId).innerHTML =
-      `θ = <span>${state.angle.toFixed(3)} rad</span>  (${deg}°)`;
+      `&theta; = <span>${state.angle.toFixed(3)}</span> rad &nbsp;|&nbsp; ` +
+      `t = tan(&theta;/4) = <span>${t_val}</span>`;
 
     animId = requestAnimationFrame(step);
   }
 
-  document.getElementById(btnStart).addEventListener('click', () => {
+  document.getElementById(startId).addEventListener('click', () => {
     if (animId) return;
     lastTs = null;
     animId = requestAnimationFrame(step);
-    document.getElementById(btnStart).disabled = true;
-    document.getElementById(btnStop).disabled  = false;
+    document.getElementById(startId).disabled = true;
+    document.getElementById(stopId).disabled  = false;
   });
 
-  document.getElementById(btnStop).addEventListener('click', () => {
+  document.getElementById(stopId).addEventListener('click', () => {
     if (animId) { cancelAnimationFrame(animId); animId = null; }
     lastTs = null;
-    document.getElementById(btnStart).disabled = false;
-    document.getElementById(btnStop).disabled  = true;
+    document.getElementById(startId).disabled = false;
+    document.getElementById(stopId).disabled  = true;
   });
 }
 
-makeAnimator(st1, board1, 'p1-info', 'p1-start', 'p1-stop');
-makeAnimator(st2, board2, 'p2-info', 'p2-start', 'p2-stop');
+makeAnimator(st1, b1, 'p1-info', 'p1-start', 'p1-stop');
+makeAnimator(st2, b2, 'p2-info', 'p2-start', 'p2-stop');
 </script>
 </body>
 </html>
