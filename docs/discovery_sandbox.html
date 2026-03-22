@@ -1,67 +1,101 @@
+<div id="controls-1" style="margin-bottom: 10px;">
+    <button onclick="toggleAnimation(s1, b1, 'ani1')">Start/Stop Nagel Animation</button>
+</div>
+<div id="nagel-box" class="jxgbox" style="width:500px; height:500px;"></div>
+
+<hr />
+
+<div id="controls-2" style="margin-bottom: 10px;">
+    <button onclick="toggleAnimation(s2, b2, 'ani2')">Start/Stop Feuerbach Animation</button>
+</div>
+<div id="feuerbach-box" class="jxgbox" style="width:500px; height:500px;"></div>
+
 <script>
-    // --- Shared Setup ---
-    const setupBoard = (id) => JXG.JSXGraph.initBoard(id, {
-        boundingbox: [-1.5, 1.5, 1.5, -1.5], 
-        axis: true, 
-        showCopyright: false,
-        attributes: { pan: { enabled: true }, zoom: { enabled: true } }
-    });
+    // Animation state tracking
+    const animations = { ani1: null, ani2: null };
 
-    // --- Nagel Board (X1, X2, X8) ---
-    const b1 = setupBoard('nagel-box');
-    
-    // 1. Add Slider for Angle (0 to 2*Pi)
-    const s1 = b1.create('slider', [[-1.2, -1.2], [0.5, -1.2], [0, 0, 2 * Math.PI]], {name: '&alpha;'});
-    
-    const A = b1.create('point', [-1, 0], {name: 'A', fixed: true, color: 'blue', size: 3});
-    const B = b1.create('point', [1, 0], {name: 'B', fixed: true, color: 'blue', size: 3});
-    const circ = b1.create('circle', [[0,0], 1], {strokeColor: '#ccc', dash: 2});
-    
-    // 2. Bind Point C to the Slider value
-    const C = b1.create('point', [
-        () => Math.cos(s1.Value()), 
-        () => Math.sin(s1.Value())
-    ], {name: 'C', color: 'blue'});
-
-    b1.create('polygon', [A, B, C], {fillColor: '#ffff0011', border: {strokeColor: '#ccc'}});
-
-    const X1 = b1.create('incenter', [A, B, C], {name: 'X1', color: 'red', size: 2});
-    const X2 = b1.create('centroid', [A, B, C], {name: 'X2', color: 'orange', size: 2});
-    const X8 = b1.create('nagelpoint', [A, B, C], {name: 'X8', color: 'purple', size: 2});
-    
-    // Loci
-    b1.create('locus', [X1], {strokeColor: 'red', strokeWidth: 1, dash: 1});
-    b1.create('locus', [X2], {strokeColor: 'orange', strokeWidth: 1});
-    b1.create('locus', [X8], {strokeColor: 'purple', strokeWidth: 1});
-    b1.create('line', [X1, X8], {strokeColor: '#333', dash: 1, strokeWidth: 0.5});
-
-    // --- Feuerbach Board (X11) ---
-    const b2 = setupBoard('feuerbach-box');
-    
-    // 1. Add Slider for Angle
-    const s2 = b2.create('slider', [[-1.2, -1.2], [0.5, -1.2], [0, 1.0, 2 * Math.PI]], {name: '&alpha;'});
-
-    const A2 = b2.create('point', [-1, 0], {fixed: true, visible: true, name:'A', size: 2, color: '#bbb'});
-    const B2 = b2.create('point', [1, 0], {fixed: true, visible: true, name:'B', size: 2, color: '#bbb'});
-    const circum2 = b2.create('circle', [[0,0], 1], {strokeColor: '#eee'});
-    
-    // 2. Bind Point C2 to Slider
-    const C2 = b2.create('point', [
-        () => Math.cos(s2.Value()), 
-        () => Math.sin(s2.Value())
-    ], {name: 'C', color: 'blue'});
-
-    const getX11Coord = (idx) => {
-        let a = JXG.Math.Geometry.distance(B2.coords.usrCoords, C2.coords.usrCoords);
-        let b = JXG.Math.Geometry.distance(A2.coords.usrCoords, C2.coords.usrCoords);
-        let c = JXG.Math.Geometry.distance(A2.coords.usrCoords, B2.coords.usrCoords);
-        let s = (a + b + c) / 2;
-        let w = [(s-a)*Math.pow(b-c,2), (s-b)*Math.pow(c-a,2), (s-c)*Math.pow(a-b,2)];
-        let total = w[0] + w[1] + w[2];
-        if (Math.abs(total) < 0.0001) return 0; // Avoid division by zero at endpoints
-        return (w[0]*A2.coords.usrCoords[idx] + w[1]*B2.coords.usrCoords[idx] + w[2]*C2.coords.usrCoords[idx]) / total;
+    const toggleAnimation = (slider, board, key) => {
+        if (animations[key]) {
+            clearInterval(animations[key]);
+            animations[key] = null;
+        } else {
+            animations[key] = setInterval(() => {
+                let val = slider.Value() + 0.02;
+                if (val > 2 * Math.PI) val = 0;
+                slider.setValue(val);
+                board.update();
+            }, 30);
+        }
     };
 
-    const X11 = b2.create('point', [() => getX11Coord(1), () => getX11Coord(2)], {name: 'X11', color: 'green', size: 4});
-    b2.create('locus', [X11], {strokeColor: 'green', strokeWidth: 2, opacity: 0.6});
+    // Helper: Calculate Barycentric to Cartesian coordinates
+    const getBarycentric = (A, B, C, wa, wb, wc) => {
+        const total = wa + wb + wc;
+        if (Math.abs(total) < 0.00001) return [0, 0];
+        const x = (wa * A.X() + wb * B.X() + wc * C.X()) / total;
+        const y = (wa * A.Y() + wb * B.Y() + wc * C.Y()) / total;
+        return [x, y];
+    };
+
+    // Shared side-length and perimeter logic
+    const getTriangleData = (A, B, C) => {
+        const a = B.Dist(C);
+        const b = A.Dist(C);
+        const c = A.Dist(B);
+        const s = (a + b + c) / 2;
+        return { a, b, c, s };
+    };
+
+    // --- BOARD 1: NAGEL (X1, X2, X8) ---
+    const b1 = JXG.JSXGraph.initBoard('nagel-box', { boundingbox: [-1.5, 1.5, 1.5, -1.5], axis: true, showCopyright: false });
+    const s1 = b1.create('slider', [[-1.2, -1.3], [0.5, -1.3], [0, 0.8, 2 * Math.PI]], { name: 'α' });
+    
+    const A1 = b1.create('point', [-1, 0], { name: 'A', fixed: true, color: 'blue' });
+    const B1 = b1.create('point', [1, 0], { name: 'B', fixed: true, color: 'blue' });
+    const circ1 = b1.create('circle', [[0, 0], 1], { strokeColor: '#ccc', dash: 2 });
+    
+    // C1 follows slider, but slider also follows C1 if dragged
+    const C1 = b1.create('point', [() => Math.cos(s1.Value()), () => Math.sin(s1.Value())], { name: 'C', color: 'red' });
+    C1.on('drag', () => {
+        let angle = Math.atan2(C1.Y(), C1.X());
+        if (angle < 0) angle += 2 * Math.PI;
+        s1.setValue(angle);
+    });
+
+    // Exact Coordinate Calculations
+    const X1 = b1.create('point', [() => {
+        const { a, b, c } = getTriangleData(A1, B1, C1);
+        return getBarycentric(A1, B1, C1, a, b, c);
+    }], { name: 'X1', color: 'red', size: 3 });
+
+    const X2 = b1.create('point', [() => {
+        return getBarycentric(A1, B1, C1, 1, 1, 1);
+    }], { name: 'X2', color: 'orange', size: 3 });
+
+    const X8 = b1.create('point', [() => {
+        const { a, b, c, s } = getTriangleData(A1, B1, C1);
+        return getBarycentric(A1, B1, C1, s - a, s - b, s - c);
+    }], { name: 'X8', color: 'purple', size: 3 });
+
+    b1.create('locus', [X1], { strokeColor: 'red', dash: 1 });
+    b1.create('locus', [X2], { strokeColor: 'orange' });
+    b1.create('locus', [X8], { strokeColor: 'purple' });
+
+    // --- BOARD 2: FEUERBACH (X11) ---
+    const b2 = JXG.JSXGraph.initBoard('feuerbach-box', { boundingbox: [-1.5, 1.5, 1.5, -1.5], axis: true, showCopyright: false });
+    const s2 = b2.create('slider', [[-1.2, -1.3], [0.5, -1.3], [0, 1.2, 2 * Math.PI]], { name: 'α' });
+    
+    const A2 = b2.create('point', [-1, 0], { name: 'A', fixed: true, color: '#bbb' });
+    const B2 = b2.create('point', [1, 0], { name: 'B', fixed: true, color: '#bbb' });
+    const C2 = b2.create('point', [() => Math.cos(s2.Value()), () => Math.sin(s2.Value())], { name: 'C' });
+
+    const X11 = b2.create('point', [() => {
+        const { a, b, c, s } = getTriangleData(A2, B2, C2);
+        const wa = (s - a) * Math.pow(b - c, 2);
+        const wb = (s - b) * Math.pow(c - a, 2);
+        const wc = (s - c) * Math.pow(a - b, 2);
+        return getBarycentric(A2, B2, C2, wa, wb, wc);
+    }], { name: 'X11', color: 'green', size: 4 });
+
+    b2.create('locus', [X11], { strokeColor: 'green', strokeWidth: 2 });
 </script>
