@@ -11,6 +11,7 @@
     - [📏 The Thales-Right Configuration](#-the-thales-right-configuration)
     - [📟 Rational Representations](#-rational-representations)
     - [🖼️ Thales Configuration Gallery](#-thales-configuration-gallery)
+    - [🕹️ Interactive Research Tools](#-interactive-research-tools)
   - [📚 Filtering & Classification](#-filtering--classification)
   - [📈 Real-Time Monitoring](#-real-time-monitoring)
   - [🚧 Current progress](#-current-progress)
