@@ -319,4 +319,4 @@ python scripts/analyze_cache.py
 ```
 <hr>
 
-*For a detailed log of technical corrections and LLM-assisted optimizations, see [DEVELOPMENT_LOG.md](https://mmathster.github.io/ETC-Center-Table/docs/DEVELOPMENT_LOG.md)*
+*For a detailed log of technical corrections and LLM-assisted optimizations, see [DEVELOPMENT_LOG.md](https://github.com/MMathster/ETC-Center-Table/blob/main/docs/DEVELOPMENT_LOG.md)*
