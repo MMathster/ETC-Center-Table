@@ -55,6 +55,8 @@ body {
 }
 .sidebar-link:hover,.sidebar-link.active{color:#fff;border-color:rgba(112,184,255,.3);background:rgba(19,35,58,.9);box-shadow:var(--glow)}
 .sidebar-link small{font-size:.72rem;color:var(--soft)}
+.section-title{display:flex;align-items:center;gap:.8rem;font-size:1.02rem;font-weight:800;color:#fff;line-height:1.2}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(112,184,255,.34) 0%,rgba(112,184,255,0) 100%)}
 h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; letter-spacing: -.02em; }
 .subtitle { font-size: .92rem; color: var(--dim); margin-bottom: 1.15rem; max-width: 760px; line-height: 1.8; }
 .math-inline { white-space: nowrap; }
@@ -218,7 +220,7 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
 </p>
 
 <section class="derive-box">
-  <h2>Compact derivation</h2>
+  <h2 class="section-title">Compact derivation</h2>
   <p>
     With \(A=(1,0)\), \(B=(-1,0)\), and \(C=(\cos\theta,\sin\theta)\), each center starts from a barycentric triple \((u:v:w)\). The Thales normalization turns the Cartesian conversion into
     \[
@@ -248,7 +250,7 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
   <!-- Panel 1: X(1) · X(2) · X(8) -->
   <div class="panel">
     <div class="panel-head">
-      <h2>Incenter · Centroid · Nagel Point</h2>
+      <h2 class="section-title">Incenter · Centroid · Nagel Point</h2>
       <p>X(1) : X(2) : X(8)</p>
     </div>
     <div class="board-wrap"><div id="box1" class="jxgbox"></div></div>
@@ -294,7 +296,7 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
   <!-- Panel 2: X(5) · X(6) · X(11) -->
   <div class="panel">
     <div class="panel-head">
-      <h2>Nine-Point · Symmedian · Feuerbach</h2>
+      <h2 class="section-title">Nine-Point · Symmedian · Feuerbach</h2>
       <p>X(5) : X(6) : X(11)</p>
     </div>
     <div class="board-wrap"><div id="box2" class="jxgbox"></div></div>

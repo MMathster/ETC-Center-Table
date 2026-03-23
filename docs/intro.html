@@ -83,7 +83,9 @@ h1{font-size:1.45rem;color:#fff;margin-bottom:.25rem;font-weight:800;letter-spac
 .story-card:nth-child(1){background:linear-gradient(180deg,rgba(12,28,48,.98) 0%,rgba(10,20,33,.99) 100%);border-color:#2a527d}
 .story-card:nth-child(2){background:linear-gradient(180deg,rgba(26,33,55,.98) 0%,rgba(13,22,37,.99) 100%);border-color:#61518e}
 .story-card:nth-child(3){background:linear-gradient(180deg,rgba(25,31,50,.98) 0%,rgba(9,20,34,.99) 100%);border-color:#38648a}
-.story-card h2,.deep-dive h2,.widget-guide h2{font-size:1.04rem;color:#fff;margin-bottom:.45rem;font-weight:800}
+.story-card h2,.deep-dive h2,.widget-guide h2,.section-title{font-size:1.04rem;color:#fff;margin-bottom:.45rem;font-weight:800}
+.section-title{display:flex;align-items:center;gap:.8rem;line-height:1.2}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(112,184,255,.34) 0%,rgba(112,184,255,0) 100%)}
 .story-card p,.deep-dive p,.widget-guide p{font-size:.88rem;color:var(--muted);line-height:1.68}
 .story-card ul,.deep-dive ul,.widget-guide ul{margin:.5rem 0 0 1.1rem;color:var(--text)}
 .story-card li,.deep-dive li,.widget-guide li{margin:.3rem 0;font-size:.85rem;line-height:1.62}
@@ -489,7 +491,7 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
 <div class="hero-note">
   <div class="story-grid">
     <section class="story-card">
-      <h2>What you are seeing</h2>
+      <h2 class="section-title">What you are seeing</h2>
       <p>
         Think of this page as a synchronized geometry lab: the orange point moves, the triangle updates,
         and a classical center such as the incenter, centroid, or symmedian point responds instantly.
@@ -501,7 +503,7 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
       </ul>
     </section>
     <section class="story-card">
-      <h2>Why Thales makes life cleaner</h2>
+      <h2 class="section-title">Why Thales makes life cleaner</h2>
       <p>
         Because <span class="math-inline">\(AB\)</span> is a diameter of the circumcircle, Thales' theorem gives a right angle at
         <span class="math-inline">\(C\)</span>. So every non-degenerate triangle in this widget has <span class="math-inline">\(\angle C=90^\circ\)</span>.
@@ -516,7 +518,7 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
       </p>
     </section>
     <section class="story-card">
-      <h2>From classical geometry to coordinates</h2>
+      <h2 class="section-title">From classical geometry to coordinates</h2>
       <p>
         The README's main idea is that the moving centers can be rewritten as rational coordinate formulas,
         so the loci can be computed efficiently and plotted smoothly.
@@ -532,7 +534,7 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   </div>
 
   <section class="deep-dive">
-    <h2>Deep dive — a Brilliant-style tour of triangle centers</h2>
+    <h2 class="section-title">Deep dive — a Brilliant-style tour of triangle centers</h2>
     <p>
       One of the nicest surprises in Euclidean geometry is that very different definitions can produce points that move in a coordinated way.
       Some centers are defined by <strong>distance</strong>, some by <strong>balancing</strong>, and some by <strong>angle symmetry</strong>, but in this widget they all respond to the same moving vertex \(C\).
@@ -573,7 +575,7 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   </section>
 
   <section class="widget-guide">
-    <h2>How to read the widget</h2>
+    <h2 class="section-title">How to read the widget</h2>
     <div class="guide-grid">
       <div>
         <p><strong>1. Pick a center.</strong> Use the dropdown to jump among ETC entries. The line just below the selector shows the active barycentric recipe and whether the locus is tagged as a circle, point, or more general curve.</p>
