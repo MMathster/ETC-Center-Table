@@ -13,7 +13,7 @@
 <script>
 window.MathJax = {
   tex: {
-    inlineMath: [['\\(', '\\)']],
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
     displayMath: [['\\[', '\\]'], ['$$', '$$']]
   },
   options: {
@@ -61,6 +61,36 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
   display: flex; align-items: center; gap: .6rem;
   padding: .55rem .8rem; border-top: 1px solid var(--border); flex-wrap: wrap;
 }
+.angle-box {
+  padding: .7rem .85rem .8rem;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg,rgba(13,28,48,.72) 0%,rgba(9,20,35,.92) 100%);
+}
+.angle-row {
+  display: grid;
+  grid-template-columns: 74px 1fr 92px;
+  gap: .7rem;
+  align-items: center;
+}
+.angle-row + .angle-row { margin-top: .55rem; }
+.angle-row label {
+  font-size: .74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--soft);
+}
+.angle-row input[type=range] {
+  width: 100%;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+.angle-value {
+  font-family: var(--mono);
+  font-size: .76rem;
+  color: var(--gold);
+  text-align: right;
+}
 .btn {
   font-family: var(--font); font-size: .82rem; font-weight: 800;
   border: none; border-radius: 8px; padding: .38rem .95rem;
@@ -73,6 +103,7 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
 .btn-stop { background: linear-gradient(180deg,#ff9b7e 0%,#f86a45 100%); color: #1a0a07; }
 .chips { display: flex; gap: .4rem; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
 .chip { display: flex; align-items: center; gap: 5px; font-size: .74rem; font-weight: 700; color: var(--dim); }
+.chip .mjx-container { font-size: 1em; }
 .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 /* Formula block */
 .fbox {
@@ -123,15 +154,27 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
       <button class="btn btn-go"   id="p1-start">▶ Start</button>
       <button class="btn btn-stop" id="p1-stop" disabled>■ Stop</button>
       <div class="chips">
-        <div class="chip"><div class="dot" style="background:#ff7043"></div>C</div>
-        <div class="chip"><div class="dot" style="background:#ffd166"></div>X(1)</div>
-        <div class="chip"><div class="dot" style="background:#b388ff"></div>X(2)</div>
-        <div class="chip"><div class="dot" style="background:#06d6a0"></div>X(8)</div>
+        <div class="chip"><div class="dot" style="background:#ff7043"></div><span>$C$</span></div>
+        <div class="chip"><div class="dot" style="background:#ffd166"></div><span>$X(1)$</span></div>
+        <div class="chip"><div class="dot" style="background:#b388ff"></div><span>$X(2)$</span></div>
+        <div class="chip"><div class="dot" style="background:#06d6a0"></div><span>$X(8)$</span></div>
       </div>
     </div>
     <div class="panel-info" id="p1-info">θ = —</div>
+    <div class="angle-box">
+      <div class="angle-row">
+        <label for="p1-rad">Radians</label>
+        <input type="range" id="p1-rad" min="0" max="6.283185307179586" step="0.005" value="1.0471975512">
+        <span class="angle-value" id="p1-rad-val">1.047 rad</span>
+      </div>
+      <div class="angle-row">
+        <label for="p1-deg">Degrees</label>
+        <input type="range" id="p1-deg" min="0" max="360" step="0.25" value="60">
+        <span class="angle-value" id="p1-deg-val">60.0°</span>
+      </div>
+    </div>
     <div class="fbox">
-      <div class="fbox-title">Parametric curves — \(t = \tan(\theta/4),\; t \in (0,1)\)</div>
+      <div class="fbox-title">Parametric curves — $t = \tan\frac{\theta}{4}$, $t \in (0,1)$</div>
       <div style="margin-bottom:.4rem">
         <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(1) Incenter — degree 2</div>
         <div class="frow"><span class="fx">\(x = -\dfrac{t^2 + 2t - 1}{t^2 + 1}\)</span></div>
@@ -161,15 +204,27 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
       <button class="btn btn-go"   id="p2-start">▶ Start</button>
       <button class="btn btn-stop" id="p2-stop" disabled>■ Stop</button>
       <div class="chips">
-        <div class="chip"><div class="dot" style="background:#ff7043"></div>C</div>
-        <div class="chip"><div class="dot" style="background:#ffd166"></div>X(5)</div>
-        <div class="chip"><div class="dot" style="background:#4da6ff"></div>X(6)</div>
-        <div class="chip"><div class="dot" style="background:#f78c6c"></div>X(11)</div>
+        <div class="chip"><div class="dot" style="background:#ff7043"></div><span>$C$</span></div>
+        <div class="chip"><div class="dot" style="background:#ffd166"></div><span>$X(5)$</span></div>
+        <div class="chip"><div class="dot" style="background:#4da6ff"></div><span>$X(6)$</span></div>
+        <div class="chip"><div class="dot" style="background:#f78c6c"></div><span>$X(11)$</span></div>
       </div>
     </div>
     <div class="panel-info" id="p2-info">θ = —</div>
+    <div class="angle-box">
+      <div class="angle-row">
+        <label for="p2-rad">Radians</label>
+        <input type="range" id="p2-rad" min="0" max="6.283185307179586" step="0.005" value="1.5707963268">
+        <span class="angle-value" id="p2-rad-val">1.571 rad</span>
+      </div>
+      <div class="angle-row">
+        <label for="p2-deg">Degrees</label>
+        <input type="range" id="p2-deg" min="0" max="360" step="0.25" value="90">
+        <span class="angle-value" id="p2-deg-val">90.0°</span>
+      </div>
+    </div>
     <div class="fbox">
-      <div class="fbox-title">Parametric curves — \(t = \tan(\theta/4),\; t \in (0,1)\)</div>
+      <div class="fbox-title">Parametric curves — $t = \tan\frac{\theta}{4}$, $t \in (0,1)$</div>
       <div style="margin-bottom:.4rem">
         <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(5) Nine-Point — degree 4, locus is circle r = 1/2</div>
         <div class="frow"><span class="fx">\(x = \dfrac{(t^2-2t-1)(t^2+2t-1)}{2(t^2+1)^2}\)</span></div>
@@ -259,7 +314,8 @@ const XT = {
 
 // Convert state.angle (θ) to t = tan(θ/4), clipped away from singularities
 function tFromTheta(theta) {
-  return Math.tan(theta / 4);
+  const signedTheta = theta > Math.PI ? theta - 2 * Math.PI : theta;
+  return Math.tan(signedTheta / 4);
 }
 
 // Evaluate a formula safely — return [NaN, NaN] if out of range
@@ -353,13 +409,13 @@ function addThalesGeometry(board, state) {
   const ptA = board.create('point', [-1, 0], {
     name: 'A', fixed: true,
     fillColor: '#4da6ff', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
+    label: { fontSize: 12, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
              color: '#4da6ff', offset: [-18, -14] },
   });
   const ptB = board.create('point', [1, 0], {
     name: 'B', fixed: true,
     fillColor: '#4da6ff', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
+    label: { fontSize: 12, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
              color: '#4da6ff', offset: [8, -14] },
   });
   board.create('point', [0, 0], {
@@ -371,7 +427,7 @@ function addThalesGeometry(board, state) {
     [() => Math.cos(state.angle), () => Math.sin(state.angle)],
     { name: 'C', fixed: true,
       fillColor: '#ff7043', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-      label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
+      label: { fontSize: 12, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
                color: '#ff7043', offset: [7, 9] },
     });
   board.create('segment', [ptA, ptB], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
@@ -403,7 +459,7 @@ function addCenter(board, state, formulaId, color, label) {
   ], {
     name: label, fixed: true,
     fillColor: color, strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 11, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
+    label: { fontSize: 11, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
              color, offset: [8, 6] },
   });
 }
@@ -431,11 +487,33 @@ addCenter(b2, st2, 'X(11)', '#f78c6c', 'X(11)');
 // ══════════════════════════════════════════════════════════════════
 //  Animation engine — shared factory
 // ══════════════════════════════════════════════════════════════════
-function makeAnimator(state, board, infoId, startId, stopId) {
+function makeAnimator(state, board, infoId, startId, stopId, radId, degId, radValId, degValId) {
   let animId  = null;
   let lastTs  = null;
   const SPEED = 0.9;   // rad/s
-  const PI    = Math.PI;
+  const TAU   = 2 * Math.PI;
+  const radEl = document.getElementById(radId);
+  const degEl = document.getElementById(degId);
+  const radValEl = document.getElementById(radValId);
+  const degValEl = document.getElementById(degValId);
+  const startBtn = document.getElementById(startId);
+  const stopBtn = document.getElementById(stopId);
+
+  function syncUI() {
+    const angle = ((state.angle % TAU) + TAU) % TAU;
+    state.angle = angle;
+    radEl.value = angle;
+    const deg = angle * 180 / Math.PI;
+    degEl.value = deg;
+    radValEl.textContent = `${angle.toFixed(3)} rad`;
+    degValEl.textContent = `${deg.toFixed(1)}°`;
+    const tVal = tFromTheta(angle).toFixed(4);
+    document.getElementById(infoId).innerHTML =
+      `θ = <span>${angle.toFixed(3)}</span> rad &nbsp;|&nbsp; ` +
+      `deg = <span>${deg.toFixed(1)}°</span> &nbsp;|&nbsp; ` +
+      `t = tan(θ/4) = <span>${tVal}</span>`;
+    board.update();
+  }
 
   function step(ts) {
     if (lastTs === null) lastTs = ts;
@@ -443,37 +521,41 @@ function makeAnimator(state, board, infoId, startId, stopId) {
     lastTs = ts;
 
     state.angle += SPEED * dt;
-    if (state.angle > PI)  state.angle -= 2 * PI;  // wrap π → −π
-
-    board.update();
-
-    const deg = (state.angle * 180 / PI).toFixed(1);
-    const t_val = Math.tan(state.angle / 4).toFixed(4);
-    document.getElementById(infoId).innerHTML =
-      `&theta; = <span>${state.angle.toFixed(3)}</span> rad &nbsp;|&nbsp; ` +
-      `t = tan(&theta;/4) = <span>${t_val}</span>`;
-
+    if (state.angle > TAU) state.angle -= TAU;  // wrap right edge back to left
+    syncUI();
     animId = requestAnimationFrame(step);
   }
 
-  document.getElementById(startId).addEventListener('click', () => {
+  radEl.addEventListener('input', () => {
+    state.angle = parseFloat(radEl.value);
+    syncUI();
+  });
+
+  degEl.addEventListener('input', () => {
+    state.angle = parseFloat(degEl.value) * Math.PI / 180;
+    syncUI();
+  });
+
+  startBtn.addEventListener('click', () => {
     if (animId) return;
     lastTs = null;
     animId = requestAnimationFrame(step);
-    document.getElementById(startId).disabled = true;
-    document.getElementById(stopId).disabled  = false;
+    startBtn.disabled = true;
+    stopBtn.disabled  = false;
   });
 
-  document.getElementById(stopId).addEventListener('click', () => {
+  stopBtn.addEventListener('click', () => {
     if (animId) { cancelAnimationFrame(animId); animId = null; }
     lastTs = null;
-    document.getElementById(startId).disabled = false;
-    document.getElementById(stopId).disabled  = true;
+    startBtn.disabled = false;
+    stopBtn.disabled  = true;
   });
+
+  syncUI();
 }
 
-makeAnimator(st1, b1, 'p1-info', 'p1-start', 'p1-stop');
-makeAnimator(st2, b2, 'p2-info', 'p2-start', 'p2-stop');
+makeAnimator(st1, b1, 'p1-info', 'p1-start', 'p1-stop', 'p1-rad', 'p1-deg', 'p1-rad-val', 'p1-deg-val');
+makeAnimator(st2, b2, 'p2-info', 'p2-start', 'p2-stop', 'p2-rad', 'p2-deg', 'p2-rad-val', 'p2-deg-val');
 
 </script>
 </body>

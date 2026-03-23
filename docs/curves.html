@@ -13,7 +13,7 @@
 <script>
 window.MathJax = {
   tex: {
-    inlineMath: [['\\(', '\\)']],
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
     displayMath: [['\\[', '\\]'], ['$$', '$$']]
   },
   options: {
@@ -140,9 +140,12 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
 .ir .v.hi{color:var(--gold)}
 
 /* Legend */
-.leg{display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.55rem;
-  font-size:.76rem;color:var(--muted)}
-.leg span{display:flex;align-items:center;gap:.3rem}
+.leg{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.7rem;
+  font-size:.79rem;color:var(--muted)}
+.leg > span{display:flex;align-items:center;gap:.45rem;padding:.35rem .55rem;
+  background:rgba(12,31,53,.88);border:1px solid rgba(112,184,255,.18);
+  border-radius:999px;box-shadow:0 10px 24px rgba(1,8,20,.18)}
+.leg > span .mjx-container{font-size:1em;color:#dcecff}
 .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 
 
@@ -389,9 +392,9 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   color: var(--text);
   padding: .25rem .7rem;
   cursor: pointer;
-  transition: background .12s;
+  transition: background .12s, box-shadow .15s, transform .15s;
 }
-.step-nav:hover    { background: var(--border); }
+.step-nav:hover    { background: var(--border); transform:translateY(-1px); box-shadow:0 12px 26px rgba(31,111,235,.16); }
 .step-nav:disabled { opacity:.3; pointer-events:none; }
 
 .constr-step-list {
@@ -593,11 +596,11 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
 </div>
 
 <div class="leg">
-  <span><span class="dot" style="background:#58a6ff"></span>A, B (fixed)</span>
-  <span><span class="dot" style="background:#f78166"></span>C (slider)</span>
-  <span><span class="dot" style="background:#f0b429"></span>X<sub>n</sub> &amp; locus</span>
-  <span><span class="dot" style="background:#3fb950"></span>Circumcircle</span>
-  <span><span class="dot" style="background:#a371f7"></span>Euler line (O–H)</span>
+  <span><span class="dot" style="background:#58a6ff"></span><span>\(A,B\) fixed</span></span>
+  <span><span class="dot" style="background:#f78166"></span><span>\(C\) moving vertex</span></span>
+  <span><span class="dot" style="background:#f0b429"></span><span>\(X_n\) and its locus</span></span>
+  <span><span class="dot" style="background:#3fb950"></span><span>\(\odot(O,1)\)</span></span>
+  <span><span class="dot" style="background:#a371f7"></span><span>Euler line \(OH\)</span></span>
 </div>
 
 <div class="settings-row">
@@ -620,6 +623,10 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
             title="Show/hide step-by-step Euclidean construction">
       Show
     </button>
+    <button class="tgl-switch" id="btn-constr-play" onclick="toggleConstructionPlay()"
+            title="Automatically step through the Euclidean construction">
+      ▶ Play
+    </button>
   </div>
 </div>
 
@@ -638,6 +645,7 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
     <span class="step-counter" id="step-counter">Step 0 / 0</span>
     <button class="step-nav" id="btn-prev" onclick="stepBack()" disabled>◀ Back</button>
     <button class="step-nav" id="btn-next" onclick="stepForward()" disabled>Next ▶</button>
+    <button class="step-nav" id="btn-play-steps" onclick="toggleConstructionPlay()">▶ Play</button>
     <button class="step-nav" id="btn-reset-steps" onclick="resetSteps()" style="margin-left:.3rem">↺ Reset</button>
   </div>
   <div class="constr-step-list" id="step-list">
@@ -1234,6 +1242,7 @@ function clearConstruction() {
 function drawCenter(c) {
   if(locusObj) { board.removeObject(locusObj); locusObj=null; }
   if(centerPt) { board.removeObject(centerPt); centerPt=null; }
+  stopConstructionPlay();
   clearConstruction();
   clearGeom();
   if (constrOpen) { clearStepObjs(); }
@@ -1249,7 +1258,7 @@ function drawCenter(c) {
     ()=>{const[x]=b2c(...c.uvw(theta),theta);return isFinite(x)?x:0},
     ()=>{const[,y]=b2c(...c.uvw(theta),theta);return isFinite(y)?y:0},
   ],{name:c.id,fillColor:"#e65100",strokeColor:"#fff",strokeWidth:1.5,size:6,
-     label:{fontSize:12,fontFamily:"Nunito,sans-serif",fontWeight:700,color:"#e65100",offset:[9,7]}});
+     label:{fontSize:12,fontFamily:"Figtree,sans-serif",fontWeight:700,color:"#e65100",offset:[9,7]}});
 
   // Show classification in the select's sub-label
   const dirA = c.dir==='CCW' ? ' ↺ CCW' : (c.dir==='CW' ? ' ↻ CW' : '');
@@ -1353,7 +1362,7 @@ function drawBaryGeom(c) {
   ].forEach(([txt, x1,y1, x2,y2, x3,y3, col]) => {
     const lbl = board.create('text',
       [()=>(x1()+x2()+x3())/3, ()=>(y1()+y2()+y3())/3, txt],
-      {fontSize:10,fontFamily:'Nunito,sans-serif',fontWeight:'700',
+      {fontSize:10,fontFamily:'Figtree,sans-serif',fontWeight:'700',
        color:col, fixed:true, highlight:false, name:''});
     geomObjs.push(lbl);
   });
@@ -1402,7 +1411,7 @@ function drawTriGeom(c) {
     // Distance label at midpoint of segment
     const lbl = board.create('text',
       [()=>(Px()+Fx())/2+0.04, ()=>(Py()+Fy())/2, label],
-      {fontSize:10,fontFamily:'Nunito,sans-serif',fontWeight:'700',
+      {fontSize:10,fontFamily:'Figtree,sans-serif',fontWeight:'700',
        color, fixed:true, highlight:false, name:''});
     geomObjs.push(lbl);
   });
@@ -1493,12 +1502,50 @@ function toggleConstruction() {
     btn.classList.add('on'); btn.classList.remove('off');
     if (currentCenter) initConstruction(currentCenter);
   } else {
+    stopConstructionPlay();
     panel.classList.remove('open');
     btn.textContent = 'Show';
     btn.classList.add('off'); btn.classList.remove('on');
     clearStepObjs();
     board.update();
   }
+}
+
+function syncConstructionPlayButtons(playing) {
+  const labels = playing ? '⏸ Pause' : '▶ Play';
+  const a = document.getElementById('btn-constr-play');
+  const b = document.getElementById('btn-play-steps');
+  if (a) a.textContent = labels;
+  if (b) b.textContent = labels;
+}
+
+function stopConstructionPlay() {
+  if (constrPlayTimer) {
+    clearInterval(constrPlayTimer);
+    constrPlayTimer = null;
+  }
+  syncConstructionPlayButtons(false);
+}
+
+function toggleConstructionPlay() {
+  if (constrPlayTimer) {
+    stopConstructionPlay();
+    return;
+  }
+  if (!constrOpen) toggleConstruction();
+  const steps = STEPS[stepState.centerId] || [];
+  if (!steps.length) return;
+  if (stepState.current >= steps.length - 1) resetSteps();
+  syncConstructionPlayButtons(true);
+  stepForward();
+  constrPlayTimer = setInterval(() => {
+    const activeSteps = STEPS[stepState.centerId] || [];
+    if (stepState.current >= activeSteps.length - 1) {
+      stopConstructionPlay();
+      return;
+    }
+    stepForward();
+  }, 1100);
 }
 
 
@@ -1809,6 +1856,15 @@ function triV() {
   return {a,b,c};
 }
 
+function incenterXY() {
+  const {a,b,c} = triV();
+  const s = a + b + c;
+  return {
+    x: (a*ptA.X() + b*ptB.X() + c*ptC.X()) / s,
+    y: (a*ptA.Y() + b*ptB.Y() + c*ptC.Y()) / s
+  };
+}
+
 function updateConstruction(c) {
   clearConstruction();
   const fn = CONSTRUCTIONS[c.id];
@@ -1833,6 +1889,7 @@ function updateConstruction(c) {
 let stepState   = { centerId: null, current: -1 };
 let stepObjs    = [];   // stepObjs[i] = [JSXGraph objects from step i]
 let constrOpen  = false;
+let constrPlayTimer = null;
 
 // ── Helper factories (with step-scoped push) ─────────────────
 function stepArc(objs, center, rPt, startPt, color='#3b82f6', dash=0) {
@@ -1866,7 +1923,7 @@ function stepPt(objs, x, y, color='#a78bfa', label='', sz=4) {
   const o = board.create('point',[xFn,yFn],{
     fillColor:color, strokeColor:'#fff', strokeWidth:1, size:sz,
     fixed:true, highlight:false, name:label,
-    label: label ? {fontSize:11,fontFamily:'Nunito,sans-serif',fontWeight:700,color,offset:[7,7]} : {visible:false},
+    label: label ? {fontSize:11,fontFamily:'Figtree,sans-serif',fontWeight:700,color,offset:[7,7]} : {visible:false},
   });
   objs.push(o); return o;
 }
@@ -2260,6 +2317,88 @@ const STEPS = {
     },
   ],
 
+  "X(55)": [
+    { tool:'mark', icon:'📍', label:'The Insimilicenter \(X(55)\) is the internal center of similitude of the circumcircle and incircle.',
+      draw: objs => { stepSeg(objs,ptA,ptB,'#888'); stepSeg(objs,ptB,ptC,'#888'); stepSeg(objs,ptC,ptA,'#888'); stepPt(objs,0,0,'#60a5fa','O',4); }
+    },
+    { tool:'compass', icon:'⭕', label:'Construct the incenter \(I\) and the incircle. The inradius is the perpendicular distance from \(I\) to side \(AB\).',
+      draw: objs => {
+        const Ixy = incenterXY();
+        const I = stepPt(objs,()=>Ixy.x,()=>Ixy.y,'#fbbf24','I',4);
+        const F = stepPt(objs,()=>Ixy.x,0,'#fbbf24','F',3);
+        stepSeg(objs,I,F,'#fbbf24',1);
+        stepCircle(objs,I,F,'#fbbf24',1);
+      }
+    },
+    { tool:'ruler', icon:'📏', label:'Draw the line \(OI\). The center of similitude must lie on the line joining the two circle centers.',
+      draw: objs => {
+        const Ixy = incenterXY();
+        const I = stepPt(objs,()=>Ixy.x,()=>Ixy.y,'#60a5fa','',0);
+        const O = stepPt(objs,0,0,'#60a5fa','',0);
+        stepLine(objs,O,I,'#60a5fa');
+      }
+    },
+    { tool:'compass', icon:'⭕', label:'On an auxiliary ray from \(O\), copy \(OA=R\) and then copy \(IF=r\) beyond it. Join the second mark to \(I\). Through the first mark draw a parallel to that line.',
+      draw: objs => {
+        const Ixy = incenterXY();
+        const r = Math.abs(Ixy.y);
+        const ux = 0.62, uy = -0.78;
+        const O = stepPt(objs,0,0,'#94a3b8','',0);
+        const P = stepPt(objs,ux,uy,'#22c55e','P',3);
+        const Q = stepPt(objs,ux*(1+r),uy*(1+r),'#22c55e','Q',3);
+        const I = stepPt(objs,()=>Ixy.x,()=>Ixy.y,'#22c55e','',0);
+        const P2 = stepPt(objs,()=>P.X() + (I.X() - Q.X()),()=>P.Y() + (I.Y() - Q.Y()),'#22c55e','',0);
+        stepSeg(objs,O,Q,'#22c55e',1);
+        stepSeg(objs,Q,I,'#22c55e',1);
+        stepLine(objs,P,P2,'#22c55e');
+      }
+    },
+    { tool:'mark', icon:'✦', label:'The parallel line meets \(OI\) at the Insimilicenter \(X(55)\), dividing \(OI\) internally in the ratio \(R:r\).',
+      draw: objs => { stepPt(objs,()=>centerPt.X(),()=>centerPt.Y(),'#e65100','X(55)',5); }
+    },
+  ],
+
+  "X(56)": [
+    { tool:'mark', icon:'📍', label:'The Exsimilicenter \(X(56)\) is the external center of similitude of the circumcircle and incircle.',
+      draw: objs => { stepSeg(objs,ptA,ptB,'#888'); stepSeg(objs,ptB,ptC,'#888'); stepSeg(objs,ptC,ptA,'#888'); stepPt(objs,0,0,'#60a5fa','O',4); }
+    },
+    { tool:'compass', icon:'⭕', label:'Construct the incenter \(I\), the foot \(F\) to \(AB\), and the incircle so the radii \(R=OA\) and \(r=IF\) are both available as copied lengths.',
+      draw: objs => {
+        const Ixy = incenterXY();
+        const I = stepPt(objs,()=>Ixy.x,()=>Ixy.y,'#fbbf24','I',4);
+        const F = stepPt(objs,()=>Ixy.x,0,'#fbbf24','F',3);
+        stepSeg(objs,I,F,'#fbbf24',1);
+        stepCircle(objs,I,F,'#fbbf24',1);
+      }
+    },
+    { tool:'ruler', icon:'📏', label:'Draw line \(OI\) and extend it beyond \(I\); the external center of similitude lies on this extension.',
+      draw: objs => {
+        const Ixy = incenterXY();
+        const I = stepPt(objs,()=>Ixy.x,()=>Ixy.y,'#60a5fa','',0);
+        const O = stepPt(objs,0,0,'#60a5fa','',0);
+        stepLine(objs,O,I,'#60a5fa');
+      }
+    },
+    { tool:'compass', icon:'⭕', label:'On an auxiliary ray from \(O\), mark \(P\) with \(OP=R\) and then \(Q\) with \(PQ=r\). Join \(P\) to \(I\); through \(Q\) draw a parallel to \(PI\).',
+      draw: objs => {
+        const Ixy = incenterXY();
+        const r = Math.abs(Ixy.y);
+        const ux = -0.56, uy = -0.82;
+        const O = stepPt(objs,0,0,'#a78bfa','',0);
+        const P = stepPt(objs,ux,uy,'#a78bfa','P',3);
+        const Q = stepPt(objs,ux*(1+r),uy*(1+r),'#a78bfa','Q',3);
+        const I = stepPt(objs,()=>Ixy.x,()=>Ixy.y,'#a78bfa','',0);
+        const Q2 = stepPt(objs,()=>Q.X() + (I.X() - P.X()),()=>Q.Y() + (I.Y() - P.Y()),'#a78bfa','',0);
+        stepSeg(objs,O,Q,'#a78bfa',1);
+        stepSeg(objs,P,I,'#a78bfa',1);
+        stepLine(objs,Q,Q2,'#a78bfa');
+      }
+    },
+    { tool:'mark', icon:'✦', label:'That parallel meets the extension of \(OI\) at the Exsimilicenter \(X(56)\), dividing the centers externally in the ratio \(R:r\).',
+      draw: objs => { stepPt(objs,()=>centerPt.X(),()=>centerPt.Y(),'#e65100','X(56)',5); }
+    },
+  ],
+
 
 
 };
@@ -2288,6 +2427,7 @@ function renderStepList(steps, current) {
       'target="_blank" style="color:var(--accent)">Search ETC ↗</a> for its classical construction.' +
       '</div>';
     document.getElementById('btn-next').disabled = true;
+    if (window.MathJax?.typesetPromise) MathJax.typesetPromise([list]).catch(() => {});
     return;
   }
   list.innerHTML = steps.map((s, i) => {
@@ -2302,6 +2442,7 @@ function renderStepList(steps, current) {
       </span>
     </div>`;
   }).join('');
+  if (window.MathJax?.typesetPromise) MathJax.typesetPromise([list]).catch(() => {});
 }
 
 function updateStepCounter() {
@@ -2343,6 +2484,7 @@ function stepForward() {
 }
 
 function stepBack() {
+  stopConstructionPlay();
   if (stepState.current < 0) return;
   // Remove objects from current step
   if (stepObjs[stepState.current]) {
@@ -2357,6 +2499,7 @@ function stepBack() {
 }
 
 function resetSteps() {
+  stopConstructionPlay();
   clearStepObjs();
   const steps = STEPS[stepState.centerId] || [];
   stepState.current = -1;
