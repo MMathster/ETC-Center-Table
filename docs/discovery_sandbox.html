@@ -35,15 +35,52 @@ window.MathJax = {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   background: var(--bg); color: var(--text);
-  font-family: var(--font); font-weight: 500; letter-spacing: .01em; padding: 1.2rem;
+  font-family: var(--font); font-weight: 500; letter-spacing: .01em; padding: 1.2rem 1.2rem 1.2rem 17.5rem;
   min-height: 100vh;
 }
+.site-sidebar{
+  position:fixed;left:1rem;top:1rem;width:15rem;z-index:20;
+  background:linear-gradient(180deg,rgba(14,26,43,.97) 0%,rgba(8,17,31,.98) 100%);
+  border:1px solid var(--border);border-radius:16px;padding:1rem .9rem;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.85rem;
+}
+.sidebar-brand{font-size:.95rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-.02em}
+.sidebar-copy{font-size:.76rem;line-height:1.55;color:var(--dim)}
+.sidebar-nav{display:grid;gap:.45rem}
+.sidebar-link{
+  display:flex;align-items:center;justify-content:space-between;gap:.55rem;
+  padding:.55rem .7rem;border-radius:10px;text-decoration:none;
+  color:var(--dim);font-size:.82rem;font-weight:700;border:1px solid transparent;
+  background:rgba(9,20,35,.35);transition:all .16s ease;
+}
+.sidebar-link:hover,.sidebar-link.active{color:#fff;border-color:rgba(112,184,255,.3);background:rgba(19,35,58,.9);box-shadow:var(--glow)}
+.sidebar-link small{font-size:.72rem;color:var(--soft)}
 h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; letter-spacing: -.02em; }
-.subtitle { font-size: .9rem; color: var(--dim); margin-bottom: 1.15rem; max-width: 760px; line-height: 1.78; }
+.subtitle { font-size: .92rem; color: var(--dim); margin-bottom: 1.15rem; max-width: 760px; line-height: 1.8; }
 .math-inline { white-space: nowrap; }
 .mjx-container { color: inherit; }
+.derive-box{
+  max-width: 760px; margin-bottom: 1rem; padding: .9rem 1rem;
+  background: linear-gradient(180deg,rgba(16,37,67,.94) 0%,rgba(8,18,31,.98) 100%);
+  border:1px solid #315f8f; border-radius: 14px; box-shadow: var(--shadow);
+}
+.derive-box h2{font-size:.9rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;margin-bottom:.45rem}
+.derive-box p{font-size:.84rem;line-height:1.68;color:var(--dim)}
+.derive-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.65rem}
+.derive-card{padding:.75rem .8rem;border-radius:12px;background:rgba(9,20,35,.52);border:1px solid rgba(112,184,255,.18)}
+.derive-card strong{display:block;margin-bottom:.28rem;color:#fff}
 .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media (max-width: 720px) { .panels { grid-template-columns: 1fr; } }
+@media(max-width:980px){
+  body{padding:5.7rem 1rem 1rem}
+  .site-sidebar{
+    position:fixed;left:1rem;right:1rem;top:.75rem;width:auto;padding:.75rem .8rem;gap:.55rem
+  }
+  .sidebar-copy{display:none}
+  .sidebar-nav{display:flex;gap:.45rem;overflow:auto}
+  .sidebar-link{white-space:nowrap;min-width:max-content}
+}
+@media(max-width:760px){.derive-grid{grid-template-columns:1fr}}
 .panel {
   background: linear-gradient(180deg,rgba(15,28,46,.97) 0%,rgba(9,18,31,.99) 100%);
   border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden;
@@ -54,7 +91,7 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
 .panel:nth-child(2) { border-color:#575ea3; }
 .panel-head { padding: .75rem 1rem .55rem; border-bottom: 1px solid var(--border); background: linear-gradient(180deg,rgba(17,39,67,.8) 0%,rgba(10,24,40,.4) 100%); }
 .panel-head h2 { font-size: 1.04rem; font-weight: 800; color: var(--text); }
-.panel-head p  { font-size: .77rem; color: var(--soft); margin-top: .2rem; }
+.panel-head p  { font-size: .79rem; color: var(--dim); margin-top: .2rem; font-weight: 600; }
 .board-wrap { position: relative; width: 100%; padding-bottom: 100%; background: #070b14; }
 .jxgbox { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; }
 .panel-ctrl {
@@ -102,17 +139,16 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
 .btn-go   { background: linear-gradient(180deg,#1be0a0 0%,#0fb87e 100%);  color: #071a14; }
 .btn-stop { background: linear-gradient(180deg,#ff9b7e 0%,#f86a45 100%); color: #1a0a07; }
 .chips { display: flex; gap: .4rem; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
-.chip { display: flex; align-items: center; gap: 5px; font-size: .74rem; font-weight: 700; color: var(--dim); }
-.chip .mjx-container { font-size: 1em; }
+.chip { display: flex; align-items: center; gap: 6px; font-size: .77rem; font-weight: 700; color: var(--text); background: rgba(9,20,35,.38); border: 1px solid rgba(112,184,255,.14); border-radius: 999px; padding: .18rem .45rem; }
 .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 /* Formula block */
 .fbox {
   border-top: 1px solid var(--border); background: linear-gradient(180deg,#102543 0%,#0b192d 100%);
-  font-family: var(--mono); font-size: .78rem; line-height: 1.85;
+  font-family: var(--mono); font-size: .83rem; line-height: 1.9;
   padding: .68rem .9rem;
 }
 .fbox-title {
-  font-family: var(--font); font-size: .72rem; font-weight: 800;
+  font-family: var(--font); font-size: .74rem; font-weight: 800;
   text-transform: uppercase; letter-spacing: .07em;
   color: var(--soft); margin-bottom: .38rem;
 }
@@ -120,17 +156,57 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
 .fk   { color: var(--dim); font-size: .68rem; min-width: 1.6rem; }
 .fx   { color: #ffe19b; }
 .fy   { color: #d1bbff; }
-.fnote { font-size: .72rem; color: #dbe8fb; margin-top: .25rem; font-family: var(--font); }
+.fnote { font-size: .77rem; color: #e4efff; margin-top: .32rem; font-family: var(--font); font-weight: 600; }
 /* Theta info */
 .panel-info {
   padding: .42rem .9rem; border-top: 1px solid var(--border);
-  font-size: .78rem; font-family: var(--mono); color: var(--dim); min-height: 1.6rem;
+  font-size: .8rem; font-family: var(--mono); color: var(--dim); min-height: 1.7rem;
   background: rgba(10,20,35,.55);
 }
 .panel-info span { color: var(--gold); }
+.panel-slider {
+  border-top: 1px solid rgba(112,184,255,.14);
+  padding: .65rem .85rem .75rem;
+  background: rgba(8,17,31,.6);
+}
+.panel-slider label {
+  display: block;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--soft);
+  margin-bottom: .42rem;
+}
+.angle-slider {
+  width: 100%;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+.angle-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-top: .42rem;
+  flex-wrap: wrap;
+  font-size: .78rem;
+  color: var(--dim);
+}
+.angle-meta span strong { color: var(--text); font-weight: 800; }
 </style>
 </head>
 <body>
+<aside class="site-sidebar">
+  <a class="sidebar-brand" href="toc.html">ETC Center Table</a>
+  <div class="sidebar-copy">Use the intro, sandbox, search page, and ToC from one sticky navigation rail.</div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link" href="intro.html"><span>Introduction</span><small>Intro</small></a>
+    <a class="sidebar-link active" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
+    <a class="sidebar-link" href="barycentric_search.html"><span>Barycentric Search</span><small>Search</small></a>
+    <a class="sidebar-link" href="toc.html"><span>Repository ToC</span><small>Summary</small></a>
+    <a class="sidebar-link" href="https://github.com/MMathster/ETC-Center-Table#readme" target="_blank" rel="noreferrer"><span>GitHub README</span><small>↗</small></a>
+  </nav>
+</aside>
 
 <h1>ETC Loci Sandbox — Thales Configuration</h1>
 <p class="subtitle">
@@ -140,6 +216,32 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
   <span class="math-inline">\(\bar a = 1-t^2\)</span>, <span class="math-inline">\(\bar b = 2t\)</span>, <span class="math-inline">\(\bar c = 1+t^2\)</span>
   and applying the Weierstrass half-angle identities.
 </p>
+
+<section class="derive-box">
+  <h2>Compact derivation</h2>
+  <p>
+    With \(A=(1,0)\), \(B=(-1,0)\), and \(C=(\cos\theta,\sin\theta)\), each center starts from a barycentric triple \((u:v:w)\). The Thales normalization turns the Cartesian conversion into
+    \[
+      x=\frac{u-v+w\cos\theta}{u+v+w},\qquad
+      y=\frac{w\sin\theta}{u+v+w}.
+    \]
+    Using the substitution \(t = \tan \frac{\theta}{4}\), we replace trigonometric terms by rational ones:
+    \[
+      \cos\theta = \frac{1-t^2}{1+t^2},\qquad
+      \sin\theta = \frac{2t}{1+t^2}.
+    \]
+  </p>
+  <div class="derive-grid">
+    <div class="derive-card">
+      <strong>Why this matters</strong>
+      The locus formulas become rational in \(t\), which is why the viewer can plot exact-looking curves so smoothly.
+    </div>
+    <div class="derive-card">
+      <strong>How to use the sandbox</strong>
+      Move the angle slider, compare the radian and degree readouts, and inspect how the plotted center responds to the same parameter \(t\).
+    </div>
+  </div>
+</section>
 
 <div class="panels">
 
@@ -154,23 +256,19 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
       <button class="btn btn-go"   id="p1-start">▶ Start</button>
       <button class="btn btn-stop" id="p1-stop" disabled>■ Stop</button>
       <div class="chips">
-        <div class="chip"><div class="dot" style="background:#ff7043"></div><span>$C$</span></div>
-        <div class="chip"><div class="dot" style="background:#ffd166"></div><span>$X(1)$</span></div>
-        <div class="chip"><div class="dot" style="background:#b388ff"></div><span>$X(2)$</span></div>
-        <div class="chip"><div class="dot" style="background:#06d6a0"></div><span>$X(8)$</span></div>
+        <div class="chip"><div class="dot" style="background:#ff7043"></div><span>\(C\)</span></div>
+        <div class="chip"><div class="dot" style="background:#ffd166"></div><span>\(X(1)\)</span></div>
+        <div class="chip"><div class="dot" style="background:#b388ff"></div><span>\(X(2)\)</span></div>
+        <div class="chip"><div class="dot" style="background:#06d6a0"></div><span>\(X(8)\)</span></div>
       </div>
     </div>
-    <div class="panel-info" id="p1-info">θ = —</div>
-    <div class="angle-box">
-      <div class="angle-row">
-        <label for="p1-rad">Radians</label>
-        <input type="range" id="p1-rad" min="0" max="6.283185307179586" step="0.005" value="1.0471975512">
-        <span class="angle-value" id="p1-rad-val">1.047 rad</span>
-      </div>
-      <div class="angle-row">
-        <label for="p1-deg">Degrees</label>
-        <input type="range" id="p1-deg" min="0" max="360" step="0.25" value="60">
-        <span class="angle-value" id="p1-deg-val">60.0°</span>
+    <div class="panel-info" id="p1-info">\(\theta\) = —</div>
+    <div class="panel-slider">
+      <label for="p1-angle">Angle slider</label>
+      <input class="angle-slider" type="range" id="p1-angle" min="0" max="6.283185307179586" step="0.002" value="1.0471975511965976">
+      <div class="angle-meta">
+        <span id="p1-rad"><strong>Radians:</strong> —</span>
+        <span id="p1-deg"><strong>Degrees:</strong> —</span>
       </div>
     </div>
     <div class="fbox">
@@ -204,23 +302,19 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
       <button class="btn btn-go"   id="p2-start">▶ Start</button>
       <button class="btn btn-stop" id="p2-stop" disabled>■ Stop</button>
       <div class="chips">
-        <div class="chip"><div class="dot" style="background:#ff7043"></div><span>$C$</span></div>
-        <div class="chip"><div class="dot" style="background:#ffd166"></div><span>$X(5)$</span></div>
-        <div class="chip"><div class="dot" style="background:#4da6ff"></div><span>$X(6)$</span></div>
-        <div class="chip"><div class="dot" style="background:#f78c6c"></div><span>$X(11)$</span></div>
+        <div class="chip"><div class="dot" style="background:#ff7043"></div><span>\(C\)</span></div>
+        <div class="chip"><div class="dot" style="background:#ffd166"></div><span>\(X(5)\)</span></div>
+        <div class="chip"><div class="dot" style="background:#4da6ff"></div><span>\(X(6)\)</span></div>
+        <div class="chip"><div class="dot" style="background:#f78c6c"></div><span>\(X(11)\)</span></div>
       </div>
     </div>
-    <div class="panel-info" id="p2-info">θ = —</div>
-    <div class="angle-box">
-      <div class="angle-row">
-        <label for="p2-rad">Radians</label>
-        <input type="range" id="p2-rad" min="0" max="6.283185307179586" step="0.005" value="1.5707963268">
-        <span class="angle-value" id="p2-rad-val">1.571 rad</span>
-      </div>
-      <div class="angle-row">
-        <label for="p2-deg">Degrees</label>
-        <input type="range" id="p2-deg" min="0" max="360" step="0.25" value="90">
-        <span class="angle-value" id="p2-deg-val">90.0°</span>
+    <div class="panel-info" id="p2-info">\(\theta\) = —</div>
+    <div class="panel-slider">
+      <label for="p2-angle">Angle slider</label>
+      <input class="angle-slider" type="range" id="p2-angle" min="0" max="6.283185307179586" step="0.002" value="1.5707963267948966">
+      <div class="angle-meta">
+        <span id="p2-rad"><strong>Radians:</strong> —</span>
+        <span id="p2-deg"><strong>Degrees:</strong> —</span>
       </div>
     </div>
     <div class="fbox">
@@ -487,32 +581,24 @@ addCenter(b2, st2, 'X(11)', '#f78c6c', 'X(11)');
 // ══════════════════════════════════════════════════════════════════
 //  Animation engine — shared factory
 // ══════════════════════════════════════════════════════════════════
-function makeAnimator(state, board, infoId, startId, stopId, radId, degId, radValId, degValId) {
+function makeAnimator(state, board, infoId, startId, stopId, sliderId, radId, degId) {
   let animId  = null;
   let lastTs  = null;
-  const SPEED = 0.9;   // rad/s
-  const TAU   = 2 * Math.PI;
+  const SPEED = 1.0;   // rad/s
+  const TWO_PI = 2 * Math.PI;
+  const sliderEl = document.getElementById(sliderId);
   const radEl = document.getElementById(radId);
   const degEl = document.getElementById(degId);
-  const radValEl = document.getElementById(radValId);
-  const degValEl = document.getElementById(degValId);
-  const startBtn = document.getElementById(startId);
-  const stopBtn = document.getElementById(stopId);
 
-  function syncUI() {
-    const angle = ((state.angle % TAU) + TAU) % TAU;
-    state.angle = angle;
-    radEl.value = angle;
-    const deg = angle * 180 / Math.PI;
-    degEl.value = deg;
-    radValEl.textContent = `${angle.toFixed(3)} rad`;
-    degValEl.textContent = `${deg.toFixed(1)}°`;
-    const tVal = tFromTheta(angle).toFixed(4);
+  function updateReadout() {
+    const deg = (state.angle * 180 / Math.PI).toFixed(1);
+    const tVal = Math.tan(state.angle / 4).toFixed(4);
     document.getElementById(infoId).innerHTML =
-      `θ = <span>${angle.toFixed(3)}</span> rad &nbsp;|&nbsp; ` +
-      `deg = <span>${deg.toFixed(1)}°</span> &nbsp;|&nbsp; ` +
-      `t = tan(θ/4) = <span>${tVal}</span>`;
-    board.update();
+      `&theta; = <span>${state.angle.toFixed(3)}</span> rad &nbsp;|&nbsp; ` +
+      `${deg}&deg; &nbsp;|&nbsp; t = tan(&theta;/4) = <span>${tVal}</span>`;
+    radEl.innerHTML = `<strong>Radians:</strong> ${state.angle.toFixed(3)}`;
+    degEl.innerHTML = `<strong>Degrees:</strong> ${deg}&deg;`;
+    sliderEl.value = state.angle;
   }
 
   function step(ts) {
@@ -521,22 +607,21 @@ function makeAnimator(state, board, infoId, startId, stopId, radId, degId, radVa
     lastTs = ts;
 
     state.angle += SPEED * dt;
-    if (state.angle > TAU) state.angle -= TAU;  // wrap right edge back to left
-    syncUI();
+    if (state.angle > TWO_PI) state.angle -= TWO_PI;  // wrap right edge → left edge
+
+    board.update();
+    updateReadout();
+
     animId = requestAnimationFrame(step);
   }
 
-  radEl.addEventListener('input', () => {
-    state.angle = parseFloat(radEl.value);
-    syncUI();
+  sliderEl.addEventListener('input', () => {
+    state.angle = parseFloat(sliderEl.value);
+    board.update();
+    updateReadout();
   });
 
-  degEl.addEventListener('input', () => {
-    state.angle = parseFloat(degEl.value) * Math.PI / 180;
-    syncUI();
-  });
-
-  startBtn.addEventListener('click', () => {
+  document.getElementById(startId).addEventListener('click', () => {
     if (animId) return;
     lastTs = null;
     animId = requestAnimationFrame(step);
@@ -551,11 +636,11 @@ function makeAnimator(state, board, infoId, startId, stopId, radId, degId, radVa
     stopBtn.disabled  = true;
   });
 
-  syncUI();
+  updateReadout();
 }
 
-makeAnimator(st1, b1, 'p1-info', 'p1-start', 'p1-stop', 'p1-rad', 'p1-deg', 'p1-rad-val', 'p1-deg-val');
-makeAnimator(st2, b2, 'p2-info', 'p2-start', 'p2-stop', 'p2-rad', 'p2-deg', 'p2-rad-val', 'p2-deg-val');
+makeAnimator(st1, b1, 'p1-info', 'p1-start', 'p1-stop', 'p1-angle', 'p1-rad', 'p1-deg');
+makeAnimator(st2, b2, 'p2-info', 'p2-start', 'p2-stop', 'p2-angle', 'p2-rad', 'p2-deg');
 
 </script>
 </body>

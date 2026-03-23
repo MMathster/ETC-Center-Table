@@ -47,6 +47,64 @@
     line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
+    padding-left: 17.5rem;
+  }
+  .site-sidebar {
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    width: 15rem;
+    z-index: 2;
+    background: linear-gradient(180deg, rgba(15,22,34,0.97) 0%, rgba(9,12,20,0.98) 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1rem 0.9rem;
+    box-shadow: 0 20px 48px rgba(0,0,0,0.28);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .sidebar-brand {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-size: 0.95rem;
+  }
+  .sidebar-copy {
+    font-size: 0.76rem;
+    color: var(--text-soft);
+    line-height: 1.55;
+  }
+  .sidebar-nav {
+    display: grid;
+    gap: 0.45rem;
+  }
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.55rem;
+    text-decoration: none;
+    color: var(--text-soft);
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.55rem 0.7rem;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: rgba(255,255,255,0.02);
+    transition: all 0.16s ease;
+  }
+  .sidebar-link:hover,
+  .sidebar-link.active {
+    color: #fff;
+    border-color: rgba(240,168,50,0.22);
+    background: rgba(255,255,255,0.04);
+    box-shadow: var(--glow-amber);
+  }
+  .sidebar-link small {
+    font-size: 0.72rem;
+    color: var(--text-dim);
   }
 
   /* ── Dot-grid background ── */
@@ -99,6 +157,22 @@
     max-width: 700px;
     margin: 0 auto;
     padding: 5.5rem 2rem 7rem;
+  }
+  @media (max-width: 980px) {
+    body { padding-left: 0; padding-top: 5.5rem; }
+    .site-sidebar {
+      position: fixed;
+      left: 1rem;
+      right: 1rem;
+      top: 0.75rem;
+      width: auto;
+      padding: 0.75rem 0.8rem;
+      gap: 0.5rem;
+    }
+    .sidebar-copy { display: none; }
+    .sidebar-nav { display: flex; gap: 0.45rem; overflow: auto; }
+    .sidebar-link { white-space: nowrap; min-width: max-content; }
+    .wrapper { padding-top: 2.5rem; }
   }
 
   /* ── Header ── */
@@ -407,6 +481,18 @@
 </style>
 </head>
 <body>
+
+<aside class="site-sidebar">
+  <a class="sidebar-brand" href="toc.html">ETC Center Table</a>
+  <div class="sidebar-copy">Sticky navigation for the introduction, sandbox, barycentric search, and repository summary.</div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link" href="intro.html"><span>Introduction</span><small>Intro</small></a>
+    <a class="sidebar-link" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
+    <a class="sidebar-link" href="barycentric_search.html"><span>Barycentric Search</span><small>Search</small></a>
+    <a class="sidebar-link active" href="toc.html"><span>Repository ToC</span><small>Summary</small></a>
+    <a class="sidebar-link" href="https://github.com/MMathster/ETC-Center-Table#readme" target="_blank" rel="noreferrer"><span>GitHub README</span><small>↗</small></a>
+  </nav>
+</aside>
 
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>

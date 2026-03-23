@@ -1,0 +1,518 @@
+{
+  "meta": {
+    "source": "docs/intro.html",
+    "total": 102
+  },
+  "centers": [
+    {
+      "center_id": "X(3)",
+      "name": "Circumcenter",
+      "barycentric": "sin 2A : sin 2B : sin 2C"
+    },
+    {
+      "center_id": "X(4)",
+      "name": "Orthocenter (= C here)",
+      "barycentric": "SA : SB : SC"
+    },
+    {
+      "center_id": "X(5)",
+      "name": "Nine-Point Center",
+      "barycentric": "cos(B-C):cos(C-A):cos(A-B)"
+    },
+    {
+      "center_id": "X(6)",
+      "name": "Symmedian Point",
+      "barycentric": "a² : b² : c²"
+    },
+    {
+      "center_id": "X(7)",
+      "name": "Gergonne Point",
+      "barycentric": "1/(s−a) : 1/(s−b) : 1/(s−c)"
+    },
+    {
+      "center_id": "X(8)",
+      "name": "Nagel Point",
+      "barycentric": "b+c−a : c+a−b : a+b−c"
+    },
+    {
+      "center_id": "X(9)",
+      "name": "Mittenpunkt",
+      "barycentric": "a(b+c−a):b(c+a−b):c(a+b−c)"
+    },
+    {
+      "center_id": "X(10)",
+      "name": "Spieker Center",
+      "barycentric": "b+c : c+a : a+b"
+    },
+    {
+      "center_id": "X(11)",
+      "name": "Feuerbach Point",
+      "barycentric": "(b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)"
+    },
+    {
+      "center_id": "X(12)",
+      "name": "Extouchpoint-midpoint",
+      "barycentric": "a/(b+c+a)²:…"
+    },
+    {
+      "center_id": "X(13)",
+      "name": "Fermat Point 1 (isog conj X14)",
+      "barycentric": "1/(SA+√3·S):…"
+    },
+    {
+      "center_id": "X(14)",
+      "name": "Fermat Point 2",
+      "barycentric": "1/(SA-√3·S):…"
+    },
+    {
+      "center_id": "X(15)",
+      "name": "Isogonic Point 1",
+      "barycentric": "sin(A+π/3):sin(B+π/3):sin(C+π/3)"
+    },
+    {
+      "center_id": "X(16)",
+      "name": "Isogonic Point 2",
+      "barycentric": "sin(A-π/3):sin(B-π/3):sin(C-π/3)"
+    },
+    {
+      "center_id": "X(17)",
+      "name": "Napoleon Pt 1",
+      "barycentric": "1/(SA+√3·S):… (=X13 variant)"
+    },
+    {
+      "center_id": "X(18)",
+      "name": "Napoleon Pt 2",
+      "barycentric": "SA-√3·S:…"
+    },
+    {
+      "center_id": "X(19)",
+      "name": "Clawson Point (isog conj X63)",
+      "barycentric": "tan A:tan B:tan C"
+    },
+    {
+      "center_id": "X(20)",
+      "name": "de Longchamps Point",
+      "barycentric": "-SA·(SB-SC)²+…  ≈ SA+SB+3SC variant"
+    },
+    {
+      "center_id": "X(21)",
+      "name": "Schiffler Point",
+      "barycentric": "1/(b+c):…"
+    },
+    {
+      "center_id": "X(22)",
+      "name": "Exeter Point",
+      "barycentric": "a²(b⁴+c⁴-a⁴):…"
+    },
+    {
+      "center_id": "X(23)",
+      "name": "Far-Out Point",
+      "barycentric": "a²(a⁴-b²c²):…"
+    },
+    {
+      "center_id": "X(25)",
+      "name": "Homothetic Center (orthic and tangential)",
+      "barycentric": "a²/SA:…"
+    },
+    {
+      "center_id": "X(31)",
+      "name": "2nd Power Point",
+      "barycentric": "a³:b³:c³ (trilinear a²:…)"
+    },
+    {
+      "center_id": "X(32)",
+      "name": "3rd Power Point",
+      "barycentric": "a⁴:b⁴:c⁴"
+    },
+    {
+      "center_id": "X(35)",
+      "name": "Intersection AP₁ with BC … isog 1st isog of X36",
+      "barycentric": "a²(b²+c²-a²-bc):…"
+    },
+    {
+      "center_id": "X(36)",
+      "name": "Inverse of Incenter in circumcircle",
+      "barycentric": "a(a²-b²-bc-c²):…  simplified"
+    },
+    {
+      "center_id": "X(37)",
+      "name": "Crosspoint of X1,X2 (harmonic mean)",
+      "barycentric": "ab+ac : bc+ba : ca+cb"
+    },
+    {
+      "center_id": "X(39)",
+      "name": "Brocard Midpoint (X3 of medial)",
+      "barycentric": "a²(b²+c²):…"
+    },
+    {
+      "center_id": "X(40)",
+      "name": "Bevan Point (circumcenter of excentral)",
+      "barycentric": "−a(b²+c²−a²−2bc):…"
+    },
+    {
+      "center_id": "X(41)",
+      "name": "Crosspoint of X1 and X6",
+      "barycentric": "a²(b+c-a):…"
+    },
+    {
+      "center_id": "X(42)",
+      "name": "Crosssum of X1 and X2",
+      "barycentric": "a(b+c):…"
+    },
+    {
+      "center_id": "X(43)",
+      "name": "X(1) of medial triangle",
+      "barycentric": "bc(b+c-a):…"
+    },
+    {
+      "center_id": "X(44)",
+      "name": "X(1)-beth conjugate of X(44)",
+      "barycentric": "a(b+c-2a):…"
+    },
+    {
+      "center_id": "X(45)",
+      "name": "Complement of X(44)",
+      "barycentric": "a(2b+2c-a):…"
+    },
+    {
+      "center_id": "X(46)",
+      "name": "X(4) of excentral triangle",
+      "barycentric": "a(cos B cos C - cos A):…"
+    },
+    {
+      "center_id": "X(55)",
+      "name": "Insimilicenter of circumcircle and incircle",
+      "barycentric": "a(b+c-a):…"
+    },
+    {
+      "center_id": "X(56)",
+      "name": "Exsimilicenter (isog conj X55)",
+      "barycentric": "a/(b+c-a):…"
+    },
+    {
+      "center_id": "X(57)",
+      "name": "Isogonal conj of X9",
+      "barycentric": "1/(b+c-a):…"
+    },
+    {
+      "center_id": "X(58)",
+      "name": "Isogonal conj of X10",
+      "barycentric": "a²/(b+c):…"
+    },
+    {
+      "center_id": "X(59)",
+      "name": "Isogonal conj of X11",
+      "barycentric": "a/((s-b)(s-c)):…"
+    },
+    {
+      "center_id": "X(63)",
+      "name": "Isogonal conj of X19",
+      "barycentric": "a/tan A:…  = a cos A:…"
+    },
+    {
+      "center_id": "X(65)",
+      "name": "Isogonal conj of X21",
+      "barycentric": "a/(tan B+tan C):…"
+    },
+    {
+      "center_id": "X(69)",
+      "name": "Isotomic conj of X25  (symmedian point of anticomp)",
+      "barycentric": "b²c²(b²+c²-a²):…"
+    },
+    {
+      "center_id": "X(75)",
+      "name": "Isotomic conj of X31",
+      "barycentric": "bc:ca:ab"
+    },
+    {
+      "center_id": "X(76)",
+      "name": "Isotomic conj of X32",
+      "barycentric": "b²c²:c²a²:a²b²"
+    },
+    {
+      "center_id": "X(79)",
+      "name": "Isogonal conj of X35",
+      "barycentric": "1/(2SA+bc):…"
+    },
+    {
+      "center_id": "X(80)",
+      "name": "Reflection of X1 in X11 variant",
+      "barycentric": "(b+c-a)/(b-a+c):…  simplified"
+    },
+    {
+      "center_id": "X(81)",
+      "name": "Isogonal conj of X42",
+      "barycentric": "b+c:c+a:a+b → reciprocal of…  a/(b+c):…"
+    },
+    {
+      "center_id": "X(82)",
+      "name": "Isogonal conj of X38",
+      "barycentric": "a/(b²+c²):…"
+    },
+    {
+      "center_id": "X(83)",
+      "name": "Isogonal conj of X39",
+      "barycentric": "1/(b²+c²):…"
+    },
+    {
+      "center_id": "X(85)",
+      "name": "Isotomic conj of X41",
+      "barycentric": "bc/(b+c-a):…"
+    },
+    {
+      "center_id": "X(86)",
+      "name": "Isotomic conj of X42",
+      "barycentric": "bc(b+c):…"
+    },
+    {
+      "center_id": "X(88)",
+      "name": "Isogonal conj of X44",
+      "barycentric": "a/(2a-b-c):…"
+    },
+    {
+      "center_id": "X(89)",
+      "name": "Isogonal conj of X45",
+      "barycentric": "a/(2b+2c-a):…"
+    },
+    {
+      "center_id": "X(98)",
+      "name": "Tarry Point (isog conj of Steiner)",
+      "barycentric": "SA(SB-SC)²:…"
+    },
+    {
+      "center_id": "X(99)",
+      "name": "Steiner Point",
+      "barycentric": "1/(b²-c²):…"
+    },
+    {
+      "center_id": "X(100)",
+      "name": "Anticomplement of Feuerbach",
+      "barycentric": "1/(b-c):…"
+    },
+    {
+      "center_id": "X(101)",
+      "name": "Isog conj of X514 (trilinear: a/(b-c))",
+      "barycentric": "a²/(b-c):…"
+    },
+    {
+      "center_id": "X(105)",
+      "name": "Isog conj of X518",
+      "barycentric": "1/(a(b+c)-b²-c²):…"
+    },
+    {
+      "center_id": "X(110)",
+      "name": "Focus of Kiepert parabola",
+      "barycentric": "a²/(b²-c²):…"
+    },
+    {
+      "center_id": "X(111)",
+      "name": "Parry Point",
+      "barycentric": "a²/(2a²-b²-c²):…"
+    },
+    {
+      "center_id": "X(114)",
+      "name": "Center of Kiepert hyperbola",
+      "barycentric": "SA(SB-SC)²+…  midpoint X113 X4"
+    },
+    {
+      "center_id": "X(115)",
+      "name": "Center of Kiepert circumconic",
+      "barycentric": "(b²-c²)²:…"
+    },
+    {
+      "center_id": "X(116)",
+      "name": "Tripole of Euler line",
+      "barycentric": "(SB-SC)²:…"
+    },
+    {
+      "center_id": "X(119)",
+      "name": "Complement of X(11)",
+      "barycentric": "(b+c-a)(b²+c²-a²):…"
+    },
+    {
+      "center_id": "X(120)",
+      "name": "Complement of X(105)",
+      "barycentric": "b²+c²-a(b+c):…"
+    },
+    {
+      "center_id": "X(121)",
+      "name": "Complement of X(106)",
+      "barycentric": "bc(b+c-a-bc/a):…  → a(b+c-2a)²:…"
+    },
+    {
+      "center_id": "X(125)",
+      "name": "Center of Jerabek hyperbola",
+      "barycentric": "a²(b²-c²)²·SA:…"
+    },
+    {
+      "center_id": "X(126)",
+      "name": "Midpoint of X3 and X111",
+      "barycentric": "a²(2a²-b²-c²):…"
+    },
+    {
+      "center_id": "X(127)",
+      "name": "Midpoint X3 and X112",
+      "barycentric": "a²·SA(SB-SC)²:…"
+    },
+    {
+      "center_id": "X(140)",
+      "name": "Complement of X5",
+      "barycentric": "a²(b²+c²)+bc(b²+c²-a²):…"
+    },
+    {
+      "center_id": "X(141)",
+      "name": "Complement of X6",
+      "barycentric": "b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)"
+    },
+    {
+      "center_id": "X(142)",
+      "name": "Complement of X7",
+      "barycentric": "(b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…"
+    },
+    {
+      "center_id": "X(144)",
+      "name": "Anticomplement of X7",
+      "barycentric": "(b-c)²+a(b+c-2a):…"
+    },
+    {
+      "center_id": "X(145)",
+      "name": "Anticomplement of X8",
+      "barycentric": "(b+c-3a):…"
+    },
+    {
+      "center_id": "X(162)",
+      "name": "Isog conj of X525 (trilinear:a/(b²-c²))",
+      "barycentric": "a³/(b²-c²):…"
+    },
+    {
+      "center_id": "X(174)",
+      "name": "Isog conj of X175 (midcircle)",
+      "barycentric": "sin(A/2):sin(B/2):sin(C/2)"
+    },
+    {
+      "center_id": "X(175)",
+      "name": "Isog conj of X174",
+      "barycentric": "1/sin(A/2):…"
+    },
+    {
+      "center_id": "X(176)",
+      "name": "Isotomic conj X174",
+      "barycentric": "bc/sin(A/2):…"
+    },
+    {
+      "center_id": "X(178)",
+      "name": "Midcircle of incircle and A-excircle (approx)",
+      "barycentric": "cos(A/2):cos(B/2):cos(C/2)"
+    },
+    {
+      "center_id": "X(181)",
+      "name": "Isog conj of X314",
+      "barycentric": "a²/((b+c)(s-a)):…"
+    },
+    {
+      "center_id": "X(182)",
+      "name": "Midpoint of X3 and X6",
+      "barycentric": "a²(b²+c²-a²):…"
+    },
+    {
+      "center_id": "X(184)",
+      "name": "Crosssum of X3 and X6",
+      "barycentric": "a⁴(b²+c²-a²):…"
+    },
+    {
+      "center_id": "X(186)",
+      "name": "Inverse of X4 in circumcircle",
+      "barycentric": "a²(a⁴-b⁴-c⁴+b²c²):…"
+    },
+    {
+      "center_id": "X(187)",
+      "name": "Schoute Center",
+      "barycentric": "a²(2a²-b²-c²):…"
+    },
+    {
+      "center_id": "X(190)",
+      "name": "Isotomic conj of X44",
+      "barycentric": "bc(b+c-2a):…"
+    },
+    {
+      "center_id": "X(192)",
+      "name": "Crosspoint of X1 and X75",
+      "barycentric": "bc(c+a-b):…  variant"
+    },
+    {
+      "center_id": "X(193)",
+      "name": "Isotomic conj of X69",
+      "barycentric": "a²(b²+c²)-b²c²:…  = a²SA:…"
+    },
+    {
+      "center_id": "X(200)",
+      "name": "Isog conj X269 (Mittenpunkt variant)",
+      "barycentric": "a(b+c-a)²:…"
+    },
+    {
+      "center_id": "X(210)",
+      "name": "Isog conj X1170",
+      "barycentric": "a(b+c-a)²:…  (same as X200 up to sign — see ETC)"
+    },
+    {
+      "center_id": "X(213)",
+      "name": "Crosspoint X1,X42",
+      "barycentric": "a²(b+c):…"
+    },
+    {
+      "center_id": "X(214)",
+      "name": "Harmonic conjugate of X1 wrt X11 X12",
+      "barycentric": "a²(b+c-a)²:…"
+    },
+    {
+      "center_id": "X(216)",
+      "name": "Kosnita's theorem point",
+      "barycentric": "SA(SB·SC):…  → SA·SB:…"
+    },
+    {
+      "center_id": "X(218)",
+      "name": "Isog conj X1445",
+      "barycentric": "a²(b+c-a)(a(b+c)-bc):…"
+    },
+    {
+      "center_id": "X(220)",
+      "name": "Isog conj X279",
+      "barycentric": "a²(b+c-a)²/(bc):…"
+    },
+    {
+      "center_id": "X(222)",
+      "name": "Isog conj X281 (3rd Conway pt)",
+      "barycentric": "a·cos²(A/2)/(b+c-a):…"
+    },
+    {
+      "center_id": "X(223)",
+      "name": "Isog conj X282",
+      "barycentric": "a(b+c-a)/(b²+c²-a²):…"
+    },
+    {
+      "center_id": "X(226)",
+      "name": "Isog conj X284",
+      "barycentric": "bc/(b+c-a):…"
+    },
+    {
+      "center_id": "X(230)",
+      "name": "Crossdiff X2,X6 (Euler-line tripole)",
+      "barycentric": "SA·SB:SB·SC:SC·SA → simplified"
+    },
+    {
+      "center_id": "X(232)",
+      "name": "Crossdiff X3,X6",
+      "barycentric": "a²·SA(SB-SC)²:…"
+    },
+    {
+      "center_id": "X(233)",
+      "name": "Nine-point circle inverse of X5",
+      "barycentric": "a⁴(b²-c²)²:…"
+    },
+    {
+      "center_id": "X(236)",
+      "name": "Midpoint X175 X176",
+      "barycentric": "cos(A/2)+cos(B/2)+cos(C/2):…  variant"
+    }
+  ]
+}
