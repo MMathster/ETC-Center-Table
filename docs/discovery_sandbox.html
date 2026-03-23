@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ETC Loci Sandbox — Thales Configuration</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script>
@@ -96,6 +99,36 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
 .panel-ctrl {
   display: flex; align-items: center; gap: .6rem;
   padding: .55rem .8rem; border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.angle-box {
+  padding: .7rem .85rem .8rem;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg,rgba(13,28,48,.72) 0%,rgba(9,20,35,.92) 100%);
+}
+.angle-row {
+  display: grid;
+  grid-template-columns: 74px 1fr 92px;
+  gap: .7rem;
+  align-items: center;
+}
+.angle-row + .angle-row { margin-top: .55rem; }
+.angle-row label {
+  font-size: .74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--soft);
+}
+.angle-row input[type=range] {
+  width: 100%;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+.angle-value {
+  font-family: var(--mono);
+  font-size: .76rem;
+  color: var(--gold);
+  text-align: right;
 }
 .btn {
   font-family: var(--font); font-size: .82rem; font-weight: 800;
@@ -377,7 +410,8 @@ const XT = {
 
 // Convert state.angle (θ) to t = tan(θ/4), clipped away from singularities
 function tFromTheta(theta) {
-  return Math.tan(theta / 4);
+  const signedTheta = theta > Math.PI ? theta - 2 * Math.PI : theta;
+  return Math.tan(signedTheta / 4);
 }
 
 // Evaluate a formula safely — return [NaN, NaN] if out of range
@@ -471,13 +505,13 @@ function addThalesGeometry(board, state) {
   const ptA = board.create('point', [-1, 0], {
     name: 'A', fixed: true,
     fillColor: '#4da6ff', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
+    label: { fontSize: 12, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
              color: '#4da6ff', offset: [-18, -14] },
   });
   const ptB = board.create('point', [1, 0], {
     name: 'B', fixed: true,
     fillColor: '#4da6ff', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
+    label: { fontSize: 12, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
              color: '#4da6ff', offset: [8, -14] },
   });
   board.create('point', [0, 0], {
@@ -489,7 +523,7 @@ function addThalesGeometry(board, state) {
     [() => Math.cos(state.angle), () => Math.sin(state.angle)],
     { name: 'C', fixed: true,
       fillColor: '#ff7043', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-      label: { fontSize: 12, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
+      label: { fontSize: 12, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
                color: '#ff7043', offset: [7, 9] },
     });
   board.create('segment', [ptA, ptB], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
@@ -521,7 +555,7 @@ function addCenter(board, state, formulaId, color, label) {
   ], {
     name: label, fixed: true,
     fillColor: color, strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 11, fontFamily: 'Nunito,sans-serif', fontWeight: 700,
+    label: { fontSize: 11, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
              color, offset: [8, 6] },
   });
 }
@@ -593,15 +627,15 @@ function makeAnimator(state, board, infoId, startId, stopId, sliderId, radId, de
     if (animId) return;
     lastTs = null;
     animId = requestAnimationFrame(step);
-    document.getElementById(startId).disabled = true;
-    document.getElementById(stopId).disabled  = false;
+    startBtn.disabled = true;
+    stopBtn.disabled  = false;
   });
 
-  document.getElementById(stopId).addEventListener('click', () => {
+  stopBtn.addEventListener('click', () => {
     if (animId) { cancelAnimationFrame(animId); animId = null; }
     lastTs = null;
-    document.getElementById(startId).disabled = false;
-    document.getElementById(stopId).disabled  = true;
+    startBtn.disabled = false;
+    stopBtn.disabled  = true;
   });
 
   updateReadout();
