@@ -294,7 +294,12 @@ With more triangle centers to come and different geometrical compositions to dis
 ### 🕹️ Interactive Research Tools
 Experience the kinematics of triangle centers in real-time. The sandbox allows for dynamic manipulation of vertex $C$ and visualization of invariant loci.
 
-[![Launch Discovery Sandbox](https://img.shields.io/badge/Launch-Discovery%20Sandbox-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/discovery_sandbox.html)
+- **Discovery Sandbox**:
+  [![Launch Discovery Sandbox](https://img.shields.io/badge/Launch-Discovery%20Sandbox-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/discovery_sandbox.html)
+- **Curves**:
+  [![Launch Curves](https://img.shields.io/badge/Launch-Curves-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/curves.html)
+
+
 
 ## 📚 Filtering & Classification
 
