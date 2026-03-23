@@ -21,6 +21,11 @@
 
 > A systematic investigation into the symbolic Cartesian loci of triangle centers within dynamic configurations.
 
+Click below for the head start of the web applet:
+
+- **Quick Start**:
+  [![Launch Intro](https://img.shields.io/badge/Launch-Introduction-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/intro.html)
+
 [![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
 
 This repository computes ETC-center parametric outputs $(x(t),y(t))$, using a decoupled JSON pipeline so symbolic workloads are resumable and memory-safe outside a monolithic notebook runtime.
@@ -291,8 +296,6 @@ Experience the kinematics of triangle centers in real-time. The sandbox allows f
 
 - **Discovery Sandbox**:
   [![Launch Discovery Sandbox](https://img.shields.io/badge/Launch-Discovery%20Sandbox-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/discovery_sandbox.html)
-- **Introduction**:
-  [![Launch Intro](https://img.shields.io/badge/Launch-Introduction-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/intro.html)
 - **Barycentric Search**:
   [![Launch Search](https://img.shields.io/badge/Launch-Barycentric%20Search-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/barycentric_search.html)
 
