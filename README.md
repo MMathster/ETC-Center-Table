@@ -192,6 +192,52 @@ With more triangle centers to come and different geometrical compositions to dis
 </div>
 
 <!---Lemoine X6--->
+<div style="display:inline-block; border:1px solid #555; border-radius:8px; overflow:hidden; width:100%; max-width:600px;">
+
+  <!-- Image on top, centered -->
+  <div style="text-align:center; padding:16px; border-bottom:1px solid #555;">
+    <img src="assets/images/x6_locus.gif" width="60%">
+  </div>
+
+  <!-- Table on bottom -->
+  <table style="border-collapse:collapse; width:100%;">
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Name</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">Lemoine/Symmedian Point</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>ETC Reference</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">$X_{6}$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Locus Type</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">Rational Quadratic Curve (Ellipse)</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Barycentric Coordinates</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">$a^2 : b^2 : c^2$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Angle Substitution</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">$t = \tan\dfrac{\theta}{4}$ with $0 \leq t < 1$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-bottom:1px solid #555; border-right:1px solid #555; white-space:nowrap;"><strong>Parametric Curve (upper plane)</strong></td>
+        <td style="padding:6px 10px; border-bottom:1px solid #555;">$\left(\dfrac{t^4 - 6t^2 + 1}{(1+t^2)^2}, \dfrac{2t - 2t^3}{(1+t^2)^2}\right)$</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border-right:1px solid #555; white-space:nowrap;"><strong>View on GeoGebra</strong></td>
+        <td style="padding:6px 10px;">
+          <a href="https://www.geogebra.org/classic/uhu2ap6q" target="_blank" class="glow-new-version">
+            <img src="https://img.shields.io/badge/Open_Full_Screen-Geogebra-6557D2?style=for-the-badge&logo=geogebra&logoColor=black">
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
 
 <!---Feuerbach X11--->
 <div style="display:inline-block; border:1px solid #555; border-radius:8px; overflow:hidden; width:100%; max-width:600px;">
