@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETC Center Table — Barycentric Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']]
+  },
+  options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+:root {
+  --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a; --surface3:#102846;
+  --border:#24456a; --accent:#70b8ff; --accent-2:#3ea6ff; --gold:#ffd479; --mint:#59e1a8;
+  --text:#f7fbff; --muted:#b7c8e6; --soft:#8fa8ca; --radius:14px;
+  --font:'Figtree',system-ui,sans-serif; --display:'Fraunces',serif; --mono:'JetBrains Mono','Fira Code',monospace;
+  --shadow:0 18px 44px rgba(1,8,20,.34); --glow:0 0 0 1px rgba(112,184,255,.18),0 16px 44px rgba(31,111,235,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:500;letter-spacing:.01em;padding:1rem 1rem 1rem 17.5rem;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(rgba(112,184,255,.09) 1px, transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0}
+.site-sidebar{position:fixed;left:1rem;top:1rem;width:15rem;z-index:20;background:linear-gradient(180deg,rgba(14,26,43,.97) 0%,rgba(8,17,31,.98) 100%);border:1px solid var(--border);border-radius:16px;padding:1rem .9rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.85rem}
+.sidebar-brand{font-size:.95rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-.02em}
+.sidebar-copy{font-size:.76rem;line-height:1.55;color:var(--muted)}
+.sidebar-nav{display:grid;gap:.45rem}
+.sidebar-link{display:flex;align-items:center;justify-content:space-between;gap:.55rem;padding:.55rem .7rem;border-radius:10px;text-decoration:none;color:var(--muted);font-size:.82rem;font-weight:700;border:1px solid transparent;background:rgba(9,20,35,.35);transition:all .16s ease}
+.sidebar-link:hover,.sidebar-link.active{color:#fff;border-color:rgba(112,184,255,.3);background:rgba(19,35,58,.9);box-shadow:var(--glow)}
+.sidebar-link small{font-size:.72rem;color:var(--soft)}
+.blob{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(110px)}
+.blob-1{width:520px;height:360px;top:-120px;right:10%;background:radial-gradient(ellipse,rgba(112,184,255,.12) 0%,rgba(255,212,121,.08) 50%,transparent 72%)}
+.blob-2{width:420px;height:420px;bottom:-120px;left:-80px;background:radial-gradient(ellipse,rgba(89,225,168,.10) 0%,transparent 68%)}
+.page{position:relative;z-index:1;max-width:1120px}
+h1{font-family:var(--display);font-size:clamp(2.1rem,4.7vw,3.5rem);line-height:1.02;letter-spacing:-.03em;margin-bottom:.75rem}
+.title-accent{display:block;background:linear-gradient(110deg,#fff 0%,var(--gold) 40%,var(--accent) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.title-sub{display:block;font-family:var(--font);font-size:.3em;letter-spacing:.24em;text-transform:uppercase;color:var(--soft);-webkit-text-fill-color:var(--soft);margin-top:.8rem}
+.subtitle{max-width:76ch;color:var(--muted);line-height:1.8;font-size:.94rem;margin-bottom:1rem}
+.hero-note,.results-panel,.story-card,.deep-dive,.toolbar{background:linear-gradient(180deg,rgba(16,30,48,.96) 0%,rgba(8,17,31,.98) 100%);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero-note{padding:1rem 1.1rem;margin-bottom:1rem}
+.story-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.85rem;margin-top:.8rem}
+.story-card{padding:.95rem 1rem;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.story-card:hover,.deep-dive:hover,.toolbar:hover,.results-panel:hover{transform:translateY(-2px);border-color:rgba(112,184,255,.58);box-shadow:var(--glow)}
+.story-card h2,.deep-dive h2{font-size:1rem;font-weight:800;margin-bottom:.4rem}
+.story-card p,.story-card li,.deep-dive p{font-size:.86rem;color:var(--muted);line-height:1.65}
+.story-card ul{margin-left:1.1rem;margin-top:.45rem}
+.deep-dive{padding:1rem 1.05rem;margin-bottom:1rem}
+.deep-dive-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:1rem;margin-top:.85rem}
+.formula-block{margin:.75rem 0;padding:.82rem .9rem;background:linear-gradient(180deg,#0f2746 0%,#0a1b32 100%);border:1px solid #356799;border-radius:10px;color:#eff7ff;overflow:auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.callout-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem}
+.callout{background:linear-gradient(180deg,#102543 0%,#0b192d 100%);border:1px solid #315f8f;border-radius:10px;padding:.75rem .8rem}
+.callout .tag{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);margin-bottom:.3rem}
+.callout p{font-size:.82rem;color:#dbe8fb;line-height:1.55}
+.toolbar{padding:1rem 1.05rem;margin-bottom:1rem;position:sticky;top:1rem;z-index:10;backdrop-filter:blur(16px)}
+.toolbar-grid{display:grid;grid-template-columns:2fr 1.1fr 1fr 1fr;gap:.8rem;align-items:end}
+label{display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);margin-bottom:.4rem}
+input,select{width:100%;padding:.68rem .78rem;background:#081321;color:var(--text);border:1px solid #31567c;border-radius:10px;font-family:var(--font);font-weight:600}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(112,184,255,.16)}
+.segmented{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.75rem}
+.segmented button{border:none;border-radius:999px;padding:.42rem .72rem;font:700 .78rem var(--font);color:var(--muted);background:rgba(11,28,48,.72);border:1px solid rgba(112,184,255,.16);cursor:pointer;transition:all .18s ease}
+.segmented button.active,.segmented button:hover{color:#fff;background:rgba(19,35,58,.92);border-color:rgba(112,184,255,.34);box-shadow:var(--glow)}
+.results-panel{padding:1rem 1.05rem;overflow:hidden}
+.loading-shell{position:relative;overflow:hidden;border-radius:12px;border:1px solid rgba(112,184,255,.16);background:rgba(8,17,31,.6);padding:1rem;margin-bottom:1rem}
+.loading-shell::after{content:'';position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(112,184,255,.11),transparent);animation:shimmer 2.2s infinite}
+.loading-shell.ready::after{display:none}
+@keyframes shimmer{100%{transform:translateX(100%)}}
+.loading-status{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem}
+.loading-status strong{font-size:.92rem}
+.loading-status span{font-size:.8rem;color:var(--soft)}
+.progress{height:10px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:.8rem}
+.progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--mint));border-radius:999px;transition:width .22s ease}
+.loading-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.65rem}
+.loading-step{padding:.7rem .75rem;border-radius:10px;border:1px solid rgba(112,184,255,.14);background:rgba(9,20,35,.45)}
+.loading-step strong{display:block;font-size:.77rem;color:#fff;margin-bottom:.22rem}
+.loading-step span{font-size:.78rem;color:var(--muted);line-height:1.5}
+.stats{display:flex;gap:.7rem;flex-wrap:wrap;margin-bottom:.9rem}
+.stat{padding:.34rem .66rem;border-radius:999px;background:rgba(15,39,70,.85);border:1px solid rgba(112,184,255,.18);font-size:.78rem;color:var(--muted);font-weight:700}
+.table-wrap{overflow:auto;border-radius:14px;border:1px solid rgba(112,184,255,.14)}
+table{width:100%;border-collapse:collapse;background:rgba(8,17,31,.72)}
+th,td{padding:.78rem .82rem;text-align:left;vertical-align:top;border-bottom:1px solid rgba(112,184,255,.08)}
+th{font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);background:rgba(11,27,49,.94)}
+td{font-size:.86rem;color:var(--text)}
+.center-cell strong{display:block;margin-bottom:.18rem}
+.page-pill{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;padding:.18rem .5rem;margin-top:.2rem;background:rgba(255,255,255,.04);border:1px solid rgba(112,184,255,.14);font-size:.68rem;color:var(--soft);font-weight:700}
+.bary-list{display:grid;gap:.42rem}
+.bary-chip{display:block;padding:.46rem .56rem;border-radius:10px;background:rgba(11,28,48,.82);border:1px solid rgba(112,184,255,.12);font-family:var(--mono);font-size:.77rem;line-height:1.55;color:#e4f1ff;white-space:pre-wrap}
+.empty{padding:1rem;color:var(--muted);font-size:.88rem}
+.section-card{opacity:.62;transform:translateY(18px);transition:opacity .45s ease,transform .45s ease,border-color .3s ease,box-shadow .3s ease}
+.section-card.is-visible{opacity:1;transform:translateY(0)}
+.section-card.section-active{border-color:rgba(112,184,255,.42);box-shadow:var(--glow)}
+@media(max-width:1100px){.toolbar-grid{grid-template-columns:1fr 1fr}.deep-dive-grid{grid-template-columns:1fr}}
+@media(max-width:980px){body{padding:5.7rem 1rem 1rem}.site-sidebar{position:fixed;left:1rem;right:1rem;top:.75rem;width:auto;padding:.75rem .8rem;gap:.55rem}.sidebar-copy{display:none}.sidebar-nav{display:flex;gap:.45rem;overflow:auto}.sidebar-link{white-space:nowrap;min-width:max-content}.toolbar{top:5.1rem}}
+@media(max-width:760px){.toolbar-grid,.story-grid{grid-template-columns:1fr}h1{font-size:2rem}}
+</style>
+</head>
+<body>
+<aside class="site-sidebar">
+  <a class="sidebar-brand" href="toc.html">ETC Center Table</a>
+  <div class="sidebar-copy">Auto-index live ETC pages with the notebook-style parser, then fall back to the bundled docs index when the remote pages are unavailable.</div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link" href="intro.html"><span>Introduction</span><small>Intro</small></a>
+    <a class="sidebar-link" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
+    <a class="sidebar-link active" href="barycentric_search.html"><span>Barycentric Search</span><small>Search</small></a>
+    <a class="sidebar-link" href="toc.html"><span>Repository ToC</span><small>Summary</small></a>
+    <a class="sidebar-link" href="https://github.com/MMathster/ETC-Center-Table#readme" target="_blank" rel="noreferrer"><span>GitHub README</span><small>↗</small></a>
+  </nav>
+</aside>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<main class="page">
+  <section class="hero-note section-card" id="search-overview">
+    <h1>
+      <span class="title-accent">Barycentric Search Engine</span>
+      <span class="title-sub">Notebook-style extraction, page-aware filtering, graceful fallback</span>
+    </h1>
+    <p class="subtitle">
+      This page now tries to parse the live ETC pages with the same broad strategy as the Python notebook: walk the coordinate block, isolate genuine <em>Barycentrics</em> lines, reject prose/cross-references, and keep every barycentric variant found for a center. When the browser cannot reach those pages, it falls back to the generated local index bundled with this repo.
+    </p>
+    <div class="story-grid">
+      <section class="story-card">
+        <h2>What changed</h2>
+        <p>The search dataset is no longer treated as a flat hand-entered table. Each result now keeps a source page, all extracted barycentric variants, and combined search text for notebook-like filtering.</p>
+      </section>
+      <section class="story-card">
+        <h2>How to use it</h2>
+        <ul>
+          <li>Filter by <code>X(8)</code> or any center name.</li>
+          <li>Limit the search to one ETC page such as <code>ETC.html</code>.</li>
+          <li>Switch between center-name, page, and barycentric-only queries.</li>
+        </ul>
+      </section>
+      <section class="story-card">
+        <h2>Why there is a fallback</h2>
+        <p>Some browsers or environments cannot fetch the upstream ETC HTML directly. The local JSON keeps the search page usable while preserving the same UI and filter model.</p>
+      </section>
+    </div>
+  </section>
+
+  <section class="deep-dive section-card" id="search-loader">
+    <h2>Loading pipeline</h2>
+    <p>The interface below shows whether the page is using live ETC HTML parsing or the local fallback index. The progress bar and section highlighting update while the loader switches modes.</p>
+    <div class="deep-dive-grid">
+      <div>
+        <div class="formula-block">
+          <strong>Notebook-inspired flow</strong><br>
+          1. Fetch <code>ETC.html</code>, <code>ETCPart2.html</code>, …<br>
+          2. Walk each center header until the next structural block.<br>
+          3. Keep only direct barycentric triples and expand search text from every variant.
+        </div>
+      </div>
+      <div class="callout-row">
+        <div class="callout">
+          <span class="tag">Section effects</span>
+          <p>The loader and results sections fade and glow into focus as they become active, so switching between the search states feels less abrupt.</p>
+        </div>
+        <div class="callout">
+          <span class="tag">Page-aware search</span>
+          <p>The page filter is populated from the loaded dataset, so the UI reflects whatever pages were actually indexed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="toolbar section-card" id="search-controls">
+    <div class="toolbar-grid">
+      <div>
+        <label for="searchBox">Search text</label>
+        <input id="searchBox" type="search" placeholder="Try X(8), Nagel, b+c-a, ETCPart2, ...">
+      </div>
+      <div>
+        <label for="fieldSelect">Field</label>
+        <select id="fieldSelect">
+          <option value="all">All fields</option>
+          <option value="center_id">Center ID</option>
+          <option value="name">Center name</option>
+          <option value="source_page">Source page</option>
+          <option value="barycentric">Barycentrics only</option>
+        </select>
+      </div>
+      <div>
+        <label for="pageSelect">Page</label>
+        <select id="pageSelect">
+          <option value="all">All loaded pages</option>
+        </select>
+      </div>
+      <div>
+        <label for="limitSelect">Rows</label>
+        <select id="limitSelect">
+          <option>25</option>
+          <option selected>50</option>
+          <option>100</option>
+          <option>200</option>
+        </select>
+      </div>
+    </div>
+    <div class="segmented" id="modeSwitch">
+      <button type="button" data-mode="all" class="active">All variants</button>
+      <button type="button" data-mode="single">One row per center</button>
+      <button type="button" data-mode="page">Page-first view</button>
+    </div>
+  </section>
+
+  <section class="results-panel section-card" id="search-results">
+    <div class="loading-shell" id="loadingShell">
+      <div class="loading-status">
+        <div>
+          <strong id="loaderHeadline">Preparing search index…</strong><br>
+          <span id="loaderSubline">Trying the live ETC pages first.</span>
+        </div>
+        <span id="loaderMode">Mode: starting</span>
+      </div>
+      <div class="progress"><div id="progressFill"></div></div>
+      <div class="loading-steps">
+        <div class="loading-step"><strong>Remote parse</strong><span id="stepRemote">Waiting to probe the ETC manifest.</span></div>
+        <div class="loading-step"><strong>Fallback</strong><span id="stepFallback">Ready if the live pages are blocked.</span></div>
+        <div class="loading-step"><strong>Section switch</strong><span id="stepSection">Controls and results will animate in once data is ready.</span></div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat" id="countStat">Loading…</div>
+      <div class="stat" id="pageStat">Pages: —</div>
+      <div class="stat" id="variantStat">Variants: —</div>
+      <div class="stat" id="sourceStat">Source: —</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Center</th>
+            <th>Name</th>
+            <th>Page</th>
+            <th>All barycentric coordinates</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+          <tr><td colspan="4" class="empty">Loading barycentric data…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<script>
+const ETC_BASE = 'https://faculty.evansville.edu/ck6/encyclopedia/';
+const PAGE_MANIFEST = ['ETC.html', ...Array.from({length: 35}, (_, idx) => `ETCPart${idx + 2}.html`)];
+const BARY_STOP = /\s+(?:where|for\b|which\b|See\s+also|Trilinears|Tripolars|Lines|Note|Also|Polar|Coordinates|equals?|Compare|The\s)/i;
+const BARY_PROSE = /^(?:for|of|are|see|that|in|at|the|and|by|from|to|is)\b/i;
+const BARY_XREF = /X\s*\(\s*\d/i;
+const MATH_WORDS = new Set(['sin','cos','tan','cot','sec','csc','sinh','cosh','tanh','sqrt','cbrt','acot','atan','asin','acos','atan2','exp','log','abs','sgn','sign','floor','ceil']);
+
+let centers = [];
+let viewMode = 'all';
+let activeSource = 'starting';
+
+const searchBox = document.getElementById('searchBox');
+const fieldSelect = document.getElementById('fieldSelect');
+const pageSelect = document.getElementById('pageSelect');
+const limitSelect = document.getElementById('limitSelect');
+const resultsBody = document.getElementById('resultsBody');
+const countStat = document.getElementById('countStat');
+const pageStat = document.getElementById('pageStat');
+const variantStat = document.getElementById('variantStat');
+const sourceStat = document.getElementById('sourceStat');
+const loaderHeadline = document.getElementById('loaderHeadline');
+const loaderSubline = document.getElementById('loaderSubline');
+const loaderMode = document.getElementById('loaderMode');
+const loadingShell = document.getElementById('loadingShell');
+const progressFill = document.getElementById('progressFill');
+const stepRemote = document.getElementById('stepRemote');
+const stepFallback = document.getElementById('stepFallback');
+const stepSection = document.getElementById('stepSection');
+
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function setProgress(value, headline, subline, mode) {
+  progressFill.style.width = `${Math.max(0, Math.min(100, value))}%`;
+  if (headline) loaderHeadline.textContent = headline;
+  if (subline) loaderSubline.textContent = subline;
+  if (mode) loaderMode.textContent = `Mode: ${mode}`;
+}
+
+function updatePages() {
+  const pages = ['all', ...new Set(centers.map(row => row.source_page).filter(Boolean))];
+  pageSelect.innerHTML = pages.map(page => `<option value="${escapeHtml(page)}">${page === 'all' ? 'All loaded pages' : escapeHtml(page)}</option>`).join('');
+}
+
+function normalizeText(text) {
+  return String(text || '').replace(/\s+/g, ' ').trim();
+}
+
+function extractHeaderName(text) {
+  const clean = normalizeText(text).replace(/^[\-–—\s]+|[\-–—\s]+$/g, '');
+  const idMatch = clean.match(/(X\(\d+\))/);
+  if (!idMatch) return null;
+  const centerId = idMatch[1];
+  const after = clean.slice(clean.indexOf(centerId) + centerId.length).replace(/^\s*[:\-–—]?\s*/, '').trim();
+  return { centerId, name: after || centerId };
+}
+
+function nodeToLines(centerNode) {
+  const lines = [];
+  let buffer = [];
+
+  const flush = () => {
+    const line = normalizeText(buffer.join(' '));
+    if (line) lines.push(line);
+    buffer = [];
+  };
+
+  const visit = node => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const txt = node.textContent.replace(/\u00a0/g, ' ').replace(/\n/g, ' ');
+      if (txt.trim()) buffer.push(txt.trim());
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const tag = node.tagName.toLowerCase();
+    if (tag === 'br') {
+      flush();
+      return;
+    }
+    if (!['p','hr','h3','h2'].includes(tag)) {
+      Array.from(node.childNodes).forEach(visit);
+    }
+  };
+
+  let node = centerNode.nextSibling;
+  while (node) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const tag = node.tagName.toLowerCase();
+      if (['h3', 'h2', 'hr', 'p'].includes(tag)) break;
+    }
+    visit(node);
+    node = node.nextSibling;
+  }
+  flush();
+  return lines;
+}
+
+function isMathCoord(raw) {
+  return raw.split(':').every(part => {
+    const words = (part.match(/[A-Za-z]{4,}/g) || []);
+    const prose = words.filter(word => !MATH_WORDS.has(word.toLowerCase()));
+    return prose.length < 2;
+  });
+}
+
+function extractAllBaryLines(lines) {
+  const results = [];
+  for (const line of lines) {
+    const match = line.match(/^Barycentrics\s+(.+)/i);
+    if (!match) continue;
+    let raw = normalizeText(match[1]).replace(/[.,;]+$/g, '');
+    if (BARY_PROSE.test(raw) || BARY_XREF.test(raw)) continue;
+    raw = raw.split(BARY_STOP)[0].trim().replace(/[.,;]+$/g, '');
+    if (!raw.includes(':')) continue;
+    if (!isMathCoord(raw)) continue;
+    if (!results.includes(raw)) results.push(raw);
+  }
+  return results;
+}
+
+function parseCentersFromHtml(html, sourcePage) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const rows = [];
+  const headers = Array.from(doc.querySelectorAll('h3, h2'));
+  for (const header of headers) {
+    const parsed = extractHeaderName(header.textContent || '');
+    if (!parsed) continue;
+    const barycentrics = extractAllBaryLines(nodeToLines(header));
+    if (!barycentrics.length) continue;
+    rows.push({
+      center_id: parsed.centerId,
+      name: parsed.name,
+      source_page: sourcePage,
+      barycentrics,
+      search_text: [parsed.centerId, parsed.name, sourcePage, ...barycentrics].join(' | ')
+    });
+  }
+  return rows;
+}
+
+async function tryLiveEtc() {
+  setProgress(10, 'Scanning live ETC pages…', 'Trying the upstream page manifest with the notebook-style parser.', 'live parse');
+  stepRemote.textContent = 'Fetching the ETC manifest page by page.';
+  const loaded = [];
+  for (let index = 0; index < PAGE_MANIFEST.length; index += 1) {
+    const page = PAGE_MANIFEST[index];
+    try {
+      const response = await fetch(`${ETC_BASE}${page}`);
+      if (!response.ok) {
+        if (response.status === 404 && index > 0) break;
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const html = await response.text();
+      const parsed = parseCentersFromHtml(html, page);
+      if (parsed.length) loaded.push(...parsed);
+      setProgress(10 + Math.round(((index + 1) / PAGE_MANIFEST.length) * 58), 'Scanning live ETC pages…', `Parsed ${page} (${parsed.length} centers with barycentrics).`, 'live parse');
+    } catch (error) {
+      throw new Error(`Could not load ${page}: ${error.message}`);
+    }
+  }
+  if (!loaded.length) throw new Error('No live ETC centers were parsed.');
+  return loaded;
+}
+
+async function loadFallbackIndex() {
+  setProgress(75, 'Switching to local fallback…', 'Loading the generated docs index because the live ETC pages were unavailable.', 'fallback');
+  stepFallback.textContent = 'Reading docs/data/barycentric_index.json.';
+  const response = await fetch('data/barycentric_index.json');
+  const payload = await response.json();
+  return (payload.centers || []).map(row => ({
+    center_id: row.center_id,
+    name: row.name,
+    source_page: row.source_page || 'ETC.html',
+    barycentrics: row.barycentrics || (row.barycentric ? [row.barycentric] : []),
+    search_text: row.search_text || [row.center_id, row.name, row.source_page, ...(row.barycentrics || [])].join(' | ')
+  }));
+}
+
+function getRowsForMode(filtered) {
+  if (viewMode === 'single') {
+    return filtered.map(row => ({ ...row, barycentrics: row.barycentrics.slice(0, 1) }));
+  }
+  if (viewMode === 'page') {
+    return [...filtered].sort((a, b) => a.source_page.localeCompare(b.source_page) || a.center_id.localeCompare(b.center_id));
+  }
+  return filtered;
+}
+
+function renderRows() {
+  const q = searchBox.value.trim().toLowerCase();
+  const field = fieldSelect.value;
+  const page = pageSelect.value;
+  const limit = parseInt(limitSelect.value, 10);
+
+  const filtered = centers.filter(row => {
+    if (page !== 'all' && row.source_page !== page) return false;
+    if (!q) return true;
+    const haystacks = field === 'all'
+      ? [row.center_id, row.name, row.source_page, row.search_text, ...(row.barycentrics || [])]
+      : field === 'barycentric'
+        ? (row.barycentrics || [])
+        : [row[field] || ''];
+    return haystacks.some(value => String(value).toLowerCase().includes(q));
+  });
+
+  const rows = getRowsForMode(filtered).slice(0, limit);
+  const variantTotal = filtered.reduce((sum, row) => sum + (row.barycentrics || []).length, 0);
+  const pageTotal = new Set(filtered.map(row => row.source_page)).size;
+
+  countStat.textContent = `${filtered.length} / ${centers.length} centers`;
+  pageStat.textContent = `Pages: ${pageTotal || 0}`;
+  variantStat.textContent = `Variants: ${variantTotal}`;
+  sourceStat.textContent = `Source: ${activeSource}`;
+
+  if (!rows.length) {
+    resultsBody.innerHTML = '<tr><td colspan="4" class="empty">No barycentric coordinates match this filter.</td></tr>';
+    return;
+  }
+
+  resultsBody.innerHTML = rows.map(row => `
+    <tr>
+      <td class="center-cell"><strong>${escapeHtml(row.center_id)}</strong></td>
+      <td>${escapeHtml(row.name)}</td>
+      <td><span class="page-pill">${escapeHtml(row.source_page)}</span></td>
+      <td>
+        <div class="bary-list">
+          ${(row.barycentrics || []).map(expr => `<code class="bary-chip">${escapeHtml(expr)}</code>`).join('')}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function markReady(headline, subline, mode) {
+  loadingShell.classList.add('ready');
+  setProgress(100, headline, subline, mode);
+  stepSection.textContent = 'Results are active and section transitions are enabled.';
+}
+
+async function loadData() {
+  try {
+    centers = await tryLiveEtc();
+    activeSource = 'live ETC pages';
+    stepRemote.textContent = `Live parse succeeded for ${new Set(centers.map(row => row.source_page)).size} pages.`;
+    stepFallback.textContent = 'Fallback not needed.';
+    markReady('Live ETC index ready.', 'All parsed pages are now available in the page filter.', activeSource);
+  } catch (error) {
+    console.warn(error);
+    stepRemote.textContent = error.message;
+    centers = await loadFallbackIndex();
+    activeSource = 'local fallback index';
+    markReady('Fallback index ready.', 'Using the generated local index because the live pages could not be fetched here.', activeSource);
+  }
+  updatePages();
+  renderRows();
+}
+
+Array.from(document.querySelectorAll('#modeSwitch button')).forEach(button => {
+  button.addEventListener('click', () => {
+    viewMode = button.dataset.mode;
+    document.querySelectorAll('#modeSwitch button').forEach(btn => btn.classList.toggle('active', btn === button));
+    renderRows();
+    document.getElementById('search-results').classList.add('section-active');
+    setTimeout(() => document.getElementById('search-results').classList.remove('section-active'), 450);
+  });
+});
+
+[searchBox, fieldSelect, pageSelect, limitSelect].forEach(el => el.addEventListener('input', renderRows));
+
+const sectionObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('is-visible', 'section-active');
+      setTimeout(() => entry.target.classList.remove('section-active'), 700);
+    }
+  });
+}, { threshold: 0.18 });
+
+document.querySelectorAll('.section-card').forEach(section => sectionObserver.observe(section));
+
+loadData();
+</script>
+</body>
+</html>
