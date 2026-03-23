@@ -14,11 +14,6 @@
     - [🕹️ Interactive Research Tools](#-interactive-research-tools)
   - [📚 Filtering & Classification](#-filtering--classification)
   - [📈 Real-Time Monitoring](#-real-time-monitoring)
-  - [🚧 Current progress](#-current-progress)
-    - [3-phase JSON pipeline](#3-phase-json-pipeline)
-    - [Black-hole protections (stalled batch mitigation)](#black-hole-protections-stalled-batch-mitigation)
-    - [Compatibility wrappers](#compatibility-wrappers)
-    - [Notes](#notes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
