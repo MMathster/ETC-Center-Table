@@ -229,7 +229,7 @@ With more triangle centers to come and different geometrical compositions to dis
       <tr>
         <td style="padding:6px 10px; border-right:1px solid #555; white-space:nowrap;"><strong>View on GeoGebra</strong></td>
         <td style="padding:6px 10px;">
-          <a href="https://www.geogebra.org/classic/uhu2ap6q" target="_blank" class="glow-new-version">
+          <a href="https://www.geogebra.org/classic/u5hjcmuh" target="_blank" class="glow-new-version">
             <img src="https://img.shields.io/badge/Open_Full_Screen-Geogebra-6557D2?style=for-the-badge&logo=geogebra&logoColor=black">
           </a>
         </td>
