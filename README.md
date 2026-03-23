@@ -32,9 +32,9 @@ This repository computes ETC-center parametric outputs $(x(t),y(t))$, using a de
 
 ## 🚀 Run the Thales Notebook with Repository Binding
 
-- **JupyterLab (Binder):**
+- **JupyterLab (Binder):**  
   [![View Notebook](https://img.shields.io/badge/Platform-Jupyter%20Labs-blue?logo=github)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
-- **Classic Notebook (Binder):**
+- **Classic Notebook (Binder):**  
   [![View Notebook](https://img.shields.io/badge/GitHub-Notebook-blue?logo=github)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?filepath=ETC_Center_Table_Thales.ipynb)
 
 > Important: run `ETC_Center_Table_Thales.ipynb` from this repository context (Binder or cloned repo root). Downloading and running the notebook in isolation will break imports/path-based access to `src/`, `scripts/`, and `data/`.
@@ -294,9 +294,9 @@ With more triangle centers to come and different geometrical compositions to dis
 ### 🕹️ Interactive Research Tools
 Experience the kinematics of triangle centers in real-time. The sandbox allows for dynamic manipulation of vertex $C$ and visualization of invariant loci.
 
-- **Discovery Sandbox**:
+- **Discovery Sandbox**:  
   [![Launch Discovery Sandbox](https://img.shields.io/badge/Launch-Discovery%20Sandbox-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/discovery_sandbox.html)
-- **Barycentric Search**:
+- **Barycentric Search**:  
   [![Launch Search](https://img.shields.io/badge/Launch-Barycentric%20Search-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/barycentric_search.html)
 
 
@@ -320,6 +320,10 @@ python scripts/analyze_cache.py
 # Expected Output:
 # 15000/62000 | ok=14850 | timeouts=150 | Rate: 2.15 tasks/sec
 ```
+
 <hr>
 
-*For a detailed log of technical corrections and LLM-assisted optimizations, see [CHANGELOG.md](https://github.com/MMathster/ETC-Center-Table/blob/main/docs/CHANGELOG.md)*
+*For other information about this repository, please see below:*
+- [CHANGELOG.md](https://github.com/MMathster/ETC-Center-Table/blob/main/docs/CHANGELOG.md)
+- [DEVELOPMENT.md](https://github.com/MMathster/ETC-Center-Table/blob/main/docs/DEVELOPMENT.md)
+- [LICENSE](https://github.com/MMathster/ETC-Center-Table/blob/main/docs/LICENSE)
