@@ -23,10 +23,10 @@
 
 Click below for the head start of the web applet:
 
-- **Quick Start**:
+- **Quick Start**:  
   [![Launch Intro](https://img.shields.io/badge/Launch-Introduction-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/intro.html)
-
-[![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
+- **Notebook on Binder**:  
+  [![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MMathster/ETC-Center-Table/HEAD?labpath=ETC_Center_Table_Thales.ipynb)
 
 This repository computes ETC-center parametric outputs $(x(t),y(t))$, using a decoupled JSON pipeline so symbolic workloads are resumable and memory-safe outside a monolithic notebook runtime.
 
