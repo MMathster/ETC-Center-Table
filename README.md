@@ -317,3 +317,6 @@ python scripts/analyze_cache.py
 # Expected Output:
 # 15000/62000 | ok=14850 | timeouts=150 | Rate: 2.15 tasks/sec
 ```
+<hr>
+
+*For a detailed log of technical corrections and LLM-assisted optimizations, see [DEVELOPMENT_LOG.md](https://mmathster.github.io/ETC-Center-Table/docs/DEVELOPMENT_LOG.md)*
