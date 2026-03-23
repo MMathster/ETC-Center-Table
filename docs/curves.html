@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Triangle Centers on the Thales Circle — ETC Locus Explorer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script>
@@ -2563,6 +2566,19 @@ btnStop.addEventListener("click", () => {
 document.getElementById('btn-coord-overlay').classList.add('on');
 document.getElementById('btn-constr-toggle').classList.add('off');
 drawCenter(currentCenter);
+function renderMath(scope = document.body) {
+  if (typeof renderMathInElement !== 'function') return;
+  renderMathInElement(scope, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '\[', right: '\]', display: true},
+      {left: '\(', right: '\)', display: false}
+    ],
+    throwOnError: false
+  });
+}
+
+window.addEventListener('load', () => renderMath());
 </script>
 </body>
 </html>
