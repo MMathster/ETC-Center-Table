@@ -191,6 +191,8 @@ With more triangle centers to come and different geometrical compositions to dis
 
 </div>
 
+<!---Lemoine X6--->
+
 <!---Feuerbach X11--->
 <div style="display:inline-block; border:1px solid #555; border-radius:8px; overflow:hidden; width:100%; max-width:600px;">
 
