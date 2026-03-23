@@ -296,8 +296,10 @@ Experience the kinematics of triangle centers in real-time. The sandbox allows f
 
 - **Discovery Sandbox**:
   [![Launch Discovery Sandbox](https://img.shields.io/badge/Launch-Discovery%20Sandbox-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/discovery_sandbox.html)
-- **Curves**:
-  [![Launch Curves](https://img.shields.io/badge/Launch-Curves-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/curves.html)
+- **Introduction**:
+  [![Launch Intro](https://img.shields.io/badge/Launch-Introduction-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/intro.html)
+- **Barycentric Search**:
+  [![Launch Search](https://img.shields.io/badge/Launch-Barycentric%20Search-007bff?style=for-the-badge&logo=rocket&logoColor=white)](https://mmathster.github.io/ETC-Center-Table/barycentric_search.html)
 
 
 

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETC Center Table — Barycentric Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']]
+  },
+  options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+:root {
+  --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a; --border:#24456a;
+  --accent:#70b8ff; --gold:#ffd479; --text:#f7fbff; --muted:#b7c8e6; --soft:#8fa8ca;
+  --font:'Figtree',system-ui,sans-serif; --mono:'JetBrains Mono','Fira Code',monospace;
+  --shadow:0 18px 44px rgba(1,8,20,.34); --glow:0 0 0 1px rgba(112,184,255,.18),0 16px 44px rgba(31,111,235,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:500;letter-spacing:.01em;padding:1rem 1rem 1rem 17.5rem;min-height:100vh}
+.site-sidebar{position:fixed;left:1rem;top:1rem;width:15rem;z-index:20;background:linear-gradient(180deg,rgba(14,26,43,.97) 0%,rgba(8,17,31,.98) 100%);border:1px solid var(--border);border-radius:16px;padding:1rem .9rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.85rem}
+.sidebar-brand{font-size:.95rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-.02em}
+.sidebar-copy{font-size:.76rem;line-height:1.55;color:var(--muted)}
+.sidebar-nav{display:grid;gap:.45rem}
+.sidebar-link{display:flex;align-items:center;justify-content:space-between;gap:.55rem;padding:.55rem .7rem;border-radius:10px;text-decoration:none;color:var(--muted);font-size:.82rem;font-weight:700;border:1px solid transparent;background:rgba(9,20,35,.35);transition:all .16s ease}
+.sidebar-link:hover,.sidebar-link.active{color:#fff;border-color:rgba(112,184,255,.3);background:rgba(19,35,58,.9);box-shadow:var(--glow)}
+.sidebar-link small{font-size:.72rem;color:var(--soft)}
+.main{max-width:1040px}
+h1{font-size:1.45rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.3rem}
+.subtitle{max-width:78ch;color:var(--muted);line-height:1.75;font-size:.94rem;margin-bottom:1rem}
+.hero,.results-panel,.card{background:linear-gradient(180deg,rgba(16,30,48,.96) 0%,rgba(8,17,31,.98) 100%);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+.hero{padding:1rem 1.1rem;margin-bottom:1rem}
+.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1rem;margin-top:.8rem}
+.card{padding:.9rem 1rem}
+.card h2{font-size:.92rem;font-weight:800;margin-bottom:.4rem}
+.card p,.card li{font-size:.85rem;line-height:1.65;color:var(--muted)}
+.card ul{margin-left:1.1rem}
+.controls{display:grid;grid-template-columns:2fr 1fr 1fr;gap:.8rem;margin:1rem 0}
+label{display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);margin-bottom:.4rem}
+input,select{width:100%;padding:.65rem .75rem;background:#081321;color:var(--text);border:1px solid #31567c;border-radius:10px;font-family:var(--font);font-weight:600}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(112,184,255,.16)}
+.results-panel{padding:1rem 1.1rem}
+.stats{display:flex;gap:.7rem;flex-wrap:wrap;margin-bottom:.9rem}
+.stat{padding:.3rem .6rem;border-radius:999px;background:rgba(15,39,70,.85);border:1px solid rgba(112,184,255,.18);font-size:.78rem;color:var(--muted);font-weight:700}
+.table-wrap{overflow:auto;border-radius:14px;border:1px solid rgba(112,184,255,.14)}
+table{width:100%;border-collapse:collapse;background:rgba(8,17,31,.72)}
+th,td{padding:.75rem .8rem;text-align:left;vertical-align:top;border-bottom:1px solid rgba(112,184,255,.08)}
+th{font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);background:rgba(11,27,49,.94)}
+td{font-size:.86rem;color:var(--text)}
+td code{font-family:var(--mono);font-size:.8rem;color:#e4f1ff;white-space:pre-wrap}
+.empty{padding:1rem;color:var(--muted);font-size:.88rem}
+@media(max-width:980px){body{padding:5.7rem 1rem 1rem}.site-sidebar{position:fixed;left:1rem;right:1rem;top:.75rem;width:auto;padding:.75rem .8rem;gap:.55rem}.sidebar-copy{display:none}.sidebar-nav{display:flex;gap:.45rem;overflow:auto}.sidebar-link{white-space:nowrap;min-width:max-content}}
+@media(max-width:760px){.controls,.hero-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<aside class="site-sidebar">
+  <a class="sidebar-brand" href="toc.html">ETC Center Table</a>
+  <div class="sidebar-copy">Search the barycentric coordinate catalogue extracted from the repository viewer definitions.</div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link" href="intro.html"><span>Introduction</span><small>Intro</small></a>
+    <a class="sidebar-link" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
+    <a class="sidebar-link active" href="barycentric_search.html"><span>Barycentric Search</span><small>Search</small></a>
+    <a class="sidebar-link" href="toc.html"><span>Repository ToC</span><small>Summary</small></a>
+    <a class="sidebar-link" href="https://github.com/MMathster/ETC-Center-Table#readme" target="_blank" rel="noreferrer"><span>GitHub README</span><small>↗</small></a>
+  </nav>
+</aside>
+<main class="main">
+  <section class="hero">
+    <h1>Barycentric Search Engine</h1>
+    <p class="subtitle">
+      This page is a compact search interface for the barycentric coordinates already present in the repository viewer logic. It follows the notebook's idea of treating a center as a searchable entity with a coordinate triple, then filtering by center ID, center name, or the coordinate text itself.
+    </p>
+    <div class="hero-grid">
+      <div class="card">
+        <h2>Search logic</h2>
+        <p>
+          The dataset is stored as colon-separated triples such as \(a:b:c\) or \(b+c-a:c+a-b:a+b-c\). That mirrors the notebook/pipeline convention where barycentrics are normalized into a searchable text form before further symbolic conversion.
+        </p>
+      </div>
+      <div class="card">
+        <h2>Examples</h2>
+        <ul>
+          <li>Search <code>X(8)</code> to jump straight to the Nagel point.</li>
+          <li>Search <code>b+c-a</code> to find Nagel/Mittenpunkt-style expressions.</li>
+          <li>Use the prefix filter to restrict results to a family like <code>X(1</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="results-panel">
+    <div class="controls">
+      <div>
+        <label for="searchBox">Search text</label>
+        <input id="searchBox" type="search" placeholder="Try X(8), symmedian, a:b:c, b+c-a, ...">
+      </div>
+      <div>
+        <label for="fieldSelect">Field</label>
+        <select id="fieldSelect">
+          <option value="all">All fields</option>
+          <option value="center_id">Center ID</option>
+          <option value="name">Center name</option>
+          <option value="barycentric">Barycentric only</option>
+        </select>
+      </div>
+      <div>
+        <label for="limitSelect">Rows</label>
+        <select id="limitSelect">
+          <option>25</option>
+          <option selected>50</option>
+          <option>100</option>
+          <option>200</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat" id="countStat">Loading…</div>
+      <div class="stat">Source: <code>docs/data/barycentric_index.json</code></div>
+      <div class="stat">Format: <code>u:v:w</code></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Center</th>
+            <th>Name</th>
+            <th>Barycentric coordinates</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+          <tr><td colspan="3" class="empty">Loading barycentric data…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<script>
+let centers = [];
+const searchBox = document.getElementById('searchBox');
+const fieldSelect = document.getElementById('fieldSelect');
+const limitSelect = document.getElementById('limitSelect');
+const resultsBody = document.getElementById('resultsBody');
+const countStat = document.getElementById('countStat');
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function renderRows() {
+  const q = searchBox.value.trim().toLowerCase();
+  const field = fieldSelect.value;
+  const limit = parseInt(limitSelect.value, 10);
+
+  const filtered = centers.filter(row => {
+    if (!q) return true;
+    const haystacks = field === 'all'
+      ? [row.center_id, row.name, row.barycentric]
+      : [row[field] || ''];
+    return haystacks.some(value => value.toLowerCase().includes(q));
+  });
+
+  countStat.textContent = `${filtered.length} / ${centers.length} centers`;
+
+  const rows = filtered.slice(0, limit);
+  if (!rows.length) {
+    resultsBody.innerHTML = '<tr><td colspan="3" class="empty">No barycentric coordinates match this filter.</td></tr>';
+    return;
+  }
+
+  resultsBody.innerHTML = rows.map(row => `
+    <tr>
+      <td><strong>${escapeHtml(row.center_id)}</strong></td>
+      <td>${escapeHtml(row.name)}</td>
+      <td><code>${escapeHtml(row.barycentric)}</code></td>
+    </tr>
+  `).join('');
+}
+
+Promise.all([
+  fetch('data/barycentric_index.json').then(r => r.json()),
+  document.fonts ? document.fonts.ready : Promise.resolve()
+]).then(([payload]) => {
+  centers = payload.centers || [];
+  renderRows();
+}).catch(err => {
+  console.error(err);
+  countStat.textContent = 'Load failed';
+  resultsBody.innerHTML = '<tr><td colspan="3" class="empty">Could not load barycentric_index.json.</td></tr>';
+});
+
+[searchBox, fieldSelect, limitSelect].forEach(el => el.addEventListener('input', renderRows));
+</script>
+</body>
+</html>

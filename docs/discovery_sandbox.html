@@ -6,39 +6,89 @@
 <title>ETC Loci Sandbox — Thales Configuration</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']]
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraph.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraphcore.min.js"></script>
 <style>
 :root {
-  --bg:      #0b0f1a;
-  --surface: #121828;
-  --surface2:#1a2236;
-  --border:  #2a3550;
-  --text:    #e8edf8;
-  --dim:     #8fa3c8;
-  --blue:    #4da6ff;
-  --gold:    #ffd166;
-  --green:   #06d6a0;
-  --orange:  #ff7043;
-  --purple:  #b388ff;
-  --font:    'Nunito', sans-serif;
-  --mono:    'JetBrains Mono', monospace;
+  --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a; --surface3:#102846;
+  --border:#24456a; --text:#f7fbff; --dim:#b7c8e6; --soft:#8fa8ca;
+  --blue:#70b8ff; --gold:#ffd479; --green:#59e1a8; --orange:#ff8f70;
+  --purple:#b792ff; --font:'Figtree', sans-serif; --mono:'JetBrains Mono', monospace;
+  --shadow:0 18px 44px rgba(1,8,20,.34); --glow:0 0 0 1px rgba(112,184,255,.18),0 16px 44px rgba(31,111,235,.16);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   background: var(--bg); color: var(--text);
-  font-family: var(--font); padding: 1.2rem;
+  font-family: var(--font); font-weight: 500; letter-spacing: .01em; padding: 1.2rem 1.2rem 1.2rem 17.5rem;
   min-height: 100vh;
 }
-h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2rem; }
-.subtitle { font-size: .83rem; color: var(--dim); margin-bottom: 1.1rem; max-width: 720px; line-height: 1.5; }
+.site-sidebar{
+  position:fixed;left:1rem;top:1rem;width:15rem;z-index:20;
+  background:linear-gradient(180deg,rgba(14,26,43,.97) 0%,rgba(8,17,31,.98) 100%);
+  border:1px solid var(--border);border-radius:16px;padding:1rem .9rem;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.85rem;
+}
+.sidebar-brand{font-size:.95rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-.02em}
+.sidebar-copy{font-size:.76rem;line-height:1.55;color:var(--dim)}
+.sidebar-nav{display:grid;gap:.45rem}
+.sidebar-link{
+  display:flex;align-items:center;justify-content:space-between;gap:.55rem;
+  padding:.55rem .7rem;border-radius:10px;text-decoration:none;
+  color:var(--dim);font-size:.82rem;font-weight:700;border:1px solid transparent;
+  background:rgba(9,20,35,.35);transition:all .16s ease;
+}
+.sidebar-link:hover,.sidebar-link.active{color:#fff;border-color:rgba(112,184,255,.3);background:rgba(19,35,58,.9);box-shadow:var(--glow)}
+.sidebar-link small{font-size:.72rem;color:var(--soft)}
+h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; letter-spacing: -.02em; }
+.subtitle { font-size: .92rem; color: var(--dim); margin-bottom: 1.15rem; max-width: 760px; line-height: 1.8; }
+.math-inline { white-space: nowrap; }
+.mjx-container { color: inherit; }
+.derive-box{
+  max-width: 760px; margin-bottom: 1rem; padding: .9rem 1rem;
+  background: linear-gradient(180deg,rgba(16,37,67,.94) 0%,rgba(8,18,31,.98) 100%);
+  border:1px solid #315f8f; border-radius: 14px; box-shadow: var(--shadow);
+}
+.derive-box h2{font-size:.9rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;margin-bottom:.45rem}
+.derive-box p{font-size:.84rem;line-height:1.68;color:var(--dim)}
+.derive-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.65rem}
+.derive-card{padding:.75rem .8rem;border-radius:12px;background:rgba(9,20,35,.52);border:1px solid rgba(112,184,255,.18)}
+.derive-card strong{display:block;margin-bottom:.28rem;color:#fff}
 .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media (max-width: 720px) { .panels { grid-template-columns: 1fr; } }
-.panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
-.panel-head { padding: .65rem 1rem .5rem; border-bottom: 1px solid var(--border); }
-.panel-head h2 { font-size: 1rem; font-weight: 700; color: var(--text); }
-.panel-head p  { font-size: .74rem; color: var(--dim); margin-top: .15rem; }
+@media(max-width:980px){
+  body{padding:5.7rem 1rem 1rem}
+  .site-sidebar{
+    position:fixed;left:1rem;right:1rem;top:.75rem;width:auto;padding:.75rem .8rem;gap:.55rem
+  }
+  .sidebar-copy{display:none}
+  .sidebar-nav{display:flex;gap:.45rem;overflow:auto}
+  .sidebar-link{white-space:nowrap;min-width:max-content}
+}
+@media(max-width:760px){.derive-grid{grid-template-columns:1fr}}
+.panel {
+  background: linear-gradient(180deg,rgba(15,28,46,.97) 0%,rgba(9,18,31,.99) 100%);
+  border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden;
+  box-shadow: var(--shadow); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.panel:hover { transform: translateY(-2px); border-color: rgba(112,184,255,.58); box-shadow: var(--glow); }
+.panel:nth-child(1) { border-color:#345b87; }
+.panel:nth-child(2) { border-color:#575ea3; }
+.panel-head { padding: .75rem 1rem .55rem; border-bottom: 1px solid var(--border); background: linear-gradient(180deg,rgba(17,39,67,.8) 0%,rgba(10,24,40,.4) 100%); }
+.panel-head h2 { font-size: 1.04rem; font-weight: 800; color: var(--text); }
+.panel-head p  { font-size: .79rem; color: var(--dim); margin-top: .2rem; font-weight: 600; }
 .board-wrap { position: relative; width: 100%; padding-bottom: 100%; background: #070b14; }
 .jxgbox { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; }
 .panel-ctrl {
@@ -46,51 +96,119 @@ h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2
   padding: .55rem .8rem; border-top: 1px solid var(--border); flex-wrap: wrap;
 }
 .btn {
-  font-family: var(--font); font-size: .8rem; font-weight: 700;
-  border: none; border-radius: 6px; padding: .3rem .85rem;
-  cursor: pointer; user-select: none; transition: opacity .15s, transform .1s;
+  font-family: var(--font); font-size: .82rem; font-weight: 800;
+  border: none; border-radius: 8px; padding: .38rem .95rem;
+  cursor: pointer; user-select: none; transition: opacity .15s, transform .1s, box-shadow .15s, filter .15s;
 }
+.btn:hover:not(:disabled) { box-shadow:0 0 0 1px rgba(255,255,255,.08),0 14px 30px rgba(31,111,235,.18); filter:brightness(1.04); transform: translateY(-1px); }
 .btn:active { transform: scale(.95); }
 .btn:disabled { opacity: .35; pointer-events: none; }
-.btn-go   { background: var(--green);  color: #071a14; }
-.btn-stop { background: var(--orange); color: #1a0a07; }
+.btn-go   { background: linear-gradient(180deg,#1be0a0 0%,#0fb87e 100%);  color: #071a14; }
+.btn-stop { background: linear-gradient(180deg,#ff9b7e 0%,#f86a45 100%); color: #1a0a07; }
 .chips { display: flex; gap: .4rem; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
-.chip { display: flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 600; color: var(--dim); }
+.chip { display: flex; align-items: center; gap: 6px; font-size: .77rem; font-weight: 700; color: var(--text); background: rgba(9,20,35,.38); border: 1px solid rgba(112,184,255,.14); border-radius: 999px; padding: .18rem .45rem; }
 .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 /* Formula block */
 .fbox {
-  border-top: 1px solid var(--border); background: #0d1523;
-  font-family: var(--mono); font-size: .75rem; line-height: 1.75;
-  padding: .55rem .85rem;
+  border-top: 1px solid var(--border); background: linear-gradient(180deg,#102543 0%,#0b192d 100%);
+  font-family: var(--mono); font-size: .83rem; line-height: 1.9;
+  padding: .68rem .9rem;
 }
 .fbox-title {
-  font-family: var(--font); font-size: .7rem; font-weight: 700;
+  font-family: var(--font); font-size: .74rem; font-weight: 800;
   text-transform: uppercase; letter-spacing: .07em;
-  color: var(--dim); margin-bottom: .3rem;
+  color: var(--soft); margin-bottom: .38rem;
 }
-.frow { display: flex; gap: .6rem; align-items: baseline; }
+.frow { display: flex; gap: .6rem; align-items: baseline; flex-wrap: wrap; }
 .fk   { color: var(--dim); font-size: .68rem; min-width: 1.6rem; }
-.fx   { color: #ffd166; }
-.fy   { color: #b388ff; }
-.fnote { font-size: .68rem; color: var(--dim); margin-top: .2rem; font-family: var(--font); }
+.fx   { color: #ffe19b; }
+.fy   { color: #d1bbff; }
+.fnote { font-size: .77rem; color: #e4efff; margin-top: .32rem; font-family: var(--font); font-weight: 600; }
 /* Theta info */
 .panel-info {
-  padding: .35rem .85rem; border-top: 1px solid var(--border);
-  font-size: .76rem; font-family: var(--mono); color: var(--dim); min-height: 1.5rem;
+  padding: .42rem .9rem; border-top: 1px solid var(--border);
+  font-size: .8rem; font-family: var(--mono); color: var(--dim); min-height: 1.7rem;
+  background: rgba(10,20,35,.55);
 }
 .panel-info span { color: var(--gold); }
+.panel-slider {
+  border-top: 1px solid rgba(112,184,255,.14);
+  padding: .65rem .85rem .75rem;
+  background: rgba(8,17,31,.6);
+}
+.panel-slider label {
+  display: block;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--soft);
+  margin-bottom: .42rem;
+}
+.angle-slider {
+  width: 100%;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+.angle-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-top: .42rem;
+  flex-wrap: wrap;
+  font-size: .78rem;
+  color: var(--dim);
+}
+.angle-meta span strong { color: var(--text); font-weight: 800; }
 </style>
 </head>
 <body>
+<aside class="site-sidebar">
+  <a class="sidebar-brand" href="toc.html">ETC Center Table</a>
+  <div class="sidebar-copy">Use the intro, sandbox, search page, and ToC from one sticky navigation rail.</div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link" href="intro.html"><span>Introduction</span><small>Intro</small></a>
+    <a class="sidebar-link active" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
+    <a class="sidebar-link" href="barycentric_search.html"><span>Barycentric Search</span><small>Search</small></a>
+    <a class="sidebar-link" href="toc.html"><span>Repository ToC</span><small>Summary</small></a>
+    <a class="sidebar-link" href="https://github.com/MMathster/ETC-Center-Table#readme" target="_blank" rel="noreferrer"><span>GitHub README</span><small>↗</small></a>
+  </nav>
+</aside>
 
 <h1>ETC Loci Sandbox — Thales Configuration</h1>
 <p class="subtitle">
-  <b>A = (1,0)</b> and <b>B = (−1,0)</b> fixed. <b>C</b> moves on the unit circle.
-  Loci are drawn using the exact rational parametric forms
-  <b>x(t), y(t)</b> with <b>t = tan(θ/4)</b>,
-  obtained by normalising barycentric weights
-  ā = 1 − t², b̄ = 2t, c̄ = 1 + t², then substituting the Weierstrass half-angle identities.
+  <strong><span class="math-inline">\(A=(1,0)\)</span></strong> and <strong><span class="math-inline">\(B=(-1,0)\)</span></strong> are fixed while <strong>\(C\)</strong> moves on the unit circle.
+  The loci use exact rational parametric forms <strong><span class="math-inline">\(x(t),y(t)\)</span></strong> with <strong><span class="math-inline">\(t=\tan(\theta/4)\)</span></strong>,
+  obtained by normalizing barycentric weights
+  <span class="math-inline">\(\bar a = 1-t^2\)</span>, <span class="math-inline">\(\bar b = 2t\)</span>, <span class="math-inline">\(\bar c = 1+t^2\)</span>
+  and applying the Weierstrass half-angle identities.
 </p>
+
+<section class="derive-box">
+  <h2>Compact derivation</h2>
+  <p>
+    With \(A=(1,0)\), \(B=(-1,0)\), and \(C=(\cos\theta,\sin\theta)\), each center starts from a barycentric triple \((u:v:w)\). The Thales normalization turns the Cartesian conversion into
+    \[
+      x=\frac{u-v+w\cos\theta}{u+v+w},\qquad
+      y=\frac{w\sin\theta}{u+v+w}.
+    \]
+    Using the substitution \(t = \tan \frac{\theta}{4}\), we replace trigonometric terms by rational ones:
+    \[
+      \cos\theta = \frac{1-t^2}{1+t^2},\qquad
+      \sin\theta = \frac{2t}{1+t^2}.
+    \]
+  </p>
+  <div class="derive-grid">
+    <div class="derive-card">
+      <strong>Why this matters</strong>
+      The locus formulas become rational in \(t\), which is why the viewer can plot exact-looking curves so smoothly.
+    </div>
+    <div class="derive-card">
+      <strong>How to use the sandbox</strong>
+      Move the angle slider, compare the radian and degree readouts, and inspect how the plotted center responds to the same parameter \(t\).
+    </div>
+  </div>
+</section>
 
 <div class="panels">
 
@@ -105,29 +223,37 @@ h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2
       <button class="btn btn-go"   id="p1-start">▶ Start</button>
       <button class="btn btn-stop" id="p1-stop" disabled>■ Stop</button>
       <div class="chips">
-        <div class="chip"><div class="dot" style="background:#ff7043"></div>C</div>
-        <div class="chip"><div class="dot" style="background:#ffd166"></div>X(1)</div>
-        <div class="chip"><div class="dot" style="background:#b388ff"></div>X(2)</div>
-        <div class="chip"><div class="dot" style="background:#06d6a0"></div>X(8)</div>
+        <div class="chip"><div class="dot" style="background:#ff7043"></div><span>\(C\)</span></div>
+        <div class="chip"><div class="dot" style="background:#ffd166"></div><span>\(X(1)\)</span></div>
+        <div class="chip"><div class="dot" style="background:#b388ff"></div><span>\(X(2)\)</span></div>
+        <div class="chip"><div class="dot" style="background:#06d6a0"></div><span>\(X(8)\)</span></div>
       </div>
     </div>
-    <div class="panel-info" id="p1-info">θ = —</div>
+    <div class="panel-info" id="p1-info">\(\theta\) = —</div>
+    <div class="panel-slider">
+      <label for="p1-angle">Angle slider</label>
+      <input class="angle-slider" type="range" id="p1-angle" min="0" max="6.283185307179586" step="0.002" value="1.0471975511965976">
+      <div class="angle-meta">
+        <span id="p1-rad"><strong>Radians:</strong> —</span>
+        <span id="p1-deg"><strong>Degrees:</strong> —</span>
+      </div>
+    </div>
     <div class="fbox">
-      <div class="fbox-title">Parametric curves — t = tan(θ/4), t ∈ (0, 1)</div>
+      <div class="fbox-title">Parametric curves — $t = \tan\frac{\theta}{4}$, $t \in (0,1)$</div>
       <div style="margin-bottom:.4rem">
         <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(1) Incenter — degree 2</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">−(t² + 2t − 1) / (t² + 1)</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t) / (t² + 1)</span></div>
+        <div class="frow"><span class="fx">\(x = -\dfrac{t^2 + 2t - 1}{t^2 + 1}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t)}{t^2 + 1}\)</span></div>
       </div>
       <div style="margin-bottom:.4rem">
         <div style="color:#b388ff;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(2) Centroid — degree 4, locus is circle r = 1/3</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / [3(t²+1)²]</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">4t(1 − t²) / [3(t²+1)²]</span></div>
+        <div class="frow"><span class="fx">\(x = \dfrac{(t^2-2t-1)(t^2+2t-1)}{3(t^2+1)^2}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{4t(1-t^2)}{3(t^2+1)^2}\)</span></div>
       </div>
       <div>
         <div style="color:#06d6a0;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(8) Nagel — degree 4, y ≥ 0 for t ∈ (0,1)</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²+2t−1)(3t²−2t+1) / (t²+1)²</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">4t²(1 − t)² / (t²+1)²</span></div>
+        <div class="frow"><span class="fx">\(x = \dfrac{(t^2+2t-1)(3t^2-2t+1)}{(t^2+1)^2}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{4t^2(1-t)^2}{(t^2+1)^2}\)</span></div>
       </div>
     </div>
   </div>
@@ -143,30 +269,38 @@ h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2
       <button class="btn btn-go"   id="p2-start">▶ Start</button>
       <button class="btn btn-stop" id="p2-stop" disabled>■ Stop</button>
       <div class="chips">
-        <div class="chip"><div class="dot" style="background:#ff7043"></div>C</div>
-        <div class="chip"><div class="dot" style="background:#ffd166"></div>X(5)</div>
-        <div class="chip"><div class="dot" style="background:#4da6ff"></div>X(6)</div>
-        <div class="chip"><div class="dot" style="background:#f78c6c"></div>X(11)</div>
+        <div class="chip"><div class="dot" style="background:#ff7043"></div><span>\(C\)</span></div>
+        <div class="chip"><div class="dot" style="background:#ffd166"></div><span>\(X(5)\)</span></div>
+        <div class="chip"><div class="dot" style="background:#4da6ff"></div><span>\(X(6)\)</span></div>
+        <div class="chip"><div class="dot" style="background:#f78c6c"></div><span>\(X(11)\)</span></div>
       </div>
     </div>
-    <div class="panel-info" id="p2-info">θ = —</div>
+    <div class="panel-info" id="p2-info">\(\theta\) = —</div>
+    <div class="panel-slider">
+      <label for="p2-angle">Angle slider</label>
+      <input class="angle-slider" type="range" id="p2-angle" min="0" max="6.283185307179586" step="0.002" value="1.5707963267948966">
+      <div class="angle-meta">
+        <span id="p2-rad"><strong>Radians:</strong> —</span>
+        <span id="p2-deg"><strong>Degrees:</strong> —</span>
+      </div>
+    </div>
     <div class="fbox">
-      <div class="fbox-title">Parametric curves — t = tan(θ/4), t ∈ (0, 1)</div>
+      <div class="fbox-title">Parametric curves — $t = \tan\frac{\theta}{4}$, $t \in (0,1)$</div>
       <div style="margin-bottom:.4rem">
         <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(5) Nine-Point — degree 4, locus is circle r = 1/2</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / [2(t²+1)²]</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t²) / (t²+1)²</span></div>
+        <div class="frow"><span class="fx">\(x = \dfrac{(t^2-2t-1)(t^2+2t-1)}{2(t^2+1)^2}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t^2)}{(t^2+1)^2}\)</span></div>
       </div>
       <div style="margin-bottom:.4rem">
         <div style="color:#4da6ff;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(6) Symmedian — degree 4, locus is unit circle (= C)</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / (t²+1)²</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t²) / (t²+1)²</span></div>
-        <div class="fnote">⟹ X(2), X(5), X(6) share the same numerator factor — Euler-line collinearity</div>
+        <div class="frow"><span class="fx">\(x = \dfrac{(t^2-2t-1)(t^2+2t-1)}{(t^2+1)^2}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t^2)}{(t^2+1)^2}\)</span></div>
+        <div class="fnote">\(X(2), X(5), X(6)\) share the same numerator factor, which visually echoes Euler-line collinearity.</div>
       </div>
       <div>
         <div style="color:#f78c6c;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(11) Feuerbach — degree 6, smooth on t ∈ (0,1)</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²+2t−1)(t⁴−6t³+2t−1) / [(t²+1)²(5t²−4t+1)]</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1−t)(t²+2t−1)² / [(t²+1)²(5t²−4t+1)]</span></div>
+        <div class="frow"><span class="fx">\(x = \dfrac{(t^2+2t-1)(t^4-6t^3+2t-1)}{(t^2+1)^2(5t^2-4t+1)}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t)(t^2+2t-1)^2}{(t^2+1)^2(5t^2-4t+1)}\)</span></div>
       </div>
     </div>
   </div>
@@ -413,11 +547,25 @@ addCenter(b2, st2, 'X(11)', '#f78c6c', 'X(11)');
 // ══════════════════════════════════════════════════════════════════
 //  Animation engine — shared factory
 // ══════════════════════════════════════════════════════════════════
-function makeAnimator(state, board, infoId, startId, stopId) {
+function makeAnimator(state, board, infoId, startId, stopId, sliderId, radId, degId) {
   let animId  = null;
   let lastTs  = null;
-  const SPEED = 0.9;   // rad/s
-  const PI    = Math.PI;
+  const SPEED = 1.0;   // rad/s
+  const TWO_PI = 2 * Math.PI;
+  const sliderEl = document.getElementById(sliderId);
+  const radEl = document.getElementById(radId);
+  const degEl = document.getElementById(degId);
+
+  function updateReadout() {
+    const deg = (state.angle * 180 / Math.PI).toFixed(1);
+    const tVal = Math.tan(state.angle / 4).toFixed(4);
+    document.getElementById(infoId).innerHTML =
+      `&theta; = <span>${state.angle.toFixed(3)}</span> rad &nbsp;|&nbsp; ` +
+      `${deg}&deg; &nbsp;|&nbsp; t = tan(&theta;/4) = <span>${tVal}</span>`;
+    radEl.innerHTML = `<strong>Radians:</strong> ${state.angle.toFixed(3)}`;
+    degEl.innerHTML = `<strong>Degrees:</strong> ${deg}&deg;`;
+    sliderEl.value = state.angle;
+  }
 
   function step(ts) {
     if (lastTs === null) lastTs = ts;
@@ -425,18 +573,19 @@ function makeAnimator(state, board, infoId, startId, stopId) {
     lastTs = ts;
 
     state.angle += SPEED * dt;
-    if (state.angle > PI)  state.angle -= 2 * PI;  // wrap π → −π
+    if (state.angle > TWO_PI) state.angle -= TWO_PI;  // wrap right edge → left edge
 
     board.update();
-
-    const deg = (state.angle * 180 / PI).toFixed(1);
-    const t_val = Math.tan(state.angle / 4).toFixed(4);
-    document.getElementById(infoId).innerHTML =
-      `&theta; = <span>${state.angle.toFixed(3)}</span> rad &nbsp;|&nbsp; ` +
-      `t = tan(&theta;/4) = <span>${t_val}</span>`;
+    updateReadout();
 
     animId = requestAnimationFrame(step);
   }
+
+  sliderEl.addEventListener('input', () => {
+    state.angle = parseFloat(sliderEl.value);
+    board.update();
+    updateReadout();
+  });
 
   document.getElementById(startId).addEventListener('click', () => {
     if (animId) return;
@@ -452,10 +601,13 @@ function makeAnimator(state, board, infoId, startId, stopId) {
     document.getElementById(startId).disabled = false;
     document.getElementById(stopId).disabled  = true;
   });
+
+  updateReadout();
 }
 
-makeAnimator(st1, b1, 'p1-info', 'p1-start', 'p1-stop');
-makeAnimator(st2, b2, 'p2-info', 'p2-start', 'p2-stop');
+makeAnimator(st1, b1, 'p1-info', 'p1-start', 'p1-stop', 'p1-angle', 'p1-rad', 'p1-deg');
+makeAnimator(st2, b2, 'p2-info', 'p2-start', 'p2-stop', 'p2-angle', 'p2-rad', 'p2-deg');
+
 </script>
 </body>
 </html>
