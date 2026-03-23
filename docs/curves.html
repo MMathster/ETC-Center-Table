@@ -3,10 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETC Triangle Centers — Thales Loci</title>
+<title>Triangle Centers on the Thales Circle — ETC Locus Explorer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']]
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 
 <link rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraph.min.css">
@@ -15,19 +27,54 @@
 </script>
 <style>
 :root {
-  --bg:#0d1117; --surface:#161b22; --border:#30363d;
-  --accent:#58a6ff; --gold:#f0b429; --green:#3fb950;
-  --red:#f78166; --euler:#a371f7; --text:#e6edf3; --muted:#8b949e;
-  --radius:8px; --mono:'JetBrains Mono','Fira Code',monospace;
+  --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a; --surface3:#102846;
+  --border:#24456a; --accent:#70b8ff; --accent-2:#3ea6ff; --gold:#ffd479;
+  --green:#59e1a8; --red:#ff8f70; --euler:#b792ff; --text:#f7fbff;
+  --muted:#b7c8e6; --soft:#8fa8ca; --radius:12px;
+  --font:'Figtree',system-ui,sans-serif; --mono:'JetBrains Mono','Fira Code',monospace;
+  --shadow:0 18px 44px rgba(1,8,20,.34); --glow:0 0 0 1px rgba(112,184,255,.18),0 16px 44px rgba(31,111,235,.16);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-family:var(--font);font-weight:500;letter-spacing:.01em;
   display:flex;flex-direction:column;align-items:center;
   padding:1rem;min-height:100vh}
 .page{width:100%;max-width:900px}
-h1{font-size:1.3rem;color:var(--accent);margin-bottom:.2rem}
-.subtitle{font-size:.81rem;color:var(--muted);margin-bottom:.9rem}
+h1{font-size:1.45rem;color:#fff;margin-bottom:.25rem;font-weight:800;letter-spacing:-.02em}
+.subtitle{font-size:.95rem;color:var(--muted);margin-bottom:1rem;line-height:1.72;max-width:74ch;font-weight:500}
+.math-inline{white-space:nowrap}
+.hero-note{margin-top:.85rem;display:grid;gap:.8rem}
+.story-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin:1rem 0 .9rem}
+.story-card,.deep-dive,.widget-guide{
+  background:linear-gradient(180deg,rgba(16,30,48,.96) 0%,rgba(8,17,31,.98) 100%);
+  border:1px solid var(--border);border-radius:var(--radius);padding:.95rem 1rem;
+  box-shadow:var(--shadow);transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.story-card:hover,.deep-dive:hover,.widget-guide:hover,.ctrl:hover,.info:hover,.settings-row:hover,.coord-panel:hover,.constr-panel:hover{
+  transform:translateY(-2px);border-color:rgba(112,184,255,.58);box-shadow:var(--glow);
+}
+.story-card:nth-child(1){background:linear-gradient(180deg,rgba(12,28,48,.98) 0%,rgba(10,20,33,.99) 100%);border-color:#2a527d}
+.story-card:nth-child(2){background:linear-gradient(180deg,rgba(26,33,55,.98) 0%,rgba(13,22,37,.99) 100%);border-color:#61518e}
+.story-card:nth-child(3){background:linear-gradient(180deg,rgba(25,31,50,.98) 0%,rgba(9,20,34,.99) 100%);border-color:#38648a}
+.story-card h2,.deep-dive h2,.widget-guide h2{font-size:1.04rem;color:#fff;margin-bottom:.45rem;font-weight:800}
+.story-card p,.deep-dive p,.widget-guide p{font-size:.88rem;color:var(--muted);line-height:1.68}
+.story-card ul,.deep-dive ul,.widget-guide ul{margin:.5rem 0 0 1.1rem;color:var(--text)}
+.story-card li,.deep-dive li,.widget-guide li{margin:.3rem 0;font-size:.85rem;line-height:1.62}
+.story-card strong,.deep-dive strong,.widget-guide strong{color:var(--text)}
+.deep-dive{margin:1rem 0}
+.deep-dive-grid{display:grid;grid-template-columns:1.2fr .9fr;gap:1rem;margin-top:.8rem}
+@media(max-width:760px){.deep-dive-grid{grid-template-columns:1fr}}
+.formula-block{margin:.7rem 0;padding:.8rem .9rem;background:linear-gradient(180deg,#0f2746 0%,#0a1b32 100%);border:1px solid #356799;border-radius:10px;color:#eff7ff;overflow:auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.callout-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin-top:.8rem}
+.callout{background:linear-gradient(180deg,#102543 0%,#0b192d 100%);border:1px solid #315f8f;border-radius:10px;padding:.75rem .8rem}
+.callout:nth-child(2){background:linear-gradient(180deg,#20284b 0%,#111b33 100%);border-color:#5d61a6}
+.callout:nth-child(3){background:linear-gradient(180deg,#0d2a3d 0%,#091a27 100%);border-color:#2e7384}
+.callout .tag{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);margin-bottom:.3rem}
+.callout p{font-size:.83rem;margin:0;color:#dbe8fb}
+.widget-guide{margin:1rem 0 .85rem}
+.widget-guide .guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.85rem;margin-top:.75rem}
+.widget-guide code{font-family:var(--mono);font-size:.78rem;color:#e4f1ff;background:#0f2746;padding:.08rem .32rem;border-radius:4px}
+.mjx-container{color:inherit}
 
 /* Board — square aspect so unit circle looks circular */
 .board-wrap{
@@ -57,18 +104,21 @@ h1{font-size:1.3rem;color:var(--accent);margin-bottom:.2rem}
 @media(max-width:560px){.controls{grid-template-columns:1fr}}
 .ctrl{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:.65rem .9rem;
+  border-radius:var(--radius);padding:.75rem .95rem;box-shadow:var(--shadow);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .ctrl label{
-  display:block;font-size:.72rem;color:var(--muted);
+  display:block;font-size:.72rem;color:var(--soft);
   text-transform:uppercase;letter-spacing:.05em;margin-bottom:.45rem;
 }
 select,input[type=range]{
-  width:100%;background:var(--bg);border:1px solid var(--border);
+  width:100%;background:#081321;border:1px solid #31567c;
   border-radius:5px;color:var(--text);font-size:.86rem;
-  padding:.35rem .55rem;outline:none;
+  padding:.42rem .6rem;outline:none;font-family:var(--font);font-weight:600;
+  transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
-select:focus{border-color:var(--accent)}
+select:hover,input[type=range]:hover{border-color:var(--accent)}
+select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(112,184,255,.16)}
 input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
 .sub{font-size:.76rem;color:var(--gold);margin-top:.3rem;
   font-family:var(--mono);min-height:1.1em;line-height:1.4}
@@ -79,10 +129,10 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   border-radius:var(--radius);padding:.65rem .9rem;margin-top:.7rem;
   font-size:.8rem;display:grid;
   grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:.3rem 1.2rem;
+  gap:.3rem 1.2rem;box-shadow:var(--shadow);transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .ir{display:flex;gap:.45rem;align-items:baseline}
-.ir .k{color:var(--muted);white-space:nowrap;min-width:60px}
+.ir .k{color:var(--soft);white-space:nowrap;min-width:60px}
 .ir .v{font-family:var(--mono);font-size:.74rem}
 .ir .v.hi{color:var(--gold)}
 
@@ -104,6 +154,8 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .setting-group {
   display: flex;
@@ -137,11 +189,11 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   color: var(--muted);
   padding: .25rem .7rem;
   cursor: pointer;
-  transition: background .15s, color .15s;
+  transition: background .15s, color .15s, box-shadow .15s;
   white-space: nowrap;
 }
-.tgl.active  { background: var(--accent); color: #fff; }
-.tgl:hover:not(.active) { background: var(--border); color: var(--text); }
+.tgl.active  { background: linear-gradient(180deg,var(--accent) 0%,var(--accent-2) 100%); color: #fff; box-shadow:0 10px 24px rgba(62,166,255,.24); }
+.tgl:hover:not(.active) { background: #1b3556; color: var(--text); box-shadow:0 0 0 1px rgba(112,184,255,.16); }
 .tgl-switch {
   font-family: var(--font);
   font-size: .78rem;
@@ -152,10 +204,11 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   color: var(--muted);
   padding: .25rem .75rem;
   cursor: pointer;
-  transition: background .15s, border-color .15s, color .15s;
+  transition: background .15s, border-color .15s, color .15s, box-shadow .15s, transform .15s;
   white-space: nowrap;
 }
-.tgl-switch.on  { background: #1a3a1a; border-color: #22c55e; color: #4ade80; }
+.tgl-switch:hover { transform:translateY(-1px); box-shadow:0 10px 22px rgba(31,111,235,.14); }
+.tgl-switch.on  { background: #123423; border-color: #31c985; color: #7df2bf; }
 .tgl-switch.off { background: var(--surface2); border-color: var(--border); color: var(--muted); }
 
 
@@ -217,13 +270,15 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   color: #fff;
 }
 .coord-panel {
-  background: #1c2438;
+  background: linear-gradient(180deg,#142744 0%,#0f1c31 100%);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   padding: .75rem 1rem;
   margin-top: .6rem;
   font-size: .83rem;
   line-height: 1.6;
+  box-shadow: var(--shadow);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .coord-panel .cp-title {
   font-size: .72rem;
@@ -242,7 +297,7 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
 }
 .coord-note {
   font-size: .78rem;
-  color: #b0c4de;
+  color: #d7e5fa;
   line-height: 1.5;
 }
 /* ── Animation buttons ─────────────────────────────────────────── */
@@ -254,13 +309,14 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   border-radius: 6px;
   padding: .35rem .9rem;
   cursor: pointer;
-  transition: opacity .15s, transform .1s;
+  transition: opacity .15s, transform .1s, box-shadow .15s, filter .15s;
   user-select: none;
 }
 .anim-btn:active   { transform: scale(.96); }
 .anim-btn:disabled { opacity: .35; cursor: default; pointer-events: none; }
-.anim-go   { background: #06d6a0; color: #071a14; }
-.anim-stop { background: #ff7043; color: #1a0a07; }
+.anim-btn:hover:not(:disabled){box-shadow:0 0 0 1px rgba(255,255,255,.08),0 14px 30px rgba(31,111,235,.18);filter:brightness(1.04)}
+.anim-go   { background: linear-gradient(180deg,#1be0a0 0%,#0fb87e 100%); color: #071a14; }
+.anim-stop { background: linear-gradient(180deg,#ff8f70 0%,#f86a45 100%); color: #1a0a07; }
 
 
 /* ── Euclidean Construction Panel ─────────────────────────────── */
@@ -290,8 +346,8 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   transition: background .15s, border-color .15s;
   user-select: none;
 }
-.btn-constr:hover  { border-color: var(--accent); }
-.btn-constr.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-constr:hover  { border-color: var(--accent); box-shadow:0 12px 26px rgba(31,111,235,.16); }
+.btn-constr.active { background: linear-gradient(180deg,var(--accent) 0%,var(--accent-2) 100%); border-color: var(--accent); color: #fff; }
 .btn-constr:disabled { opacity:.35; pointer-events:none; }
 
 .constr-panel {
@@ -301,6 +357,8 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
   overflow: hidden;
   margin-top: .5rem;
   display: none;         /* hidden by default */
+  box-shadow: var(--shadow);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .constr-panel.open { display: block; }
 
@@ -383,14 +441,117 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
 </head>
 <body>
 <div class="page">
-<h1>ETC Triangle Centers — Thales Configuration</h1>
+<h1>Triangle Centers on the Thales Circle</h1>
 <p class="subtitle">
-  A = (1,0) and B = (−1,0) are fixed. C moves on the unit circle
-  x²+y²=1. The locus of X<sub>n</sub> is drawn as C completes a
-  full revolution (θ: 0 → 2π). Barycentric weights are computed
-  from the side lengths a, b, c of the resulting triangle.
+  This explorer follows a moving triangle in the <strong>Thales configuration</strong>:
+  <span class="math-inline">\(A=(1,0)\)</span> and <span class="math-inline">\(B=(-1,0)\)</span> stay fixed while
+  <span class="math-inline">\(C=(\cos\theta,\sin\theta)\)</span> slides around the unit circle <span class="math-inline">\(x^2+y^2=1\)</span>.
+  Each choice of <span class="math-inline">\(\theta\)</span> creates a new triangle, and the chosen ETC center <span class="math-inline">\(X_n\)</span> traces a locus.
 </p>
+<div class="hero-note">
+  <div class="story-grid">
+    <section class="story-card">
+      <h2>What you are seeing</h2>
+      <p>
+        Think of this page as a synchronized geometry lab: the orange point moves, the triangle updates,
+        and a classical center such as the incenter, centroid, or symmedian point responds instantly.
+      </p>
+      <ul>
+        <li><strong>The blue segment \(AB\)</strong> is fixed and acts like a stable ruler.</li>
+        <li><strong>The orange point \(C\)</strong> is the “input” of the experiment.</li>
+        <li><strong>The gold trace</strong> is the path swept out by the selected center \(X_n\).</li>
+      </ul>
+    </section>
+    <section class="story-card">
+      <h2>Why Thales makes life cleaner</h2>
+      <p>
+        Because <span class="math-inline">\(AB\)</span> is a diameter of the circumcircle, Thales' theorem gives a right angle at
+        <span class="math-inline">\(C\)</span>. So every non-degenerate triangle in this widget has <span class="math-inline">\(\angle C=90^\circ\)</span>.
+      </p>
+      <div class="formula-block">\[
+        a=|BC|=2\left|\cos\frac{\theta}{2}\right|,\qquad
+        b=|CA|=2\left|\sin\frac{\theta}{2}\right|,\qquad
+        c=|AB|=2.
+      \]</div>
+      <p>
+        Those side lengths are exactly the data used in the barycentric formulas that define many triangle centers.
+      </p>
+    </section>
+    <section class="story-card">
+      <h2>From classical geometry to coordinates</h2>
+      <p>
+        The README's main idea is that the moving centers can be rewritten as rational coordinate formulas,
+        so the loci can be computed efficiently and plotted smoothly.
+      </p>
+      <div class="formula-block">\[
+        t=\tan\frac{\theta}{2},\qquad
+        (\cos\theta,\sin\theta)=\left(\frac{1-t^2}{1+t^2},\frac{2t}{1+t^2}\right).
+      \]</div>
+      <p>
+        That substitution turns trigonometric motion into rational motion, which is especially useful for symbolic computation.
+      </p>
+    </section>
+  </div>
 
+  <section class="deep-dive">
+    <h2>Deep dive — a Brilliant-style tour of triangle centers</h2>
+    <p>
+      One of the nicest surprises in Euclidean geometry is that very different definitions can produce points that move in a coordinated way.
+      Some centers are defined by <strong>distance</strong>, some by <strong>balancing</strong>, and some by <strong>angle symmetry</strong>, but in this widget they all respond to the same moving vertex \(C\).
+    </p>
+    <div class="deep-dive-grid">
+      <div>
+        <div class="formula-block">\[
+          P=(u:v:w)\quad\longmapsto\quad
+          \left(\frac{u-v+w\cos\theta}{u+v+w},\frac{w\sin\theta}{u+v+w}\right)
+        \]</div>
+        <p>
+          Here <span class="math-inline">\((u:v:w)\)</span> are barycentric weights relative to triangle \(ABC\). The coordinate converter above is what lets the viewer translate a classical center into a visible Cartesian point.
+        </p>
+        <ul>
+          <li><strong>Incenter \(X_1\):</strong> balances the side lengths, so in barycentrics it is <span class="math-inline">\(a:b:c\)</span>.</li>
+          <li><strong>Centroid \(X_2\):</strong> is the average of the vertices, so its barycentrics are <span class="math-inline">\(1:1:1\)</span>.</li>
+          <li><strong>Nine-point center \(X_5\):</strong> tracks the midpoint geometry of the triangle.</li>
+          <li><strong>Symmedian point \(X_6\):</strong> reacts to squared side lengths, giving barycentrics <span class="math-inline">\(a^2:b^2:c^2\)</span>.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="callout-row">
+          <div class="callout">
+            <span class="tag">Euler line moment</span>
+            <p>In this configuration the circumcenter is \(O=(0,0)\), the orthocenter is \(H=C\), the centroid is \(G=C/3\), and the nine-point center is \(N=C/2\). Several famous centers line up automatically.</p>
+          </div>
+          <div class="callout">
+            <span class="tag">Synchronous motion</span>
+            <p>When \(C\) rotates once around the circle, some centers rotate in the same direction, some in the opposite direction, and some collapse to especially simple curves such as circles.</p>
+          </div>
+          <div class="callout">
+            <span class="tag">Secondary-school bridge</span>
+            <p>You can read the picture in two ways at once: as compass-and-straightedge geometry and as analytic geometry on the coordinate plane.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="widget-guide">
+    <h2>How to read the widget</h2>
+    <div class="guide-grid">
+      <div>
+        <p><strong>1. Pick a center.</strong> Use the dropdown to jump among ETC entries. The line just below the selector shows the active barycentric recipe and whether the locus is tagged as a circle, point, or more general curve.</p>
+      </div>
+      <div>
+        <p><strong>2. Move \(\theta\).</strong> Slide the angle or press <code>Start</code>. Watch the orange vertex move and compare the triangle with the center trace.</p>
+      </div>
+      <div>
+        <p><strong>3. Switch viewpoints.</strong> The coordinate toggle reveals either barycentric area weights or trilinear distance-to-side interpretations. That makes the same point feel geometric first and algebraic second.</p>
+      </div>
+      <div>
+        <p><strong>4. Use the construction panel.</strong> For selected centers, the step list gives a Euclidean-construction storyline that matches the moving picture above it.</p>
+      </div>
+    </div>
+  </section>
+</div>
 <div class="board-wrap">
   <div id="jxgbox"></div>
 </div>
