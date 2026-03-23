@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETC Center Table — Barycentric Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']]
+  },
+  options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraph.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraphcore.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
+<style>
+:root {
+  --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a; --surface3:#102846;
+  --border:#24456a; --accent:#70b8ff; --accent-2:#3ea6ff; --gold:#ffd479; --mint:#59e1a8; --orange:#ff8f70;
+  --text:#f7fbff; --muted:#b7c8e6; --soft:#8fa8ca; --radius:14px;
+  --font:'Figtree',system-ui,sans-serif; --display:'Fraunces',serif; --mono:'JetBrains Mono','Fira Code',monospace;
+  --shadow:0 18px 44px rgba(1,8,20,.34); --glow:0 0 0 1px rgba(112,184,255,.18),0 16px 44px rgba(31,111,235,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:500;letter-spacing:.01em;padding:1rem 1rem 1rem 17.5rem;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(rgba(112,184,255,.09) 1px, transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0}
+.site-sidebar{position:fixed;left:1rem;top:1rem;width:15rem;z-index:20;background:linear-gradient(180deg,rgba(14,26,43,.97) 0%,rgba(8,17,31,.98) 100%);border:1px solid var(--border);border-radius:16px;padding:1rem .9rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.85rem}
+.sidebar-brand{font-size:.95rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-.02em}
+.sidebar-copy{font-size:.76rem;line-height:1.55;color:var(--muted)}
+.sidebar-nav{display:grid;gap:.45rem}
+.sidebar-link{display:flex;align-items:center;justify-content:space-between;gap:.55rem;padding:.55rem .7rem;border-radius:10px;text-decoration:none;color:var(--muted);font-size:.82rem;font-weight:700;border:1px solid transparent;background:rgba(9,20,35,.35);transition:all .16s ease}
+.sidebar-link:hover,.sidebar-link.active{color:#fff;border-color:rgba(112,184,255,.3);background:rgba(19,35,58,.9);box-shadow:var(--glow)}
+.sidebar-link small{font-size:.72rem;color:var(--soft)}
+.blob{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(110px)}
+.blob-1{width:520px;height:360px;top:-120px;right:10%;background:radial-gradient(ellipse,rgba(112,184,255,.12) 0%,rgba(255,212,121,.08) 50%,transparent 72%)}
+.blob-2{width:420px;height:420px;bottom:-120px;left:-80px;background:radial-gradient(ellipse,rgba(89,225,168,.10) 0%,transparent 68%)}
+.page{position:relative;z-index:1;max-width:1160px}
+h1{font-family:var(--display);font-size:clamp(2.1rem,4.7vw,3.5rem);line-height:1.02;letter-spacing:-.03em;margin-bottom:.75rem}
+.title-accent{display:block;background:linear-gradient(110deg,#fff 0%,var(--gold) 40%,var(--accent) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.title-sub{display:block;font-family:var(--font);font-size:.3em;letter-spacing:.24em;text-transform:uppercase;color:var(--soft);-webkit-text-fill-color:var(--soft);margin-top:.8rem}
+.subtitle{max-width:76ch;color:var(--muted);line-height:1.8;font-size:.94rem;margin-bottom:1rem}
+.hero-note,.results-panel,.story-card,.deep-dive,.toolbar,.plot-panel{background:linear-gradient(180deg,rgba(16,30,48,.96) 0%,rgba(8,17,31,.98) 100%);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero-note{padding:1rem 1.1rem;margin-bottom:1rem}.story-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.85rem;margin-top:.8rem}.story-card,.deep-dive,.plot-panel{padding:.95rem 1rem;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.story-card:hover,.deep-dive:hover,.toolbar:hover,.results-panel:hover,.plot-panel:hover{transform:translateY(-2px);border-color:rgba(112,184,255,.58);box-shadow:var(--glow)}
+.story-card h2,.deep-dive h2,.plot-panel h2{font-size:1rem;font-weight:800;margin-bottom:.4rem}.story-card p,.story-card li,.deep-dive p,.plot-panel p{font-size:.86rem;color:var(--muted);line-height:1.65}.story-card ul{margin-left:1.1rem;margin-top:.45rem}
+.deep-dive{padding:1rem 1.05rem;margin-bottom:1rem}.deep-dive-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:1rem;margin-top:.85rem}.formula-block{margin:.75rem 0;padding:.82rem .9rem;background:linear-gradient(180deg,#0f2746 0%,#0a1b32 100%);border:1px solid #356799;border-radius:10px;color:#eff7ff;overflow:auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.callout-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem}.callout{background:linear-gradient(180deg,#102543 0%,#0b192d 100%);border:1px solid #315f8f;border-radius:10px;padding:.75rem .8rem}.callout .tag{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);margin-bottom:.3rem}.callout p{font-size:.82rem;color:#dbe8fb;line-height:1.55}
+.toolbar{padding:1rem 1.05rem;margin-bottom:1rem;position:sticky;top:1rem;z-index:10;backdrop-filter:blur(16px)}.toolbar-grid{display:grid;grid-template-columns:2fr 1.1fr 1fr 1fr;gap:.8rem;align-items:end}
+label{display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);margin-bottom:.4rem}input,select{width:100%;padding:.68rem .78rem;background:#081321;color:var(--text);border:1px solid #31567c;border-radius:10px;font-family:var(--font);font-weight:600}input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(112,184,255,.16)}
+.segmented{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.75rem}.segmented button{border:none;border-radius:999px;padding:.42rem .72rem;font:700 .78rem var(--font);color:var(--muted);background:rgba(11,28,48,.72);border:1px solid rgba(112,184,255,.16);cursor:pointer;transition:all .18s ease}.segmented button.active,.segmented button:hover{color:#fff;background:rgba(19,35,58,.92);border-color:rgba(112,184,255,.34);box-shadow:var(--glow)}
+.plot-panel{margin-bottom:1rem}.plot-grid{display:grid;grid-template-columns:minmax(320px,1fr) 1.15fr;gap:1rem;margin-top:.8rem}.board-wrap{position:relative;width:100%;padding-bottom:100%;max-height:560px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}.jxgbox{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important}
+.plot-controls{display:grid;gap:.8rem}.plot-card{padding:.8rem .88rem;border-radius:12px;background:rgba(10,22,37,.62);border:1px solid rgba(112,184,255,.14)}.plot-card h3{font-size:.86rem;font-weight:800;margin-bottom:.35rem}.plot-card p,.plot-card li{font-size:.82rem;color:var(--muted);line-height:1.58}.plot-card code{font-family:var(--mono);font-size:.76rem;color:#e4f1ff}.plot-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.6rem;margin-top:.6rem}.plot-meta div{padding:.55rem .65rem;border-radius:10px;background:rgba(15,39,70,.85);border:1px solid rgba(112,184,255,.14)}.plot-meta strong{display:block;font-size:.68rem;letter-spacing:.05em;text-transform:uppercase;color:var(--soft);margin-bottom:.2rem}.plot-meta span{font-size:.82rem;color:#fff}
+.slider-label{display:flex;justify-content:space-between;gap:.6rem;align-items:center}.theta-slider{width:100%;accent-color:var(--accent);cursor:pointer}.notice{font-size:.78rem;color:var(--soft);margin-top:.45rem}
+.results-panel{padding:1rem 1.05rem;overflow:hidden}.loading-shell{position:relative;overflow:hidden;border-radius:12px;border:1px solid rgba(112,184,255,.16);background:rgba(8,17,31,.6);padding:1rem;margin-bottom:1rem}.loading-shell::after{content:'';position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(112,184,255,.11),transparent);animation:shimmer 2.2s infinite}.loading-shell.ready::after{display:none}@keyframes shimmer{100%{transform:translateX(100%)}}
+.loading-status{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem}.loading-status strong{font-size:.92rem}.loading-status span{font-size:.8rem;color:var(--soft)}.progress{height:10px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:.8rem}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--mint));border-radius:999px;transition:width .22s ease}.loading-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.65rem}.loading-step{padding:.7rem .75rem;border-radius:10px;border:1px solid rgba(112,184,255,.14);background:rgba(9,20,35,.45)}.loading-step strong{display:block;font-size:.77rem;color:#fff;margin-bottom:.22rem}.loading-step span{font-size:.78rem;color:var(--muted);line-height:1.5}
+.stats{display:flex;gap:.7rem;flex-wrap:wrap;margin-bottom:.9rem}.stat{padding:.34rem .66rem;border-radius:999px;background:rgba(15,39,70,.85);border:1px solid rgba(112,184,255,.18);font-size:.78rem;color:var(--muted);font-weight:700}
+.table-wrap{overflow:auto;border-radius:14px;border:1px solid rgba(112,184,255,.14)}table{width:100%;border-collapse:collapse;background:rgba(8,17,31,.72)}th,td{padding:.78rem .82rem;text-align:left;vertical-align:top;border-bottom:1px solid rgba(112,184,255,.08)}th{font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);background:rgba(11,27,49,.94)}td{font-size:.86rem;color:var(--text)}
+.result-row{cursor:pointer;transition:background .16s ease,transform .16s ease}.result-row:hover{background:rgba(19,35,58,.62)}.result-row.active{background:rgba(19,35,58,.95);box-shadow:inset 0 0 0 1px rgba(112,184,255,.28)}
+.center-cell strong{display:block;margin-bottom:.18rem}.page-pill{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;padding:.18rem .5rem;margin-top:.2rem;background:rgba(255,255,255,.04);border:1px solid rgba(112,184,255,.14);font-size:.68rem;color:var(--soft);font-weight:700}.bary-list{display:grid;gap:.42rem}.bary-chip{display:block;padding:.46rem .56rem;border-radius:10px;background:rgba(11,28,48,.82);border:1px solid rgba(112,184,255,.12);font-family:var(--mono);font-size:.77rem;line-height:1.55;color:#e4f1ff;white-space:pre-wrap}.empty{padding:1rem;color:var(--muted);font-size:.88rem}
+.section-card{opacity:.62;transform:translateY(18px);transition:opacity .45s ease,transform .45s ease,border-color .3s ease,box-shadow .3s ease}.section-card.is-visible{opacity:1;transform:translateY(0)}.section-card.section-active{border-color:rgba(112,184,255,.42);box-shadow:var(--glow)}
+@media(max-width:1100px){.toolbar-grid{grid-template-columns:1fr 1fr}.deep-dive-grid,.plot-grid{grid-template-columns:1fr}}@media(max-width:980px){body{padding:5.7rem 1rem 1rem}.site-sidebar{position:fixed;left:1rem;right:1rem;top:.75rem;width:auto;padding:.75rem .8rem;gap:.55rem}.sidebar-copy{display:none}.sidebar-nav{display:flex;gap:.45rem;overflow:auto}.sidebar-link{white-space:nowrap;min-width:max-content}.toolbar{top:5.1rem}}@media(max-width:760px){.toolbar-grid,.story-grid{grid-template-columns:1fr}h1{font-size:2rem}}
+</style>
+</head>
+<body>
+<aside class="site-sidebar">
+  <a class="sidebar-brand" href="toc.html">ETC Center Table</a>
+  <div class="sidebar-copy">Extract the live ETC pages with notebook-style parsing, search every barycentric variant, and click a row to open a JSXGraph Thales plot for the selected center.</div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link" href="intro.html"><span>Introduction</span><small>Intro</small></a>
+    <a class="sidebar-link" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
+    <a class="sidebar-link active" href="barycentric_search.html"><span>Barycentric Search</span><small>Search</small></a>
+    <a class="sidebar-link" href="toc.html"><span>Repository ToC</span><small>Summary</small></a>
+    <a class="sidebar-link" href="https://github.com/MMathster/ETC-Center-Table#readme" target="_blank" rel="noreferrer"><span>GitHub README</span><small>↗</small></a>
+  </nav>
+</aside>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<main class="page">
+  <section class="hero-note section-card">
+    <h1>
+      <span class="title-accent">Barycentric Search Engine</span>
+      <span class="title-sub">Live ETC extraction • clickable rows • JSXGraph preview</span>
+    </h1>
+    <p class="subtitle">
+      The table below now treats the upstream ETC pages as the source of truth. It probes <code>ETC.html</code>, then <code>ETCPart2.html</code>, <code>ETCPart3.html</code>, and so on until <code>ETCPart37.html</code> is missing; every genuine barycentric variant found for a center is kept, searchable, and selectable for plotting in the Thales-style preview board.
+    </p>
+    <div class="story-grid">
+      <section class="story-card"><h2>Notebook-style parsing</h2><p>The loader walks the same header block structure as the notebook, rejects prose and cross-references, and keeps helper function definitions when a barycentric line uses <code>f(a,b,c)</code>-style shorthand.</p></section>
+      <section class="story-card"><h2>Page-aware filtering</h2><p>Each extracted center stores its ETC source page, so you can search by ID, name, page, or barycentrics and immediately see which part of the encyclopedia it came from.</p></section>
+      <section class="story-card"><h2>Clickable plotting</h2><p>Click any result row to attempt a numerical Thales-circle plot. When a coordinate is evaluable, the preview board shows the selected center, its locus, and the current slider-controlled position.</p></section>
+    </div>
+  </section>
+
+  <section class="toolbar section-card">
+    <div class="toolbar-grid">
+      <div><label for="searchBox">Search text</label><input id="searchBox" type="search" placeholder="Try X(1005), Gergonne, ETCPart2, b+c-a, ..."></div>
+      <div><label for="fieldSelect">Field</label><select id="fieldSelect"><option value="all">All fields</option><option value="center_id">Center ID</option><option value="name">Center name</option><option value="source_page">Source page</option><option value="barycentric">Barycentrics only</option></select></div>
+      <div><label for="pageSelect">Page</label><select id="pageSelect"><option value="all">All loaded pages</option></select></div>
+      <div><label for="limitSelect">Rows</label><select id="limitSelect"><option>25</option><option selected>50</option><option>100</option><option>200</option></select></div>
+    </div>
+    <div class="segmented" id="modeSwitch"><button type="button" data-mode="all" class="active">All variants</button><button type="button" data-mode="single">One row per center</button><button type="button" data-mode="page">Page-first view</button></div>
+  </section>
+
+  <section class="plot-panel section-card">
+    <h2>Selected center preview</h2>
+    <p>Click a table row to load the selected center into this board. The plot uses the same Thales configuration as the introduction page: <code>A=(1,0)</code>, <code>B=(-1,0)</code>, and <code>C=(\cos\theta,\sin\theta)</code>.</p>
+    <div class="plot-grid">
+      <div class="board-wrap"><div id="searchBoard" class="jxgbox"></div></div>
+      <div class="plot-controls">
+        <div class="plot-card">
+          <h3 id="plotTitle">No center selected yet</h3>
+          <p id="plotSummary">Choose a row from the table to see its extracted barycentrics and, when possible, a numeric plot.</p>
+          <div class="plot-meta">
+            <div><strong>Center</strong><span id="plotCenterId">—</span></div>
+            <div><strong>Page</strong><span id="plotPage">—</span></div>
+            <div><strong>Variant</strong><span id="plotVariant">—</span></div>
+            <div><strong>Status</strong><span id="plotStatus">Awaiting selection</span></div>
+          </div>
+        </div>
+        <div class="plot-card">
+          <div class="slider-label"><h3>Theta slider</h3><code id="thetaReadout">θ = 0.400</code></div>
+          <input id="thetaSlider" class="theta-slider" type="range" min="-3.04" max="3.04" step="0.01" value="0.4">
+          <div class="notice">If the selected center uses shorthand that cannot be evaluated numerically in the browser, the row still stays searchable but the plot will report why it could not render.</div>
+        </div>
+        <div class="plot-card">
+          <h3>Selected barycentrics</h3>
+          <code id="plotFormula">—</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="results-panel section-card" id="search-results">
+    <div class="loading-shell" id="loadingShell">
+      <div class="loading-status"><div><strong id="loaderHeadline">Preparing live ETC extraction…</strong><br><span id="loaderSubline">Probing ETC.html and then ETCPart2 onward until ETCPart37 is absent.</span></div><span id="loaderMode">Mode: live extraction</span></div>
+      <div class="progress"><div id="progressFill"></div></div>
+      <div class="loading-steps">
+        <div class="loading-step"><strong>Pages</strong><span id="stepRemote">Waiting to fetch ETC.html.</span></div>
+        <div class="loading-step"><strong>Rows</strong><span id="stepRows">No centers parsed yet.</span></div>
+        <div class="loading-step"><strong>Preview</strong><span id="stepPreview">Click a row after the live catalog loads.</span></div>
+      </div>
+    </div>
+    <div class="stats"><div class="stat" id="countStat">Loading…</div><div class="stat" id="pageStat">Pages: —</div><div class="stat" id="variantStat">Variants: —</div><div class="stat" id="sourceStat">Source: live ETC extraction</div></div>
+    <div class="table-wrap"><table><thead><tr><th>Center</th><th>Name</th><th>Page</th><th>All barycentric coordinates</th></tr></thead><tbody id="resultsBody"><tr><td colspan="4" class="empty">Loading barycentric data…</td></tr></tbody></table></div>
+  </section>
+</main>
+<script>
+const ETC_BASE = 'https://faculty.evansville.edu/ck6/encyclopedia/';
+const BARY_STOP = /\s+(?:where|for\b|which\b|See\s+also|Trilinears|Tripolars|Lines|Note|Also|Polar|Coordinates|equals?|Compare|The\s)/i;
+const MATH_WORDS = new Set(['sin','cos','tan','cot','sec','csc','sinh','cosh','tanh','sqrt','cbrt','acot','atan','asin','acos','atan2','exp','log','abs','sgn','sign','floor','ceil']);
+const SUPER_MAP = {'²':'^2','³':'^3','⁴':'^4','⁵':'^5'};
+const searchBox = document.getElementById('searchBox');
+const fieldSelect = document.getElementById('fieldSelect');
+const pageSelect = document.getElementById('pageSelect');
+const limitSelect = document.getElementById('limitSelect');
+const resultsBody = document.getElementById('resultsBody');
+const countStat = document.getElementById('countStat');
+const pageStat = document.getElementById('pageStat');
+const variantStat = document.getElementById('variantStat');
+const sourceStat = document.getElementById('sourceStat');
+const loaderHeadline = document.getElementById('loaderHeadline');
+const loaderSubline = document.getElementById('loaderSubline');
+const loaderMode = document.getElementById('loaderMode');
+const loadingShell = document.getElementById('loadingShell');
+const progressFill = document.getElementById('progressFill');
+const stepRemote = document.getElementById('stepRemote');
+const stepRows = document.getElementById('stepRows');
+const stepPreview = document.getElementById('stepPreview');
+const thetaSlider = document.getElementById('thetaSlider');
+const thetaReadout = document.getElementById('thetaReadout');
+const plotTitle = document.getElementById('plotTitle');
+const plotSummary = document.getElementById('plotSummary');
+const plotCenterId = document.getElementById('plotCenterId');
+const plotPage = document.getElementById('plotPage');
+const plotVariant = document.getElementById('plotVariant');
+const plotStatus = document.getElementById('plotStatus');
+const plotFormula = document.getElementById('plotFormula');
+
+let centers = [];
+let viewMode = 'all';
+let selectedKey = null;
+let selectedRecord = null;
+let evaluator = null;
+
+function escapeHtml(text){return String(text).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function normalizeText(text){return String(text||'').replace(/\s+/g,' ').trim();}
+function setProgress(value, headline, subline, mode){progressFill.style.width=`${Math.max(0,Math.min(100,value))}%`; if(headline) loaderHeadline.textContent=headline; if(subline) loaderSubline.textContent=subline; if(mode) loaderMode.textContent=`Mode: ${mode}`;}
+
+function extractHeaderName(text){const clean=normalizeText(text).replace(/^[\-–—\s]+|[\-–—\s]+$/g,''); const idMatch=clean.match(/(X\(\d+\))/); if(!idMatch) return null; const centerId=idMatch[1]; const after=clean.slice(clean.indexOf(centerId)+centerId.length).replace(/^\s*[:\-–—]?\s*/,'').trim(); return {centerId,name:after||centerId};}
+
+function nodeToLines(centerNode){const lines=[]; let buffer=[]; const flush=()=>{const line=normalizeText(buffer.join(' ')); if(line) lines.push(line); buffer=[];}; const visit=node=>{if(node.nodeType===Node.TEXT_NODE){const txt=node.textContent.replace(/\u00a0/g,' ').replace(/\n/g,' '); if(txt.trim()) buffer.push(txt.trim()); return;} if(node.nodeType!==Node.ELEMENT_NODE) return; const tag=node.tagName.toLowerCase(); if(tag==='br'){flush(); return;} if(!['p','hr','h3','h2'].includes(tag)) Array.from(node.childNodes).forEach(visit);}; let node=centerNode.nextSibling; while(node){if(node.nodeType===Node.ELEMENT_NODE && ['h3','h2','hr','p'].includes(node.tagName.toLowerCase())) break; visit(node); node=node.nextSibling;} flush(); return lines;}
+
+function isMathCoord(raw){return raw.split(':').every(part=>{const words=(part.match(/[A-Za-z]{4,}/g)||[]); const prose=words.filter(word=>!MATH_WORDS.has(word.toLowerCase())); return prose.length<2;});}
+
+function extractFuncs(lines){const funcs={}; const block=lines.join(' '); const regex=/\b([fghFGH])\s*\(\s*([a-zA-Z])\s*,\s*([a-zA-Z])\s*,\s*([a-zA-Z])\s*\)\s*=\s*(.*?)(?=\s*(?:;|\bfor\b|\bwhere\b|\bBarycentrics\b|\bTrilinears\b)|$)/g; for(const match of block.matchAll(regex)){const [,name,v1,v2,v3,body]=match; funcs[name.toLowerCase()]=[v1,v2,v3, body.replace(/\[/g,'(').replace(/\]/g,')').trim().replace(/[.,;]+$/g,'')];} return funcs;}
+
+function extractAllBaryLines(lines){const out=[]; for(const line of lines){const match=line.match(/^Barycentrics\s+(.+)/i); if(!match) continue; let raw=normalizeText(match[1]).replace(/[.,;]+$/g,''); if(/^(?:for|of|are|see|that|in|at|the|and|by|from|to|is)\b/i.test(raw)) continue; if(/X\s*\(\s*\d/i.test(raw)) continue; raw=raw.split(BARY_STOP)[0].trim().replace(/[.,;]+$/g,''); if(!raw.includes(':')) continue; if(!isMathCoord(raw)) continue; if(!out.includes(raw)) out.push(raw);} return out;}
+
+function parseCentersFromHtml(html, sourcePage){const doc=new DOMParser().parseFromString(html,'text/html'); const rows=[]; for(const header of doc.querySelectorAll('h3, h2')){const parsed=extractHeaderName(header.textContent||''); if(!parsed) continue; const lines=nodeToLines(header); const barycentrics=extractAllBaryLines(lines); if(!barycentrics.length) continue; const funcs=extractFuncs(lines); rows.push({center_id:parsed.centerId,name:parsed.name,source_page:sourcePage,barycentrics,funcs,search_text:[parsed.centerId,parsed.name,sourcePage,...barycentrics].join(' | ')});} return rows;}
+
+async function fetchPage(page){const response=await fetch(`${ETC_BASE}${page}`); if(!response.ok) throw new Error(String(response.status)); return response.text();}
+
+async function loadLiveEtc(){setProgress(4,'Extracting live ETC pages…','Starting with ETC.html and probing ETCPart2 onward.','live'); const loaded=[]; let pageCount=0; for(let part=1; part<=37; part+=1){const page=part===1?'ETC.html':`ETCPart${part}.html`; stepRemote.textContent=`Fetching ${page}…`; try{const html=await fetchPage(page); const parsed=parseCentersFromHtml(html,page); pageCount+=1; loaded.push(...parsed); stepRows.textContent=`Parsed ${loaded.length} centers / ${loaded.reduce((sum,row)=>sum+row.barycentrics.length,0)} barycentric variants so far.`; setProgress(Math.min(92, 4 + part*2.4), 'Extracting live ETC pages…', `Loaded ${page}.`, 'live');}catch(error){if(part===37 || String(error.message)==='404'){stepRemote.textContent=`Stopped when ${page} was unavailable.`; break;} throw new Error(`Could not load ${page}: ${error.message}`);} }
+  if(!loaded.length) throw new Error('No ETC pages could be parsed in this browser session.');
+  setProgress(100,'Live ETC extraction complete.','The search table is now using the extracted ETC catalog.','live');
+  loadingShell.classList.add('ready');
+  return loaded;
+}
+
+function updatePages(){const pages=['all',...new Set(centers.map(row=>row.source_page))]; pageSelect.innerHTML=pages.map(page=>`<option value="${escapeHtml(page)}">${page==='all'?'All loaded pages':escapeHtml(page)}</option>`).join('');}
+function prepareExpr(expr){let out=String(expr||'').replace(/\[/g,'(').replace(/\]/g,')').replace(/[−–]/g,'-').replace(/·/g,'*').replace(/π/g,'pi').replace(/½/g,'(1/2)').replace(/¼/g,'(1/4)').replace(/√\s*\(/g,'sqrt(').replace(/√\s*([A-Za-z0-9.]+)/g,'sqrt($1)').replace(/\s+/g,' '); Object.entries(SUPER_MAP).forEach(([k,v])=>{out=out.split(k).join(v);}); return out.trim();}
+function expandDoubleColon(raw){const parts=raw.split(':').map(part=>part.trim()); if(parts.length>=3 && parts.slice(0,3).every(Boolean)) return raw; const first=parts[0]||''; const restEmpty=parts.slice(1).every(part=>!part); if(!first||!restEmpty) return raw; const subs=[['SA','\u0001','SB','SC'],['SB','\u0002','SC','SA'],['SC','\u0003','SA','SB'],['sin','\u0010','sin','sin'],['cos','\u0011','cos','cos'],['tan','\u0012','tan','tan'],['cot','\u0013','cot','cot'],['sec','\u0014','sec','sec'],['csc','\u0015','csc','csc'],['pi','\u0016','pi','pi'],['A','\u0004','B','C'],['B','\u0005','C','A'],['C','\u0006','A','B'],['a','\u0007','b','c'],['b','\u0008','c','a'],['c','\u0009','a','b']]; const cycle=(input,step)=>{let s=input; subs.forEach(([src,sentinel])=>{s=src.length===1?s.replace(new RegExp(`(?<![A-Za-z0-9_])${src}(?![A-Za-z0-9_])`,'g'),sentinel):s.split(src).join(sentinel);}); subs.forEach(([,sentinel,c1,c2])=>{s=s.split(sentinel).join(step===1?c1:c2);}); return s;}; return `${first} : ${cycle(first,1)} : ${cycle(first,2)}`;}
+function thetaGeometry(theta){const ax=1, ay=0, bx=-1, by=0, cx=Math.cos(theta), cy=Math.sin(theta); const a=Math.hypot(cx-bx, cy-by); const b=Math.hypot(cx-ax, cy-ay); const c=2; const s=(a+b+c)/2; const SA=(b*b + c*c - a*a)/2; const SB=(a*a + c*c - b*b)/2; const SC=(a*a + b*b - c*c)/2; const area=Math.abs(ax*(by-cy)+bx*(cy-ay)+cx*(ay-by))/2; const S=2*area; const A=Math.acos(Math.min(1,Math.max(-1,(b*b+c*c-a*a)/(2*b*c)))); const B=Math.acos(Math.min(1,Math.max(-1,(a*a+c*c-b*b)/(2*a*c)))); const C=Math.acos(Math.min(1,Math.max(-1,(a*a+b*b-c*c)/(2*a*b)))); return {a,b,c,s,SA,SB,SC,S,A,B,C,pi:Math.PI,theta};}
+function makeScope(theta, funcs){const geom=thetaGeometry(theta); const scope={...geom, sin:Math.sin, cos:Math.cos, tan:Math.tan, sqrt:Math.sqrt, abs:Math.abs, log:Math.log, exp:Math.exp, cot:x=>1/Math.tan(x), sec:x=>1/Math.cos(x), csc:x=>1/Math.sin(x)}; Object.entries(funcs||{}).forEach(([name,[v1,v2,v3,body]])=>{const expr=prepareExpr(body); scope[name]=(...args)=>math.evaluate(expr,{...scope,[v1]:args[0],[v2]:args[1],[v3]:args[2]});}); return scope;}
+function baryToPoint(expr, theta, funcs){if(!expr || /…/.test(expr)) throw new Error('Expression uses ellipsis shorthand and is not numerically evaluable.'); const expanded=expandDoubleColon(expr); const parts=expanded.split(':').map(part=>prepareExpr(part)).filter(Boolean); if(parts.length!==3) throw new Error('Could not parse a full barycentric triple.'); const scope=makeScope(theta, funcs); const [u,v,w]=parts.map(part=>math.evaluate(part, scope)); const s=u+v+w; if(!isFinite(s)||Math.abs(s)<1e-10) throw new Error('Degenerate denominator in barycentric conversion.'); return {x:(u-v+w*Math.cos(theta))/s,y:(w*Math.sin(theta))/s};}
+function chooseEvaluableVariant(record){for(let i=0;i<record.barycentrics.length;i+=1){try{baryToPoint(record.barycentrics[i],0.4,record.funcs||{}); return i;}catch(error){}} return -1;}
+
+const board=JXG.JSXGraph.initBoard('searchBoard',{boundingbox:[-1.65,1.4,1.65,-1.4],axis:true,showNavigation:false,showCopyright:false,keepAspectRatio:true});
+const A=board.create('point',[1,0],{name:'A',fixed:true,size:3,strokeColor:'#58a6ff',fillColor:'#58a6ff'});
+const B=board.create('point',[-1,0],{name:'B',fixed:true,size:3,strokeColor:'#58a6ff',fillColor:'#58a6ff'});
+const C=board.create('point',[()=>Math.cos(parseFloat(thetaSlider.value)),()=>Math.sin(parseFloat(thetaSlider.value))],{name:'C',size:3,strokeColor:'#f78166',fillColor:'#f78166'});
+board.create('circle',[[0,0],1],{strokeColor:'#3fb950',strokeWidth:1.5,dash:1});
+board.create('segment',[A,B],{strokeColor:'#58a6ff',strokeWidth:2});
+board.create('segment',[A,C],{strokeColor:'#9fb8d8',strokeWidth:1.4});
+board.create('segment',[B,C],{strokeColor:'#9fb8d8',strokeWidth:1.4});
+let locusCurve=board.create('curve',[[],[]],{strokeColor:'#ffd479',strokeWidth:2.2});
+let centerPoint=board.create('point',[0,0],{name:'P',size:4,strokeColor:'#ffd479',fillColor:'#ffd479'});
+
+function updateThetaReadout(){thetaReadout.textContent=`θ = ${parseFloat(thetaSlider.value).toFixed(3)}`;}
+function updatePlot(){updateThetaReadout(); if(!selectedRecord){board.update(); return;} try{const theta=parseFloat(thetaSlider.value); const point=baryToPoint(selectedRecord.barycentrics[selectedRecord.variantIndex],theta,selectedRecord.funcs||{}); centerPoint.setPosition(JXG.COORDS_BY_USER,[point.x,point.y]); plotStatus.textContent='Rendered';}catch(error){plotStatus.textContent=error.message;} board.update();}
+function buildLocus(record){const xs=[]; const ys=[]; for(let i=0;i<=220;i+=1){const theta=-3.04 + (6.08*i/220); try{const point=baryToPoint(record.barycentrics[record.variantIndex],theta,record.funcs||{}); if(Number.isFinite(point.x)&&Number.isFinite(point.y)){xs.push(point.x); ys.push(point.y);} }catch(error){ }} locusCurve.dataX=xs; locusCurve.dataY=ys; board.update();}
+function selectRecord(key){selectedKey=key; const record=centers.find(row=>row.key===key); if(!record) return; const variantIndex=chooseEvaluableVariant(record); selectedRecord={...record,variantIndex:variantIndex>=0?variantIndex:0}; document.querySelectorAll('.result-row').forEach(row=>row.classList.toggle('active', row.dataset.key===key)); plotTitle.textContent=`${record.center_id} — ${record.name}`; plotSummary.textContent='The preview board samples the selected barycentric triple along the Thales-circle motion. If helper functions or shorthand were extracted, the numeric evaluator uses them directly.'; plotCenterId.textContent=record.center_id; plotPage.textContent=record.source_page; plotVariant.textContent=`${selectedRecord.variantIndex+1} / ${record.barycentrics.length}`; plotFormula.textContent=record.barycentrics[selectedRecord.variantIndex]||'—'; stepPreview.textContent=`Selected ${record.center_id}.`; if(variantIndex<0){plotStatus.textContent='Searchable, but not numerically plottable with the current browser parser.'; locusCurve.dataX=[]; locusCurve.dataY=[]; board.update(); return;} buildLocus(selectedRecord); updatePlot();}
+
+function getRowsForMode(filtered){if(viewMode==='single'){return filtered.map(row=>({...row,barycentrics:[row.barycentrics[0]]}));} if(viewMode==='page'){return [...filtered].sort((a,b)=>a.source_page.localeCompare(b.source_page)||a.center_id.localeCompare(b.center_id));} return filtered;}
+function renderRows(){const q=searchBox.value.trim().toLowerCase(); const field=fieldSelect.value; const page=pageSelect.value; const limit=parseInt(limitSelect.value,10); const filtered=centers.filter(row=>{if(page!=='all'&&row.source_page!==page) return false; if(!q) return true; const haystacks=field==='all'?[row.center_id,row.name,row.source_page,row.search_text,...row.barycentrics]:field==='barycentric'?row.barycentrics:[row[field]||'']; return haystacks.some(value=>String(value).toLowerCase().includes(q));}); const rows=getRowsForMode(filtered).slice(0,limit); countStat.textContent=`${filtered.length} / ${centers.length} centers`; pageStat.textContent=`Pages: ${new Set(filtered.map(row=>row.source_page)).size}`; variantStat.textContent=`Variants: ${filtered.reduce((sum,row)=>sum+row.barycentrics.length,0)}`; if(!rows.length){resultsBody.innerHTML='<tr><td colspan="4" class="empty">No barycentric coordinates match this filter.</td></tr>'; return;} resultsBody.innerHTML=rows.map(row=>`<tr class="result-row ${row.key===selectedKey?'active':''}" data-key="${escapeHtml(row.key)}"><td class="center-cell"><strong>${escapeHtml(row.center_id)}</strong></td><td>${escapeHtml(row.name)}</td><td><span class="page-pill">${escapeHtml(row.source_page)}</span></td><td><div class="bary-list">${row.barycentrics.map(expr=>`<code class="bary-chip">${escapeHtml(expr)}</code>`).join('')}</div></td></tr>`).join(''); document.querySelectorAll('.result-row').forEach(row=>row.addEventListener('click',()=>selectRecord(row.dataset.key)));}
+
+Array.from(document.querySelectorAll('#modeSwitch button')).forEach(button=>button.addEventListener('click',()=>{viewMode=button.dataset.mode; document.querySelectorAll('#modeSwitch button').forEach(btn=>btn.classList.toggle('active',btn===button)); renderRows(); document.getElementById('search-results').classList.add('section-active'); setTimeout(()=>document.getElementById('search-results').classList.remove('section-active'),450);}));
+[searchBox,fieldSelect,pageSelect,limitSelect].forEach(el=>el.addEventListener('input',renderRows)); thetaSlider.addEventListener('input',updatePlot);
+
+const sectionObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible','section-active'); setTimeout(()=>entry.target.classList.remove('section-active'),700);}});},{threshold:0.18}); document.querySelectorAll('.section-card').forEach(section=>sectionObserver.observe(section));
+
+async function main(){try{centers=(await loadLiveEtc()).map((row,index)=>({...row,key:`${row.source_page}::${row.center_id}::${index}`})); sourceStat.textContent='Source: live ETC extraction'; updatePages(); renderRows(); if(centers.length) selectRecord(centers[0].key);}catch(error){console.error(error); setProgress(100,'Live ETC extraction failed.','This environment could not fetch the upstream ETC pages.', 'failed'); stepRemote.textContent=error.message; stepRows.textContent='No live rows were loaded.'; stepPreview.textContent='Preview board is waiting for a reachable ETC source.'; resultsBody.innerHTML='<tr><td colspan="4" class="empty">Could not load the live ETC pages in this environment.</td></tr>'; plotStatus.textContent='Waiting for live ETC access'; sourceStat.textContent='Source: unavailable';}}
+
+updateThetaReadout(); main();
+</script>
+</body>
+</html>
