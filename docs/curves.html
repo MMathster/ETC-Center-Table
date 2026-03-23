@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETC Triangle Centers — Thales Loci</title>
+<title>Triangle Centers on the Thales Circle — ETC Locus Explorer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
@@ -27,7 +30,32 @@ body{background:var(--bg);color:var(--text);
   padding:1rem;min-height:100vh}
 .page{width:100%;max-width:900px}
 h1{font-size:1.3rem;color:var(--accent);margin-bottom:.2rem}
-.subtitle{font-size:.81rem;color:var(--muted);margin-bottom:.9rem}
+.subtitle{font-size:.9rem;color:var(--muted);margin-bottom:1rem;line-height:1.65;max-width:74ch}
+.math-inline{white-space:nowrap}
+.hero-note{margin-top:.85rem;display:grid;gap:.8rem}
+.story-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin:1rem 0 .9rem}
+.story-card,.deep-dive,.widget-guide{
+  background:linear-gradient(180deg,#161b22 0%,#11161d 100%);
+  border:1px solid var(--border);border-radius:var(--radius);padding:.95rem 1rem;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+.story-card h2,.deep-dive h2,.widget-guide h2{font-size:1rem;color:var(--text);margin-bottom:.45rem}
+.story-card p,.deep-dive p,.widget-guide p{font-size:.84rem;color:var(--muted);line-height:1.6}
+.story-card ul,.deep-dive ul,.widget-guide ul{margin:.5rem 0 0 1.1rem;color:var(--text)}
+.story-card li,.deep-dive li,.widget-guide li{margin:.3rem 0;font-size:.82rem;line-height:1.55}
+.story-card strong,.deep-dive strong,.widget-guide strong{color:var(--text)}
+.deep-dive{margin:1rem 0}
+.deep-dive-grid{display:grid;grid-template-columns:1.2fr .9fr;gap:1rem;margin-top:.8rem}
+@media(max-width:760px){.deep-dive-grid{grid-template-columns:1fr}}
+.formula-block{margin:.7rem 0;padding:.7rem .8rem;background:#0f1724;border:1px solid #223047;border-radius:8px;color:#d8e6ff;overflow:auto}
+.callout-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin-top:.8rem}
+.callout{background:#0f1724;border:1px solid #223047;border-radius:8px;padding:.75rem .8rem}
+.callout .tag{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);margin-bottom:.3rem}
+.callout p{font-size:.8rem;margin:0;color:var(--muted)}
+.widget-guide{margin:1rem 0 .85rem}
+.widget-guide .guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.85rem;margin-top:.75rem}
+.widget-guide code{font-family:var(--mono);font-size:.78rem;color:#d2e5ff;background:#0f1724;padding:.08rem .32rem;border-radius:4px}
+.katex-display{margin:.6rem 0}
 
 /* Board — square aspect so unit circle looks circular */
 .board-wrap{
@@ -383,14 +411,117 @@ input[type=range]{padding:0;cursor:pointer;accent-color:var(--accent)}
 </head>
 <body>
 <div class="page">
-<h1>ETC Triangle Centers — Thales Configuration</h1>
+<h1>Triangle Centers on the Thales Circle</h1>
 <p class="subtitle">
-  A = (1,0) and B = (−1,0) are fixed. C moves on the unit circle
-  x²+y²=1. The locus of X<sub>n</sub> is drawn as C completes a
-  full revolution (θ: 0 → 2π). Barycentric weights are computed
-  from the side lengths a, b, c of the resulting triangle.
+  This explorer follows a moving triangle in the <strong>Thales configuration</strong>:
+  <span class="math-inline">\(A=(1,0)\)</span> and <span class="math-inline">\(B=(-1,0)\)</span> stay fixed while
+  <span class="math-inline">\(C=(\cos\theta,\sin\theta)\)</span> slides around the unit circle <span class="math-inline">\(x^2+y^2=1\)</span>.
+  Each choice of <span class="math-inline">\(\theta\)</span> creates a new triangle, and the chosen ETC center <span class="math-inline">\(X_n\)</span> traces a locus.
 </p>
+<div class="hero-note">
+  <div class="story-grid">
+    <section class="story-card">
+      <h2>What you are seeing</h2>
+      <p>
+        Think of this page as a synchronized geometry lab: the orange point moves, the triangle updates,
+        and a classical center such as the incenter, centroid, or symmedian point responds instantly.
+      </p>
+      <ul>
+        <li><strong>The blue segment \(AB\)</strong> is fixed and acts like a stable ruler.</li>
+        <li><strong>The orange point \(C\)</strong> is the “input” of the experiment.</li>
+        <li><strong>The gold trace</strong> is the path swept out by the selected center \(X_n\).</li>
+      </ul>
+    </section>
+    <section class="story-card">
+      <h2>Why Thales makes life cleaner</h2>
+      <p>
+        Because <span class="math-inline">\(AB\)</span> is a diameter of the circumcircle, Thales' theorem gives a right angle at
+        <span class="math-inline">\(C\)</span>. So every non-degenerate triangle in this widget has <span class="math-inline">\(\angle C=90^\circ\)</span>.
+      </p>
+      <div class="formula-block">\[
+        a=|BC|=2\left|\cos\frac{\theta}{2}\right|,\qquad
+        b=|CA|=2\left|\sin\frac{\theta}{2}\right|,\qquad
+        c=|AB|=2.
+      \]</div>
+      <p>
+        Those side lengths are exactly the data used in the barycentric formulas that define many triangle centers.
+      </p>
+    </section>
+    <section class="story-card">
+      <h2>From classical geometry to coordinates</h2>
+      <p>
+        The README's main idea is that the moving centers can be rewritten as rational coordinate formulas,
+        so the loci can be computed efficiently and plotted smoothly.
+      </p>
+      <div class="formula-block">\[
+        t=\tan\frac{\theta}{2},\qquad
+        (\cos\theta,\sin\theta)=\left(\frac{1-t^2}{1+t^2},\frac{2t}{1+t^2}\right).
+      \]</div>
+      <p>
+        That substitution turns trigonometric motion into rational motion, which is especially useful for symbolic computation.
+      </p>
+    </section>
+  </div>
 
+  <section class="deep-dive">
+    <h2>Deep dive — a Brilliant-style tour of triangle centers</h2>
+    <p>
+      One of the nicest surprises in Euclidean geometry is that very different definitions can produce points that move in a coordinated way.
+      Some centers are defined by <strong>distance</strong>, some by <strong>balancing</strong>, and some by <strong>angle symmetry</strong>, but in this widget they all respond to the same moving vertex \(C\).
+    </p>
+    <div class="deep-dive-grid">
+      <div>
+        <div class="formula-block">\[
+          P=(u:v:w)\quad\longmapsto\quad
+          \left(\frac{u-v+w\cos\theta}{u+v+w},\frac{w\sin\theta}{u+v+w}\right)
+        \]</div>
+        <p>
+          Here <span class="math-inline">\((u:v:w)\)</span> are barycentric weights relative to triangle \(ABC\). The coordinate converter above is what lets the viewer translate a classical center into a visible Cartesian point.
+        </p>
+        <ul>
+          <li><strong>Incenter \(X_1\):</strong> balances the side lengths, so in barycentrics it is <span class="math-inline">\(a:b:c\)</span>.</li>
+          <li><strong>Centroid \(X_2\):</strong> is the average of the vertices, so its barycentrics are <span class="math-inline">\(1:1:1\)</span>.</li>
+          <li><strong>Nine-point center \(X_5\):</strong> tracks the midpoint geometry of the triangle.</li>
+          <li><strong>Symmedian point \(X_6\):</strong> reacts to squared side lengths, giving barycentrics <span class="math-inline">\(a^2:b^2:c^2\)</span>.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="callout-row">
+          <div class="callout">
+            <span class="tag">Euler line moment</span>
+            <p>In this configuration the circumcenter is \(O=(0,0)\), the orthocenter is \(H=C\), the centroid is \(G=C/3\), and the nine-point center is \(N=C/2\). Several famous centers line up automatically.</p>
+          </div>
+          <div class="callout">
+            <span class="tag">Synchronous motion</span>
+            <p>When \(C\) rotates once around the circle, some centers rotate in the same direction, some in the opposite direction, and some collapse to especially simple curves such as circles.</p>
+          </div>
+          <div class="callout">
+            <span class="tag">Secondary-school bridge</span>
+            <p>You can read the picture in two ways at once: as compass-and-straightedge geometry and as analytic geometry on the coordinate plane.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="widget-guide">
+    <h2>How to read the widget</h2>
+    <div class="guide-grid">
+      <div>
+        <p><strong>1. Pick a center.</strong> Use the dropdown to jump among ETC entries. The line just below the selector shows the active barycentric recipe and whether the locus is tagged as a circle, point, or more general curve.</p>
+      </div>
+      <div>
+        <p><strong>2. Move \(\theta\).</strong> Slide the angle or press <code>Start</code>. Watch the orange vertex move and compare the triangle with the center trace.</p>
+      </div>
+      <div>
+        <p><strong>3. Switch viewpoints.</strong> The coordinate toggle reveals either barycentric area weights or trilinear distance-to-side interpretations. That makes the same point feel geometric first and algebraic second.</p>
+      </div>
+      <div>
+        <p><strong>4. Use the construction panel.</strong> For selected centers, the step list gives a Euclidean-construction storyline that matches the moving picture above it.</p>
+      </div>
+    </div>
+  </section>
+</div>
 <div class="board-wrap">
   <div id="jxgbox"></div>
 </div>
@@ -2259,6 +2390,19 @@ btnStop.addEventListener("click", () => {
 document.getElementById('btn-coord-overlay').classList.add('on');
 document.getElementById('btn-constr-toggle').classList.add('off');
 drawCenter(currentCenter);
+function renderMath(scope = document.body) {
+  if (typeof renderMathInElement !== 'function') return;
+  renderMathInElement(scope, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '\[', right: '\]', display: true},
+      {left: '\(', right: '\)', display: false}
+    ],
+    throwOnError: false
+  });
+}
+
+window.addEventListener('load', () => renderMath());
 </script>
 </body>
 </html>

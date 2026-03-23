@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ETC Loci Sandbox — Thales Configuration</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraph.min.css">
@@ -32,7 +35,10 @@ body {
   min-height: 100vh;
 }
 h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2rem; }
-.subtitle { font-size: .83rem; color: var(--dim); margin-bottom: 1.1rem; max-width: 720px; line-height: 1.5; }
+.subtitle { font-size: .84rem; color: var(--dim); margin-bottom: 1.1rem; max-width: 760px; line-height: 1.7; }
+.math-inline { white-space: nowrap; }
+.frow .katex { font-size: 1em; }
+.fbox .katex-display { margin: .35rem 0; }
 .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media (max-width: 720px) { .panels { grid-template-columns: 1fr; } }
 .panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
@@ -85,11 +91,11 @@ h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2
 
 <h1>ETC Loci Sandbox — Thales Configuration</h1>
 <p class="subtitle">
-  <b>A = (1,0)</b> and <b>B = (−1,0)</b> fixed. <b>C</b> moves on the unit circle.
-  Loci are drawn using the exact rational parametric forms
-  <b>x(t), y(t)</b> with <b>t = tan(θ/4)</b>,
-  obtained by normalising barycentric weights
-  ā = 1 − t², b̄ = 2t, c̄ = 1 + t², then substituting the Weierstrass half-angle identities.
+  <strong><span class="math-inline">\(A=(1,0)\)</span></strong> and <strong><span class="math-inline">\(B=(-1,0)\)</span></strong> are fixed while <strong>\(C\)</strong> moves on the unit circle.
+  The loci use exact rational parametric forms <strong><span class="math-inline">\(x(t),y(t)\)</span></strong> with <strong><span class="math-inline">\(t=\tan(\theta/4)\)</span></strong>,
+  obtained by normalizing barycentric weights
+  <span class="math-inline">\(\bar a = 1-t^2\)</span>, <span class="math-inline">\(\bar b = 2t\)</span>, <span class="math-inline">\(\bar c = 1+t^2\)</span>
+  and applying the Weierstrass half-angle identities.
 </p>
 
 <div class="panels">
@@ -113,21 +119,21 @@ h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2
     </div>
     <div class="panel-info" id="p1-info">θ = —</div>
     <div class="fbox">
-      <div class="fbox-title">Parametric curves — t = tan(θ/4), t ∈ (0, 1)</div>
+      <div class="fbox-title">Parametric curves — \(t = \tan(\theta/4),\; t \in (0,1)\)</div>
       <div style="margin-bottom:.4rem">
         <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(1) Incenter — degree 2</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">−(t² + 2t − 1) / (t² + 1)</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t) / (t² + 1)</span></div>
+        <div class="frow"><span class="fx">\(x = -\dfrac{t^2 + 2t - 1}{t^2 + 1}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t)}{t^2 + 1}\)</span></div>
       </div>
       <div style="margin-bottom:.4rem">
         <div style="color:#b388ff;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(2) Centroid — degree 4, locus is circle r = 1/3</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / [3(t²+1)²]</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">4t(1 − t²) / [3(t²+1)²]</span></div>
+        <div class="frow"><span class="fx">\(x = \dfrac{(t^2-2t-1)(t^2+2t-1)}{3(t^2+1)^2}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{4t(1-t^2)}{3(t^2+1)^2}\)</span></div>
       </div>
       <div>
         <div style="color:#06d6a0;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(8) Nagel — degree 4, y ≥ 0 for t ∈ (0,1)</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²+2t−1)(3t²−2t+1) / (t²+1)²</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">4t²(1 − t)² / (t²+1)²</span></div>
+        <div class="frow"><span class="fx">\(x = \dfrac{(t^2+2t-1)(3t^2-2t+1)}{(t^2+1)^2}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{4t^2(1-t)^2}{(t^2+1)^2}\)</span></div>
       </div>
     </div>
   </div>
@@ -151,22 +157,22 @@ h1 { font-size: 1.35rem; font-weight: 800; color: var(--blue); margin-bottom: .2
     </div>
     <div class="panel-info" id="p2-info">θ = —</div>
     <div class="fbox">
-      <div class="fbox-title">Parametric curves — t = tan(θ/4), t ∈ (0, 1)</div>
+      <div class="fbox-title">Parametric curves — \(t = \tan(\theta/4),\; t \in (0,1)\)</div>
       <div style="margin-bottom:.4rem">
         <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(5) Nine-Point — degree 4, locus is circle r = 1/2</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / [2(t²+1)²]</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t²) / (t²+1)²</span></div>
+        <div class="frow"><span class="fx">\(x = \dfrac{(t^2-2t-1)(t^2+2t-1)}{2(t^2+1)^2}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t^2)}{(t^2+1)^2}\)</span></div>
       </div>
       <div style="margin-bottom:.4rem">
         <div style="color:#4da6ff;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(6) Symmedian — degree 4, locus is unit circle (= C)</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²−2t−1)(t²+2t−1) / (t²+1)²</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1 − t²) / (t²+1)²</span></div>
-        <div class="fnote">⟹ X(2), X(5), X(6) share the same numerator factor — Euler-line collinearity</div>
+        <div class="frow"><span class="fx">\(x = \dfrac{(t^2-2t-1)(t^2+2t-1)}{(t^2+1)^2}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t^2)}{(t^2+1)^2}\)</span></div>
+        <div class="fnote">\(X(2), X(5), X(6)\) share the same numerator factor, which visually echoes Euler-line collinearity.</div>
       </div>
       <div>
         <div style="color:#f78c6c;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(11) Feuerbach — degree 6, smooth on t ∈ (0,1)</div>
-        <div class="frow"><span class="fk">x =</span><span class="fx">(t²+2t−1)(t⁴−6t³+2t−1) / [(t²+1)²(5t²−4t+1)]</span></div>
-        <div class="frow"><span class="fk">y =</span><span class="fy">2t(1−t)(t²+2t−1)² / [(t²+1)²(5t²−4t+1)]</span></div>
+        <div class="frow"><span class="fx">\(x = \dfrac{(t^2+2t-1)(t^4-6t^3+2t-1)}{(t^2+1)^2(5t^2-4t+1)}\)</span></div>
+        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t)(t^2+2t-1)^2}{(t^2+1)^2(5t^2-4t+1)}\)</span></div>
       </div>
     </div>
   </div>
@@ -456,6 +462,18 @@ function makeAnimator(state, board, infoId, startId, stopId) {
 
 makeAnimator(st1, b1, 'p1-info', 'p1-start', 'p1-stop');
 makeAnimator(st2, b2, 'p2-info', 'p2-start', 'p2-stop');
+
+window.addEventListener('load', () => {
+  if (typeof renderMathInElement !== 'function') return;
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '\[', right: '\]', display: true},
+      {left: '\(', right: '\)', display: false}
+    ],
+    throwOnError: false
+  });
+});
 </script>
 </body>
 </html>
