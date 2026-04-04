@@ -1,0 +1,584 @@
+/* ============================================================
+   ETC Center Table — Shared Theme
+   All pages import this file. Mirrors the Repository ToC
+   visual grammar: typography, sidebar, cards, hero, pills.
+   ============================================================ */
+
+/* ---------- Google Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+/* ---------- Design Tokens ---------- */
+:root {
+  /* Backgrounds */
+  --bg-page:        #080d18;
+  --bg-card:        #0f1624;
+  --bg-card-hover:  #141d2e;
+  --bg-sidebar:     #0a1020;
+  --bg-sidebar-active: rgba(255,255,255,0.07);
+  --bg-input:       #0f1624;
+
+  /* Text */
+  --text-primary:   #e8edf5;
+  --text-secondary: #8b9ab5;
+  --text-muted:     #4a5a72;
+  --text-label:     #f59e0b;          /* amber — section label */
+
+  /* Hero gradient stops */
+  --grad-gold:      #f5c842;
+  --grad-sage:      #7ec88a;
+  --grad-cyan:      #38d9e0;
+
+  /* Accent / UI */
+  --accent-blue:    #3b8df0;
+  --accent-ccw:     #22c55e;
+  --accent-cw:      #ef4444;
+  --accent-euler:   #60a5fa;
+
+  /* Borders */
+  --border:         rgba(255,255,255,0.07);
+  --border-pill:    rgba(255,255,255,0.18);
+
+  /* Sidebar */
+  --sidebar-width:  260px;
+
+  /* Radius */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+
+  /* Transitions */
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+/* ---------- Reset / Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.65;
+  min-height: 100vh;
+  display: flex;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ---------- Layout Shell ---------- */
+.etc-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.etc-sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  padding: 28px 20px 40px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.etc-sidebar__brand-title {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+}
+
+.etc-sidebar__brand-sub {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.etc-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+}
+
+.etc-sidebar__nav li a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: background 0.18s var(--ease), color 0.18s var(--ease);
+  gap: 8px;
+}
+
+.etc-sidebar__nav li a:hover {
+  background: var(--bg-sidebar-active);
+  color: var(--text-primary);
+}
+
+.etc-sidebar__nav li.active a {
+  background: var(--bg-sidebar-active);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.etc-sidebar__nav li a .nav-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.etc-sidebar__nav li.active a .nav-label {
+  color: var(--text-secondary);
+}
+
+.etc-sidebar__nav li a .nav-ext {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Main Content Area ---------- */
+.etc-main {
+  flex: 1;
+  padding: 48px 56px 80px;
+  max-width: 960px;
+  overflow-x: hidden;
+}
+
+/* ---------- Section Label (orange dot + caps) ---------- */
+.etc-section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-label);
+  margin-bottom: 18px;
+}
+
+.etc-section-label::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: var(--text-label);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ---------- Hero Title (gradient, Playfair) ---------- */
+.etc-hero-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+
+/* Three gradient segments — wrap each word group in a span */
+.etc-hero-title .ht-gold  { color: var(--grad-gold); }
+.etc-hero-title .ht-sage  { color: var(--grad-sage); }
+.etc-hero-title .ht-cyan  { color: var(--grad-cyan); }
+
+/* ---------- Hero Subtitle (page type) ---------- */
+.etc-hero-subtitle {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 22px;
+}
+
+/* ---------- Hero Body ---------- */
+.etc-hero-body {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 620px;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+/* ---------- Pill Tags Row ---------- */
+.etc-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 36px;
+}
+
+.etc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--border-pill);
+  border-radius: 999px;
+  padding: 4px 13px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.etc-pill strong {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.68rem;
+}
+
+/* ---------- Divider ---------- */
+.etc-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 36px 0;
+}
+
+/* ---------- Cards Grid ---------- */
+.etc-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.etc-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 22px 24px;
+  transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.etc-card:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+}
+
+.etc-card__title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.etc-card__body {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.etc-card__body em {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.etc-card__list {
+  list-style: none;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.etc-card__list li {
+  font-size: 0.79rem;
+  color: var(--text-secondary);
+  padding-left: 14px;
+  position: relative;
+}
+
+.etc-card__list li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--text-muted);
+}
+
+/* ---------- Section Cards (used for subsections inside pages) ---------- */
+.etc-section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 28px 30px;
+  margin-top: 20px;
+}
+
+.etc-section-card__heading {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.etc-section-card__heading::after {
+  content: '—';
+  color: var(--text-muted);
+  font-weight: 300;
+  font-size: 1.1em;
+}
+
+/* ---------- Math Display (KaTeX blocks) ---------- */
+.etc-math-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+/* ---------- Inline Code ---------- */
+code {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82em;
+  background: rgba(255,255,255,0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--grad-cyan);
+}
+
+/* ---------- Status Banner ---------- */
+.etc-banner {
+  border-radius: var(--radius-md);
+  padding: 13px 18px;
+  font-size: 0.8rem;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.etc-banner--success {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.22);
+  color: #86efac;
+}
+
+.etc-banner--info {
+  background: rgba(59, 141, 240, 0.08);
+  border: 1px solid rgba(59, 141, 240, 0.22);
+  color: #93c5fd;
+}
+
+.etc-banner__icon { flex-shrink: 0; margin-top: 1px; }
+
+/* ---------- Search Input ---------- */
+.etc-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  margin-bottom: 14px;
+}
+
+.etc-search-bar input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+}
+
+.etc-search-bar input::placeholder { color: var(--text-muted); }
+
+/* ---------- Filter Row ---------- */
+.etc-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.etc-filter-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+.etc-filter-btn {
+  background: none;
+  border: 1px solid var(--border-pill);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 0.75rem;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.etc-filter-btn:hover,
+.etc-filter-btn.active {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-primary);
+}
+
+.etc-filter-btn.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #fff;
+}
+
+/* ---------- Data Table ---------- */
+.etc-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.etc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.etc-table thead tr {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+.etc-table thead th {
+  padding: 11px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+}
+
+.etc-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.14s;
+}
+
+.etc-table tbody tr:last-child { border-bottom: none; }
+.etc-table tbody tr:hover { background: var(--bg-card); }
+
+.etc-table tbody td {
+  padding: 10px 16px;
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.etc-table .col-center a {
+  color: var(--accent-blue);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.etc-table .col-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.etc-table .col-mono {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+/* Direction badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge--ccw  { background: rgba(34,197,94,0.15);  color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+.badge--cw   { background: rgba(239,68,68,0.15);  color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.badge--euler{ background: rgba(96,165,250,0.15); color: #93c5fd; border: 1px solid rgba(96,165,250,0.3); }
+
+/* ---------- Pagination / Count Row ---------- */
+.etc-count-row {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.etc-count-row strong { color: var(--text-primary); font-weight: 600; }
+
+/* ---------- Select Dropdown ---------- */
+.etc-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border-pill);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  padding: 5px 10px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234a5a72'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  body { flex-direction: column; }
+
+  .etc-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    padding: 14px 18px;
+    gap: 16px;
+    overflow-x: auto;
+  }
+
+  .etc-sidebar__brand-sub { display: none; }
+
+  .etc-sidebar__nav {
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  .etc-sidebar__nav li a { padding: 6px 12px; }
+  .etc-sidebar__nav li a .nav-label { display: none; }
+
+  .etc-main { padding: 28px 20px 60px; }
+
+  .etc-hero-title { font-size: 2rem; }
+}
