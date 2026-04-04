@@ -588,9 +588,11 @@ function makeAnimator(state, board, infoId, startId, stopId, sliderId, radId, de
   let lastTs  = null;
   const SPEED = 1.0;   // rad/s
   const TWO_PI = 2 * Math.PI;
-  const sliderEl = document.getElementById(sliderId);
-  const radEl = document.getElementById(radId);
-  const degEl = document.getElementById(degId);
+  const sliderEl  = document.getElementById(sliderId);
+  const radEl     = document.getElementById(radId);
+  const degEl     = document.getElementById(degId);
+  const startBtn  = document.getElementById(startId);
+  const stopBtn   = document.getElementById(stopId);
 
   function updateReadout() {
     const deg = (state.angle * 180 / Math.PI).toFixed(1);
@@ -623,7 +625,7 @@ function makeAnimator(state, board, infoId, startId, stopId, sliderId, radId, de
     updateReadout();
   });
 
-  document.getElementById(startId).addEventListener('click', () => {
+  startBtn.addEventListener('click', () => {
     if (animId) return;
     lastTs = null;
     animId = requestAnimationFrame(step);
