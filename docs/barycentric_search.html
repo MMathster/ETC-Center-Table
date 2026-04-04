@@ -1,333 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Barycentric Search — ETC Center Table</title>
-<style>
-:root{--bg:#0d1117;--surface:#161b22;--surface2:#1a2236;--border:#30363d;--accent:#58a6ff;--text:#e6edf3;--dim:#8b949e;--green:#3fb950;--gold:#ffd166;--red:#f78166;--radius:8px;--font:'Segoe UI',system-ui,sans-serif;--mono:'JetBrains Mono','Fira Code',monospace}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--font);padding:1rem;min-height:100vh;font-size:15px}
-.page{max-width:1100px;margin:0 auto}
-h1{font-size:1.4rem;font-weight:800;color:var(--accent);margin-bottom:.2rem}
-.subtitle{font-size:.82rem;color:var(--dim);margin-bottom:1rem}
-/* Notice */
-.notice{background:#1a2a1a;border:1px solid var(--green);border-radius:var(--radius);padding:.65rem 1rem;font-size:.82rem;color:#7ee787;margin-bottom:1rem;display:flex;gap:.6rem;align-items:flex-start}
-.notice.warn{background:#2a1a00;border-color:#f0b429;color:#f0b429}
-/* Search bar */
-.search-area{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:.75rem}
-.search-row{display:grid;grid-template-columns:1fr auto auto;gap:.6rem;align-items:center;margin-bottom:.6rem}
-.search-input{background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font);font-size:.88rem;padding:.45rem .75rem;width:100%;outline:none}
-.search-input:focus{border-color:var(--accent)}
-select{background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font);font-size:.85rem;padding:.42rem .6rem;outline:none;cursor:pointer}
-.filter-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;font-size:.8rem}
-.filter-label{color:var(--dim);font-weight:600}
-.chip-group{display:flex;gap:3px;background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:2px}
-.chip{background:transparent;border:none;border-radius:4px;color:var(--dim);font-family:var(--font);font-size:.78rem;font-weight:600;padding:.2rem .65rem;cursor:pointer;transition:background .15s,color .15s}
-.chip.active{background:var(--accent);color:#fff}
-.chip:hover:not(.active){background:var(--border);color:var(--text)}
-/* Stats bar */
-.stats-bar{display:flex;gap:.75rem;align-items:center;font-size:.78rem;color:var(--dim);margin-bottom:.5rem;flex-wrap:wrap}
-.stats-bar .count{color:var(--accent);font-weight:700;font-family:var(--mono)}
-/* Table */
-.table-wrap{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
-table{width:100%;border-collapse:collapse;font-size:.82rem}
-thead th{background:var(--surface2);padding:.55rem .75rem;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
-thead th:hover{color:var(--text)}
-thead th .sort-arrow{margin-left:.3rem;opacity:.4}
-thead th.sorted .sort-arrow{opacity:1;color:var(--accent)}
-tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
-tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:var(--surface2)}
-td{padding:.5rem .75rem;vertical-align:top}
-td.cid{font-family:var(--mono);font-weight:600;color:var(--accent);white-space:nowrap}
-td.name{color:var(--text);font-weight:600}
-td.bary{font-family:var(--mono);font-size:.76rem;color:var(--dim);max-width:260px;word-break:break-all}
-td.dir .badge{display:inline-flex;align-items:center;gap:.2rem;font-size:.72rem;font-weight:700;border-radius:20px;padding:.12rem .5rem;white-space:nowrap}
-td.dir .ccw{background:#1a3a1a;color:#4ade80;border:1px solid #2d6b2d}
-td.dir .cw{background:#3b1e1e;color:#f87171;border:1px solid #7c3030}
-td.dir .euler{background:#1e3a5f;color:#60a5fa;border:1px solid #2d5a8e}
-td.curve-type{color:var(--dim);font-size:.78rem}
-/* Pagination */
-.pagination{display:flex;gap:.35rem;align-items:center;justify-content:flex-end;padding:.6rem .75rem;border-top:1px solid var(--border);font-size:.8rem}
-.pg-btn{background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--font);font-size:.78rem;padding:.25rem .65rem;cursor:pointer;transition:background .12s}
-.pg-btn:hover:not(:disabled){background:var(--border)}
-.pg-btn:disabled{opacity:.3;cursor:default}
-.pg-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.pg-info{color:var(--dim)}
-/* Empty state */
-.empty{padding:2rem;text-align:center;color:var(--dim);font-size:.88rem}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ETC Center Table — Barycentric Search</title>
+  <link rel="stylesheet" href="etc-shared.css" />
+
+  <style>
+    /* Search-page specific layout refinements */
+    .search-controls {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .filter-row .etc-filter-label { margin-right: 4px; }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .rows-select-wrap {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Sortable column indicator */
+    .etc-table thead th.sorted::after {
+      content: ' ▲';
+      font-size: 0.6em;
+      color: var(--accent-blue);
+    }
+
+    /* Truncate long expressions */
+    .col-mono { max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+
+    @media (max-width: 900px) {
+      .search-controls { grid-template-columns: 1fr; }
+      .rows-select-wrap { margin-left: 0; }
+    }
+  </style>
 </head>
 <body>
-<div class="page">
 
-<h1>Barycentric Search</h1>
-<p class="subtitle">
-  Search and filter triangle centers from the Encyclopedia of Triangle Centers (ETC).
-  Data is pre-loaded from the repository — no live network fetch required.
-</p>
+<div class="etc-layout">
 
-<div class="notice" id="data-notice">
-  ✓ Loaded static data — 105 centers from the Thales configuration analysis.
-  Full ETC data (64 k+ centers) requires running the notebook pipeline first.
-</div>
-
-<!-- Search -->
-<div class="search-area">
-  <div class="search-row">
-    <input class="search-input" id="search-input" type="text"
-           placeholder="Search by ID, name, or barycentric expression… e.g. X(7), Gergonne, b+c-a">
-    <select id="filter-dir">
-      <option value="">All directions</option>
-      <option value="CCW">↺ CCW</option>
-      <option value="CW">↻ CW</option>
-      <option value="Euler">Euler line</option>
-    </select>
-    <select id="filter-curve">
-      <option value="">All curves</option>
-      <option value="circle">Circle</option>
-      <option value="point">Point</option>
-      <option value="locus">Locus</option>
-    </select>
-  </div>
-  <div class="filter-row">
-    <span class="filter-label">Show:</span>
-    <div class="chip-group" id="chip-group">
-      <button class="chip active" data-mode="all">All</button>
-      <button class="chip" data-mode="euler">Euler line only</button>
-      <button class="chip" data-mode="ccw">CCW only</button>
-      <button class="chip" data-mode="cw">CW only</button>
+  <!-- ── Sidebar ── -->
+  <aside class="etc-sidebar">
+    <div>
+      <div class="etc-sidebar__brand-title">ETC Center Table</div>
+      <div class="etc-sidebar__brand-sub">Navigate the intro, sandbox, barycentric search, and repository summary from one sticky sidebar.</div>
     </div>
-    <span style="flex:1"></span>
-    <select id="rows-per-page">
-      <option value="25">25 rows</option>
-      <option value="50" selected>50 rows</option>
-      <option value="100">100 rows</option>
-      <option value="9999">All</option>
-    </select>
-  </div>
-</div>
 
-<div class="stats-bar">
-  <span>Showing <span class="count" id="showing-count">—</span> of
-        <span class="count" id="total-count">—</span> centers</span>
-  <span id="page-info" class="pg-info"></span>
-</div>
+    <ul class="etc-sidebar__nav">
+      <li>
+        <a href="intro.html">
+          <span>Introduction</span>
+          <span class="nav-label">Intro</span>
+        </a>
+      </li>
+      <li>
+        <a href="sandbox.html">
+          <span>Discovery Sandbox</span>
+          <span class="nav-label">Points</span>
+        </a>
+      </li>
+      <li class="active">
+        <a href="search.html">
+          <span>Barycentric Search</span>
+          <span class="nav-label">Search</span>
+        </a>
+      </li>
+      <li>
+        <a href="index.html">
+          <span>Repository ToC</span>
+          <span class="nav-label">Summary</span>
+        </a>
+      </li>
+      <li>
+        <a href="https://github.com/MMathster/ETC-Center-Table" target="_blank" rel="noopener">
+          <span>GitHub README</span>
+          <span class="nav-ext">↗</span>
+        </a>
+      </li>
+    </ul>
+  </aside>
 
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th data-col="id" class="sorted">Center <span class="sort-arrow">▲</span></th>
-        <th data-col="name">Name <span class="sort-arrow"></span></th>
-        <th data-col="bary">Barycentric Weights <span class="sort-arrow"></span></th>
-        <th data-col="trilinear">Trilinear <span class="sort-arrow"></span></th>
-        <th data-col="dir">Direction <span class="sort-arrow"></span></th>
-        <th data-col="curve">Locus Type <span class="sort-arrow"></span></th>
-      </tr>
-    </thead>
-    <tbody id="table-body">
-      <tr><td colspan="6" class="empty">Loading…</td></tr>
-    </tbody>
-  </table>
-  <div class="pagination" id="pagination"></div>
-</div>
+  <!-- ── Main ── -->
+  <main class="etc-main">
 
-</div><!-- /page -->
+    <!-- Section label -->
+    <div class="etc-section-label">Encyclopedia of Triangle Centers</div>
+
+    <!-- Hero title — gradient + Playfair, matching ToC page -->
+    <h1 class="etc-hero-title">
+      <span class="ht-gold">Barycentric</span>
+      <span class="ht-sage"> Center</span>
+      <span class="ht-cyan"> Search</span>
+    </h1>
+
+    <div class="etc-hero-subtitle">ETC Center Table — Locus Catalog</div>
+
+    <p class="etc-hero-body">
+      Search and filter triangle centers from the Encyclopedia of Triangle Centers (ETC).
+      Data is pre-loaded from the repository — no live network fetch required.
+    </p>
+
+    <!-- Pill tags -->
+    <div class="etc-pills">
+      <span class="etc-pill"><strong>64 k+</strong> centers available</span>
+      <span class="etc-pill"><strong>JSON</strong> data format</span>
+      <span class="etc-pill"><strong>SymPy</strong> computed</span>
+      <span class="etc-pill"><strong>Thales</strong> configuration</span>
+    </div>
+
+    <!-- Status banner -->
+    <div class="etc-banner etc-banner--success">
+      <span class="etc-banner__icon">✓</span>
+      <span>
+        Loaded static data — <strong>105 centers</strong> from the Thales configuration analysis.
+        Full ETC data (64 k+ centers) requires running the notebook pipeline first.
+      </span>
+    </div>
+
+    <!-- Search controls -->
+    <div class="search-controls">
+      <div class="etc-search-bar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by ID, name, or barycentric expression… e.g. X(7), Gergonne, b+c−a"
+        />
+      </div>
+
+      <select class="etc-select" id="directionFilter">
+        <option value="">All directions</option>
+        <option value="CCW">CCW only</option>
+        <option value="CW">CW only</option>
+        <option value="Euler">Euler line only</option>
+      </select>
+
+      <select class="etc-select" id="curveFilter">
+        <option value="">All curves</option>
+        <option value="locus">Locus</option>
+        <option value="circle">Circle</option>
+        <option value="point">Point</option>
+      </select>
+    </div>
+
+    <!-- Filter row -->
+    <div class="filter-row">
+      <span class="etc-filter-label">Show:</span>
+      <div class="filter-group">
+        <button class="etc-filter-btn active" data-filter="all">All</button>
+        <button class="etc-filter-btn" data-filter="euler">Euler line only</button>
+        <button class="etc-filter-btn" data-filter="ccw">CCW only</button>
+        <button class="etc-filter-btn" data-filter="cw">CW only</button>
+      </div>
+      <div class="rows-select-wrap">
+        <select class="etc-select" id="rowsSelect">
+          <option value="50">50 rows</option>
+          <option value="100">100 rows</option>
+          <option value="200">200 rows</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Count row -->
+    <div class="etc-count-row" id="countRow">
+      Showing <strong>58</strong> of <strong>58</strong> centers &nbsp;·&nbsp; Page <strong>1</strong> / 2
+    </div>
+
+    <!-- Data table -->
+    <div class="etc-table-wrap">
+      <table class="etc-table" id="centersTable">
+        <thead>
+          <tr>
+            <th class="sorted">Center ▲</th>
+            <th>Name</th>
+            <th>Barycentric Weights</th>
+            <th>Trilinear</th>
+            <th>Direction</th>
+            <th>Locus Type</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Rows injected by JS — static sample below -->
+          <tr>
+            <td class="col-center"><a href="#">X(1)</a></td>
+            <td class="col-name">Incenter</td>
+            <td class="col-mono">a : b : c</td>
+            <td class="col-mono">1 : 1 : 1</td>
+            <td><span class="badge badge--ccw">⟳ CCW</span></td>
+            <td>locus</td>
+          </tr>
+          <tr>
+            <td class="col-center"><a href="#">X(2)</a></td>
+            <td class="col-name">Centroid</td>
+            <td class="col-mono">1 : 1 : 1</td>
+            <td class="col-mono">1/a : 1/b : 1/c</td>
+            <td><span class="badge badge--euler">★ Euler</span></td>
+            <td>circle r=1/3</td>
+          </tr>
+          <tr>
+            <td class="col-center"><a href="#">X(3)</a></td>
+            <td class="col-name">Circumcenter</td>
+            <td class="col-mono">sin 2A : sin 2B : sin 2C</td>
+            <td class="col-mono">cos A : cos B : cos C</td>
+            <td><span class="badge badge--euler">★ Euler</span></td>
+            <td>point (O)</td>
+          </tr>
+          <tr>
+            <td class="col-center"><a href="#">X(4)</a></td>
+            <td class="col-name">Orthocenter</td>
+            <td class="col-mono">S<sub>A</sub> : S<sub>B</sub> : S<sub>C</sub></td>
+            <td class="col-mono">sec A : sec B : sec C</td>
+            <td><span class="badge badge--euler">★ Euler</span></td>
+            <td>circle r=1</td>
+          </tr>
+          <tr>
+            <td class="col-center"><a href="#">X(5)</a></td>
+            <td class="col-name">Nine-Point Center</td>
+            <td class="col-mono">cos(B−C):cos(C−A):cos(A−B)</td>
+            <td class="col-mono">cos(B−C):cos(C−A):cos(A−B)</td>
+            <td><span class="badge badge--euler">★ Euler</span></td>
+            <td>circle r=1/2</td>
+          </tr>
+          <tr>
+            <td class="col-center"><a href="#">X(6)</a></td>
+            <td class="col-name">Symmedian Point</td>
+            <td class="col-mono">a² : b² : c²</td>
+            <td class="col-mono">a : b : c</td>
+            <td><span class="badge badge--ccw">⟳ CCW</span></td>
+            <td>locus</td>
+          </tr>
+          <tr>
+            <td class="col-center"><a href="#">X(7)</a></td>
+            <td class="col-name">Gergonne Point</td>
+            <td class="col-mono">1/(s−a) : 1/(s−b) : 1/(s−c)</td>
+            <td class="col-mono">(s−b)(s−c) : …</td>
+            <td><span class="badge badge--ccw">⟳ CCW</span></td>
+            <td>locus</td>
+          </tr>
+          <tr>
+            <td class="col-center"><a href="#">X(8)</a></td>
+            <td class="col-name">Nagel Point</td>
+            <td class="col-mono">b+c−a : c+a−b : a+b−c</td>
+            <td class="col-mono">(s−a)/a : (s−b)/b : (s−c)/c</td>
+            <td><span class="badge badge--cw">↺ CW</span></td>
+            <td>locus</td>
+          </tr>
+          <tr>
+            <td class="col-center"><a href="#">X(9)</a></td>
+            <td class="col-name">Mittenpunkt</td>
+            <td class="col-mono">a(b+c−a) : b(c+a−b) : c(a+b−c)</td>
+            <td class="col-mono">b+c−a : c+a−b : a+b−c</td>
+            <td><span class="badge badge--ccw">⟳ CCW</span></td>
+            <td>locus</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div><!-- /.etc-layout -->
+
 <script>
-// ── Static center data (generated from CENTERS array in curves.html) ────────
-// In production: replace with fetch('data/centers.json') pointing to the
-// pre-generated file from scripts/build_curve_json.py
-const CENTERS_DATA = [
-  {id:"X(1)",  name:"Incenter",           bary:"a : b : c",                          tri:"1 : 1 : 1",                    dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(2)",  name:"Centroid",           bary:"1 : 1 : 1",                          tri:"1/a : 1/b : 1/c",              dir:"CCW", euler:true,  curve:"circle r=1/3"},
-  {id:"X(3)",  name:"Circumcenter",       bary:"sin 2A : sin 2B : sin 2C",           tri:"cos A : cos B : cos C",        dir:"—",   euler:true,  curve:"point (O)"},
-  {id:"X(4)",  name:"Orthocenter",        bary:"SA : SB : SC",                       tri:"sec A : sec B : sec C",        dir:"CCW", euler:true,  curve:"circle r=1"},
-  {id:"X(5)",  name:"Nine-Point Center",  bary:"cos(B−C):cos(C−A):cos(A−B)",        tri:"cos(B−C):cos(C−A):cos(A−B)",  dir:"CCW", euler:true,  curve:"circle r=1/2"},
-  {id:"X(6)",  name:"Symmedian Point",    bary:"a² : b² : c²",                       tri:"a : b : c",                    dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(7)",  name:"Gergonne Point",     bary:"1/(s−a) : 1/(s−b) : 1/(s−c)",       tri:"(s−b)(s−c):…",                 dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(8)",  name:"Nagel Point",        bary:"b+c−a : c+a−b : a+b−c",             tri:"(s−a)/a : (s−b)/b : (s−c)/c", dir:"CW",  euler:false, curve:"locus"},
-  {id:"X(9)",  name:"Mittenpunkt",        bary:"a(b+c−a) : b(c+a−b) : c(a+b−c)",   tri:"b+c−a : c+a−b : a+b−c",       dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(10)", name:"Spieker Center",     bary:"b+c : c+a : a+b",                   tri:"1/a : 1/b : 1/c (medial)",     dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(11)", name:"Feuerbach Point",    bary:"(b−c)²(b+c−a):…",                   tri:"(b−c)²(b+c−a)/a:…",           dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(12)", name:"",                   bary:"a²/((b+c)²(b+c−a)):…",              tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(13)", name:"1st Fermat Point",   bary:"1/(SA+√3·S):…",                     tri:"csc(A+π/3):…",                 dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(14)", name:"2nd Fermat Point",   bary:"1/(SA−√3·S):…",                     tri:"csc(A−π/3):…",                 dir:"CW",  euler:false, curve:"locus"},
-  {id:"X(15)", name:"1st Isogonic Point", bary:"sin(A+π/3):sin(B+π/3):sin(C+π/3)", tri:"sin(A+π/3):…",                 dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(16)", name:"2nd Isogonic Point", bary:"sin(A−π/3):sin(B−π/3):sin(C−π/3)", tri:"sin(A−π/3):…",                 dir:"CW",  euler:false, curve:"locus"},
-  {id:"X(17)", name:"Napoleon Pt 1",      bary:"SA+√3·S : SB+√3·S : SC+√3·S",      tri:"",                             dir:"CW",  euler:false, curve:"locus"},
-  {id:"X(18)", name:"Napoleon Pt 2",      bary:"SA−√3·S : SB−√3·S : SC−√3·S",      tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(19)", name:"Clawson Point",      bary:"tan A : tan B : tan C",             tri:"sin A/cos²A:…",                dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(20)", name:"de Longchamps Pt",   bary:"−SA : −SB : SA+SB",                tri:"",                             dir:"CW",  euler:true,  curve:"circle r=1"},
-  {id:"X(21)", name:"Schiffler Point",    bary:"a/(b+c) : b/(c+a) : c/(a+b)",      tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(22)", name:"Exeter Point",       bary:"a²(b⁴+c⁴−a⁴):…",                  tri:"",                             dir:"CW",  euler:true,  curve:"circle r=1"},
-  {id:"X(23)", name:"Far-Out Point",      bary:"a²(a⁴−b²c²):…",                    tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(25)", name:"Homothetic Ctr",     bary:"a²/SA : b²/SB : 0",                tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(31)", name:"2nd Power Point",    bary:"a³ : b³ : c³",                      tri:"a² : b² : c²",                 dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(32)", name:"3rd Power Point",    bary:"a⁴ : b⁴ : c⁴",                     tri:"a³ : b³ : c³",                 dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(37)", name:"Harmonic Mean X1,X2",bary:"a(b+c) : b(c+a) : c(a+b)",         tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(39)", name:"Brocard Midpoint",   bary:"a²(b²+c²):…",                       tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(40)", name:"Bevan Point",        bary:"−a(b²+c²−a²−2bc):…",               tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(41)", name:"Crosspt X1,X6",      bary:"a²(b+c−a):…",                       tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(42)", name:"Crosssum X1,X2",     bary:"a(b+c) : b(c+a) : c(a+b)",         tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(43)", name:"X(1) of medial",     bary:"bc(b+c−a):…",                       tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(44)", name:"X1·beth·conj",       bary:"a(b+c−2a):…",                       tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(45)", name:"Complement X44",     bary:"a(2b+2c−a):…",                      tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(55)", name:"Insimilicenter",     bary:"a(b+c−a):…",                        tri:"cos((B−C)/2):…",               dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(56)", name:"Exsimilicenter",     bary:"a/(b+c−a):…",                       tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(57)", name:"Isog. conj. X9",     bary:"1/(b+c−a):…",                       tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(58)", name:"Isog. conj. X10",    bary:"a²/(b+c):…",                        tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(63)", name:"Isog. conj. X19",    bary:"a·cos A : b·cos B : 0",             tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(69)", name:"Isotomic conj. X25", bary:"b²c²·SA : c²a²·SB : 0",            tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(75)", name:"Isotomic conj. X31", bary:"bc : ca : ab",                      tri:"1/a² : 1/b² : 1/c²",          dir:"CW",  euler:false, curve:"locus"},
-  {id:"X(76)", name:"Isotomic conj. X32", bary:"b²c² : c²a² : a²b²",               tri:"",                             dir:"CW",  euler:false, curve:"locus"},
-  {id:"X(79)", name:"Isog. conj. X35",    bary:"1/(2SA+bc):…",                      tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(80)", name:"Refl. X1 in X11",   bary:"(b+c−a)² : (c+a−b)² : (a+b−c)²",  tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(81)", name:"Isog. conj. X42",    bary:"a/(b+c):…",                         tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(82)", name:"Isog. conj. X38",    bary:"a/(b²+c²):…",                       tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(83)", name:"Isog. conj. X39",    bary:"1/(b²+c²):…",                       tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(85)", name:"Isotomic conj. X41", bary:"bc/(b+c−a):…",                      tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(86)", name:"Isotomic conj. X42", bary:"bc(b+c):…",                         tri:"",                             dir:"CW",  euler:false, curve:"locus"},
-  {id:"X(88)", name:"Isog. conj. X44",    bary:"a/(2a−b−c):…",                      tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(98)", name:"Tarry Point",        bary:"SA(SB−SC)²:…",                      tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(99)", name:"Steiner Point",      bary:"1/(b²−c²):…",                       tri:"",                             dir:"CW",  euler:false, curve:"locus"},
-  {id:"X(100)",name:"Anticomp. Feuerbach",bary:"1/(b−c):…",                         tri:"",                             dir:"CW",  euler:false, curve:"locus"},
-  {id:"X(101)",name:"Isog. conj. X514",   bary:"a²/(b−c):…",                        tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(105)",name:"Isog. conj. X518",   bary:"1/(a(b+c)−b²−c²):…",               tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(110)",name:"Kiepert foc.",       bary:"a²/(b²−c²):…",                      tri:"",                             dir:"CW",  euler:false, curve:"locus"},
-  {id:"X(111)",name:"Parry Point",        bary:"a²/(2a²−b²−c²):…",                 tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-  {id:"X(115)",name:"Kiepert conic ctr",  bary:"(b²−c²)²:…",                        tri:"",                             dir:"CCW", euler:false, curve:"locus"},
-];
-
-// ── State ─────────────────────────────────────────────────────────
-let filtered = [...CENTERS_DATA];
-let sortCol = 'id';
-let sortAsc = true;
-let page = 1;
-let rowsPerPage = 50;
-let modeFilter = 'all';
-
-// Numeric sort for X(n) ids
-function centerNum(id) {
-  const m = id.match(/\d+/);
-  return m ? parseInt(m[0]) : 9999;
-}
-
-function applyFilters() {
-  const q     = document.getElementById('search-input').value.toLowerCase().trim();
-  const dirF  = document.getElementById('filter-dir').value;
-  const curF  = document.getElementById('filter-curve').value.toLowerCase();
-
-  filtered = CENTERS_DATA.filter(c => {
-    if (q && ![c.id,c.name,c.bary,c.tri].join(' ').toLowerCase().includes(q)) return false;
-    if (dirF === 'Euler' && !c.euler) return false;
-    if (dirF === 'CCW' && c.dir !== 'CCW') return false;
-    if (dirF === 'CW'  && c.dir !== 'CW')  return false;
-    if (curF && !c.curve.toLowerCase().includes(curF)) return false;
-    if (modeFilter === 'euler' && !c.euler) return false;
-    if (modeFilter === 'ccw'   && c.dir !== 'CCW') return false;
-    if (modeFilter === 'cw'    && c.dir !== 'CW')  return false;
-    return true;
+  // Simple filter toggle UI (no-op data — wire to your actual data source)
+  document.querySelectorAll('.etc-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.etc-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
   });
-
-  // Sort
-  filtered.sort((a, b) => {
-    let va = a[sortCol] || '', vb = b[sortCol] || '';
-    if (sortCol === 'id') { va = centerNum(a.id); vb = centerNum(b.id); }
-    if (va < vb) return sortAsc ? -1 : 1;
-    if (va > vb) return sortAsc ?  1 : -1;
-    return 0;
-  });
-
-  page = 1;
-  render();
-}
-
-function render() {
-  rowsPerPage = parseInt(document.getElementById('rows-per-page').value);
-  const total = filtered.length;
-  const start = (page - 1) * rowsPerPage;
-  const slice = filtered.slice(start, start + rowsPerPage);
-
-  document.getElementById('showing-count').textContent = total;
-  document.getElementById('total-count').textContent   = CENTERS_DATA.length;
-
-  const tbody = document.getElementById('table-body');
-  if (!slice.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty">No centers match the current filters.</td></tr>';
-  } else {
-    tbody.innerHTML = slice.map(c => {
-      const dirBadge = c.euler
-        ? '<span class="badge euler">★ Euler</span>'
-        : (c.dir === 'CCW'
-            ? '<span class="badge ccw">↺ CCW</span>'
-            : (c.dir === 'CW' ? '<span class="badge cw">↻ CW</span>' : '<span>—</span>'));
-      return `<tr>
-        <td class="cid">${c.id}</td>
-        <td class="name">${c.name || '—'}</td>
-        <td class="bary">${c.bary}</td>
-        <td class="bary">${c.tri || '—'}</td>
-        <td class="dir">${dirBadge}</td>
-        <td class="curve-type">${c.curve}</td>
-      </tr>`;
-    }).join('');
-  }
-
-  // Pagination
-  const pages = Math.ceil(total / rowsPerPage) || 1;
-  const pg = document.getElementById('pagination');
-  document.getElementById('page-info').textContent =
-    `Page ${page} / ${pages}`;
-
-  if (pages <= 1) { pg.innerHTML = ''; return; }
-  let html = '';
-  html += `<button class="pg-btn" onclick="goPage(${page-1})" ${page<=1?'disabled':''}>‹</button>`;
-  for (let i=1;i<=pages;i++) {
-    if (pages>7 && Math.abs(i-page)>2 && i!==1 && i!==pages) {
-      if (i===2||i===pages-1) html+='<span class="pg-info">…</span>';
-      continue;
-    }
-    html += `<button class="pg-btn${i===page?' active':''}" onclick="goPage(${i})">${i}</button>`;
-  }
-  html += `<button class="pg-btn" onclick="goPage(${page+1})" ${page>=pages?'disabled':''}>›</button>`;
-  pg.innerHTML = html;
-}
-
-function goPage(p) { page=p; render(); }
-
-// Sort by column header click
-document.querySelectorAll('thead th[data-col]').forEach(th => {
-  th.addEventListener('click', () => {
-    const col = th.dataset.col;
-    if (sortCol === col) sortAsc = !sortAsc;
-    else { sortCol = col; sortAsc = true; }
-    document.querySelectorAll('thead th').forEach(t => t.classList.remove('sorted'));
-    th.classList.add('sorted');
-    th.querySelector('.sort-arrow').textContent = sortAsc ? '▲' : '▼';
-    applyFilters();
-  });
-});
-
-// Chips
-document.querySelectorAll('#chip-group .chip').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#chip-group .chip').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    modeFilter = btn.dataset.mode;
-    applyFilters();
-  });
-});
-
-// Inputs
-['search-input','filter-dir','filter-curve','rows-per-page'].forEach(id => {
-  document.getElementById(id).addEventListener('input', applyFilters);
-  document.getElementById(id).addEventListener('change', applyFilters);
-});
-
-// Init
-document.getElementById('total-count').textContent = CENTERS_DATA.length;
-applyFilters();
 </script>
 </body>
 </html>
