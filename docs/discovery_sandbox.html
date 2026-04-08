@@ -3,204 +3,268 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETC Loci Sandbox — Thales Configuration</title>
+<title>ETC Center Table — Discovery Sandbox</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<!-- Exact same fonts as toc.html: Figtree body + Fraunces display -->
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<!-- MathJax (sandbox uses \( \) syntax throughout) -->
 <script>
 window.MathJax = {
   tex: {
     inlineMath: [['$', '$'], ['\\(', '\\)']],
     displayMath: [['\\[', '\\]'], ['$$', '$$']]
   },
-  options: {
-    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-  }
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
 };
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<!-- JSXGraph -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraph.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraphcore.min.js"></script>
+
 <style>
+/* ── Design tokens — exact match with toc.html ─────────────────── */
 :root {
   --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a; --surface3:#102846;
-  --border:#24456a; --text:#f7fbff; --dim:#b7c8e6; --soft:#8fa8ca;
-  --blue:#70b8ff; --gold:#ffd479; --green:#59e1a8; --orange:#ff8f70;
-  --purple:#b792ff; --font:'Figtree', sans-serif; --mono:'JetBrains Mono', monospace;
-  --shadow:0 18px 44px rgba(1,8,20,.34); --glow:0 0 0 1px rgba(112,184,255,.18),0 16px 44px rgba(31,111,235,.16);
+  --border:#24456a; --accent:#70b8ff; --accent-2:#3ea6ff;
+  --gold:#ffd479; --mint:#59e1a8; --violet:#b792ff;
+  --text:#f7fbff; --muted:#b7c8e6; --soft:#8fa8ca; --radius:14px;
+  --font:'Figtree',system-ui,sans-serif;
+  --display:'Fraunces',serif;
+  --mono:'JetBrains Mono',monospace;
+  --shadow:0 18px 44px rgba(1,8,20,.34);
+  --glow:0 0 0 1px rgba(112,184,255,.18),0 16px 44px rgba(31,111,235,.16);
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
 body {
-  background: var(--bg); color: var(--text);
-  font-family: var(--font); font-weight: 500; letter-spacing: .01em; padding: 1.2rem 1.2rem 1.2rem 17.5rem;
-  min-height: 100vh;
+  background:var(--bg); color:var(--text);
+  font-family:var(--font); font-weight:500; letter-spacing:.01em;
+  padding:1.2rem 1.2rem 1.2rem 17.5rem;
+  min-height:100vh; overflow-x:hidden;
 }
-.site-sidebar{
-  position:fixed;left:1rem;top:1rem;width:15rem;z-index:20;
+
+/* Dot-grid background — exact toc.html */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image:radial-gradient(rgba(112,184,255,.09) 1px, transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none; z-index:0;
+}
+
+/* Ambient blobs — exact toc.html */
+.blob { position:fixed; border-radius:50%; pointer-events:none; z-index:0; filter:blur(110px); }
+.blob-1 { width:720px; height:480px; top:-200px; left:50%; transform:translateX(-50%);
+  background:radial-gradient(ellipse at 40% 50%,rgba(255,212,121,.11) 0%,rgba(183,146,255,.06) 55%,transparent 75%); }
+.blob-2 { width:500px; height:500px; bottom:-160px; right:-80px;
+  background:radial-gradient(ellipse,rgba(89,225,168,.09) 0%,transparent 65%); }
+.blob-3 { width:300px; height:300px; bottom:20%; left:-60px;
+  background:radial-gradient(ellipse,rgba(112,184,255,.10) 0%,transparent 65%); }
+
+/* ── Sidebar — exact toc.html ──────────────────────────────────── */
+.site-sidebar {
+  position:fixed; left:1rem; top:1rem; width:15rem; z-index:20;
   background:linear-gradient(180deg,rgba(14,26,43,.97) 0%,rgba(8,17,31,.98) 100%);
-  border:1px solid var(--border);border-radius:16px;padding:1rem .9rem;
-  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.85rem;
+  border:1px solid var(--border); border-radius:16px; padding:1rem .9rem;
+  box-shadow:var(--shadow); display:flex; flex-direction:column; gap:.85rem;
 }
-.sidebar-brand{font-size:.95rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-.02em}
-.sidebar-copy{font-size:.76rem;line-height:1.55;color:var(--dim)}
-.sidebar-nav{display:grid;gap:.45rem}
-.sidebar-link{
-  display:flex;align-items:center;justify-content:space-between;gap:.55rem;
-  padding:.55rem .7rem;border-radius:10px;text-decoration:none;
-  color:var(--dim);font-size:.82rem;font-weight:700;border:1px solid transparent;
-  background:rgba(9,20,35,.35);transition:all .16s ease;
+.sidebar-brand { font-size:.95rem; font-weight:800; color:#fff; text-decoration:none; letter-spacing:-.02em; }
+.sidebar-copy  { font-size:.76rem; line-height:1.55; color:var(--muted); }
+.sidebar-nav   { display:grid; gap:.45rem; }
+.sidebar-link  {
+  display:flex; align-items:center; justify-content:space-between; gap:.55rem;
+  padding:.55rem .7rem; border-radius:10px; text-decoration:none;
+  color:var(--muted); font-size:.82rem; font-weight:700;
+  border:1px solid transparent; background:rgba(9,20,35,.35); transition:all .16s ease;
 }
-.sidebar-link:hover,.sidebar-link.active{color:#fff;border-color:rgba(112,184,255,.3);background:rgba(19,35,58,.9);box-shadow:var(--glow)}
-.sidebar-link small{font-size:.72rem;color:var(--soft)}
-.section-title{display:flex;align-items:center;gap:.8rem;font-size:1.02rem;font-weight:800;color:#fff;line-height:1.2}
-.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(112,184,255,.34) 0%,rgba(112,184,255,0) 100%)}
-h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; letter-spacing: -.02em; }
-.subtitle { font-size: .92rem; color: var(--dim); margin-bottom: 1.15rem; max-width: 760px; line-height: 1.8; }
-.math-inline { white-space: nowrap; }
-.mjx-container { color: inherit; }
-.derive-box{
-  max-width: 760px; margin-bottom: 1rem; padding: .9rem 1rem;
-  background: linear-gradient(180deg,rgba(16,37,67,.94) 0%,rgba(8,18,31,.98) 100%);
-  border:1px solid #315f8f; border-radius: 14px; box-shadow: var(--shadow);
+.sidebar-link:hover,
+.sidebar-link.active { color:#fff; border-color:rgba(112,184,255,.3); background:rgba(19,35,58,.9); box-shadow:var(--glow); }
+.sidebar-link small { font-size:.72rem; color:var(--soft); }
+
+/* ── Page wrapper (sits above blobs) ───────────────────────────── */
+.page { position:relative; z-index:1; max-width:980px; }
+
+/* ── Eyebrow — exact toc.html ──────────────────────────────────── */
+.eyebrow {
+  display:inline-flex; align-items:center; gap:.7rem;
+  font-size:.68rem; font-weight:600; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:1.5rem; opacity:.9;
 }
-.derive-box h2{font-size:.9rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;margin-bottom:.45rem}
-.derive-box p{font-size:.84rem;line-height:1.68;color:var(--dim)}
-.derive-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.65rem}
-.derive-card{padding:.75rem .8rem;border-radius:12px;background:rgba(9,20,35,.52);border:1px solid rgba(112,184,255,.18)}
-.derive-card strong{display:block;margin-bottom:.28rem;color:#fff}
-.panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-@media (max-width: 720px) { .panels { grid-template-columns: 1fr; } }
-@media(max-width:980px){
-  body{padding:5.7rem 1rem 1rem}
-  .site-sidebar{
-    position:fixed;left:1rem;right:1rem;top:.75rem;width:auto;padding:.75rem .8rem;gap:.55rem
-  }
-  .sidebar-copy{display:none}
-  .sidebar-nav{display:flex;gap:.45rem;overflow:auto}
-  .sidebar-link{white-space:nowrap;min-width:max-content}
+.eyebrow-dot {
+  width:5px; height:5px; border-radius:50%;
+  background:var(--gold); box-shadow:0 0 6px var(--gold);
+  animation:pulse 2.4s ease-in-out infinite;
 }
-@media(max-width:760px){.derive-grid{grid-template-columns:1fr}}
+@keyframes pulse {
+  0%,100%{ opacity:1; transform:scale(1); }
+  50%    { opacity:.4; transform:scale(.7); }
+}
+
+/* ── Hero title — exact toc.html Fraunces treatment ────────────── */
+h1 {
+  font-family:var(--display);
+  font-size:clamp(2.4rem,6vw,3.8rem);
+  font-weight:900; line-height:1.0;
+  letter-spacing:-.02em; color:#fff;
+  margin-bottom:1.2rem;
+}
+/* Multi-stop gradient: white → gold → blue → mint, matching toc.html exactly */
+.title-etc {
+  display:block;
+  background:linear-gradient(110deg,#ffffff 0%,var(--gold) 40%,var(--accent) 65%,var(--mint) 100%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+/* Small-caps subtitle line below main title */
+.title-sub {
+  display:block;
+  font-family:var(--font);
+  font-weight:500;
+  font-size:.38em;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--soft);
+  -webkit-text-fill-color:var(--soft);
+  margin-top:.8rem;
+}
+
+/* ── Subtitle prose ─────────────────────────────────────────────── */
+.subtitle {
+  font-size:.92rem; font-weight:400;
+  color:var(--muted); line-height:1.8; max-width:58ch;
+  margin-bottom:1.1rem;
+}
+.math-inline { white-space:nowrap; }
+.mjx-container { color:inherit; }
+
+/* ── Stat pills — exact toc.html .stat-row / .stat-pill ───────── */
+.stat-row  { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1rem; margin-bottom:1.4rem; }
+.stat-pill {
+  display:flex; align-items:center; gap:.5rem;
+  padding:.42em 1em;
+  background:var(--surface); border:1px solid var(--border); border-radius:30px;
+  font-size:.71rem; font-weight:500; color:var(--muted);
+}
+.stat-pill strong { font-weight:700; color:var(--text); }
+
+/* ── Derive box (compact derivation card) ───────────────────────── */
+.derive-box {
+  margin-bottom:1rem; padding:.9rem 1rem;
+  background:linear-gradient(180deg,rgba(16,30,48,.96) 0%,rgba(8,17,31,.98) 100%);
+  border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.derive-box:hover { transform:translateY(-2px); border-color:rgba(112,184,255,.58); box-shadow:var(--glow); }
+.derive-box p { font-size:.84rem; line-height:1.68; color:var(--muted); }
+.derive-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; margin-top:.65rem; }
+.derive-card {
+  padding:.75rem .8rem; border-radius:12px;
+  background:rgba(9,20,35,.52); border:1px solid rgba(112,184,255,.18);
+}
+.derive-card strong { display:block; margin-bottom:.28rem; color:#fff; }
+
+/* ── Section title rule (shared with intro/sandbox) ─────────────── */
+.section-title {
+  display:flex; align-items:center; gap:.8rem;
+  font-size:1.02rem; font-weight:800; color:#fff;
+  line-height:1.2; margin-bottom:.6rem;
+}
+.section-title::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg,rgba(112,184,255,.34) 0%,rgba(112,184,255,0) 100%);
+}
+
+/* ── JSXGraph panels ─────────────────────────────────────────────── */
+.panels { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media(max-width:720px){ .panels { grid-template-columns:1fr; } }
+
 .panel {
-  background: linear-gradient(180deg,rgba(15,28,46,.97) 0%,rgba(9,18,31,.99) 100%);
-  border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden;
-  box-shadow: var(--shadow); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  background:linear-gradient(180deg,rgba(15,28,46,.97) 0%,rgba(9,18,31,.99) 100%);
+  border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden;
+  box-shadow:var(--shadow);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
-.panel:hover { transform: translateY(-2px); border-color: rgba(112,184,255,.58); box-shadow: var(--glow); }
-.panel:nth-child(1) { border-color:#345b87; }
-.panel:nth-child(2) { border-color:#575ea3; }
-.panel-head { padding: .75rem 1rem .55rem; border-bottom: 1px solid var(--border); background: linear-gradient(180deg,rgba(17,39,67,.8) 0%,rgba(10,24,40,.4) 100%); }
-.panel-head h2 { font-size: 1.04rem; font-weight: 800; color: var(--text); }
-.panel-head p  { font-size: .79rem; color: var(--dim); margin-top: .2rem; font-weight: 600; }
-.board-wrap { position: relative; width: 100%; padding-bottom: 100%; background: #070b14; }
-.jxgbox { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; }
+.panel:hover { transform:translateY(-2px); border-color:rgba(112,184,255,.58); box-shadow:var(--glow); }
+.panel:nth-child(1){ border-color:#345b87; }
+.panel:nth-child(2){ border-color:#575ea3; }
+
+.panel-head { padding:.75rem 1rem .55rem; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(17,39,67,.8) 0%,rgba(10,24,40,.4) 100%); }
+.panel-head h2 { font-size:1.04rem; font-weight:800; color:var(--text); }
+.panel-head p  { font-size:.79rem; color:var(--muted); margin-top:.2rem; font-weight:600; }
+
+.board-wrap { position:relative; width:100%; padding-bottom:100%; background:#070b14; }
+.jxgbox { position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; }
+
 .panel-ctrl {
-  display: flex; align-items: center; gap: .6rem;
-  padding: .55rem .8rem; border-top: 1px solid var(--border); flex-wrap: wrap;
+  display:flex; align-items:center; gap:.6rem;
+  padding:.55rem .8rem; border-top:1px solid var(--border); flex-wrap:wrap;
 }
-.angle-box {
-  padding: .7rem .85rem .8rem;
-  border-top: 1px solid var(--border);
-  background: linear-gradient(180deg,rgba(13,28,48,.72) 0%,rgba(9,20,35,.92) 100%);
-}
-.angle-row {
-  display: grid;
-  grid-template-columns: 74px 1fr 92px;
-  gap: .7rem;
-  align-items: center;
-}
-.angle-row + .angle-row { margin-top: .55rem; }
-.angle-row label {
-  font-size: .74rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--soft);
-}
-.angle-row input[type=range] {
-  width: 100%;
-  accent-color: var(--blue);
-  cursor: pointer;
-}
-.angle-value {
-  font-family: var(--mono);
-  font-size: .76rem;
-  color: var(--gold);
-  text-align: right;
-}
+
+/* Slider area */
+.panel-slider { border-top:1px solid rgba(112,184,255,.14); padding:.65rem .85rem .75rem; background:rgba(8,17,31,.6); }
+.panel-slider label { display:block; font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); margin-bottom:.42rem; }
+.angle-slider { width:100%; accent-color:var(--accent); cursor:pointer; }
+.angle-meta { display:flex; justify-content:space-between; gap:.75rem; margin-top:.42rem; flex-wrap:wrap; font-size:.78rem; color:var(--muted); }
+.angle-meta span strong { color:var(--text); font-weight:800; }
+
+/* Theta readout */
+.panel-info { padding:.42rem .9rem; border-top:1px solid var(--border); font-size:.8rem; font-family:var(--mono); color:var(--muted); min-height:1.7rem; background:rgba(10,20,35,.55); }
+.panel-info span { color:var(--gold); }
+
+/* Buttons */
 .btn {
-  font-family: var(--font); font-size: .82rem; font-weight: 800;
-  border: none; border-radius: 8px; padding: .38rem .95rem;
-  cursor: pointer; user-select: none; transition: opacity .15s, transform .1s, box-shadow .15s, filter .15s;
+  font-family:var(--font); font-size:.82rem; font-weight:800;
+  border:none; border-radius:8px; padding:.38rem .95rem;
+  cursor:pointer; user-select:none;
+  transition:opacity .15s, transform .1s, box-shadow .15s, filter .15s;
 }
-.btn:hover:not(:disabled) { box-shadow:0 0 0 1px rgba(255,255,255,.08),0 14px 30px rgba(31,111,235,.18); filter:brightness(1.04); transform: translateY(-1px); }
-.btn:active { transform: scale(.95); }
-.btn:disabled { opacity: .35; pointer-events: none; }
-.btn-go   { background: linear-gradient(180deg,#1be0a0 0%,#0fb87e 100%);  color: #071a14; }
-.btn-stop { background: linear-gradient(180deg,#ff9b7e 0%,#f86a45 100%); color: #1a0a07; }
-.chips { display: flex; gap: .4rem; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
-.chip { display: flex; align-items: center; gap: 6px; font-size: .77rem; font-weight: 700; color: var(--text); background: rgba(9,20,35,.38); border: 1px solid rgba(112,184,255,.14); border-radius: 999px; padding: .18rem .45rem; }
-.dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-/* Formula block */
-.fbox {
-  border-top: 1px solid var(--border); background: linear-gradient(180deg,#102543 0%,#0b192d 100%);
-  font-family: var(--mono); font-size: .83rem; line-height: 1.9;
-  padding: .68rem .9rem;
+.btn:hover:not(:disabled){ box-shadow:0 0 0 1px rgba(255,255,255,.08),0 14px 30px rgba(31,111,235,.18); filter:brightness(1.04); transform:translateY(-1px); }
+.btn:active { transform:scale(.95); }
+.btn:disabled { opacity:.35; pointer-events:none; }
+.btn-go   { background:linear-gradient(180deg,#1be0a0 0%,#0fb87e 100%); color:#071a14; }
+.btn-stop { background:linear-gradient(180deg,#ff9b7e 0%,#f86a45 100%); color:#1a0a07; }
+
+/* Legend chips */
+.chips { display:flex; gap:.4rem; flex-wrap:wrap; flex:1; justify-content:flex-end; }
+.chip { display:flex; align-items:center; gap:6px; font-size:.77rem; font-weight:700; color:var(--text); background:rgba(9,20,35,.38); border:1px solid rgba(112,184,255,.14); border-radius:999px; padding:.18rem .45rem; }
+.dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+
+/* Formula box inside panels */
+.fbox { border-top:1px solid var(--border); background:linear-gradient(180deg,#102543 0%,#0b192d 100%); font-family:var(--mono); font-size:.83rem; line-height:1.9; padding:.68rem .9rem; }
+.fbox-title { font-family:var(--font); font-size:.74rem; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:var(--soft); margin-bottom:.38rem; }
+.frow { display:flex; gap:.6rem; align-items:baseline; flex-wrap:wrap; }
+.fx   { color:#ffe19b; }
+.fy   { color:#d1bbff; }
+.fnote{ font-size:.77rem; color:#e4efff; margin-top:.32rem; font-family:var(--font); font-weight:600; }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media(max-width:980px){
+  body { padding:5.7rem 1rem 1rem; }
+  .site-sidebar { position:fixed; left:1rem; right:1rem; top:.75rem; width:auto; padding:.75rem .8rem; gap:.55rem; }
+  .sidebar-copy { display:none; }
+  .sidebar-nav  { display:flex; gap:.45rem; overflow:auto; }
+  .sidebar-link { white-space:nowrap; min-width:max-content; }
 }
-.fbox-title {
-  font-family: var(--font); font-size: .74rem; font-weight: 800;
-  text-transform: uppercase; letter-spacing: .07em;
-  color: var(--soft); margin-bottom: .38rem;
-}
-.frow { display: flex; gap: .6rem; align-items: baseline; flex-wrap: wrap; }
-.fk   { color: var(--dim); font-size: .68rem; min-width: 1.6rem; }
-.fx   { color: #ffe19b; }
-.fy   { color: #d1bbff; }
-.fnote { font-size: .77rem; color: #e4efff; margin-top: .32rem; font-family: var(--font); font-weight: 600; }
-/* Theta info */
-.panel-info {
-  padding: .42rem .9rem; border-top: 1px solid var(--border);
-  font-size: .8rem; font-family: var(--mono); color: var(--dim); min-height: 1.7rem;
-  background: rgba(10,20,35,.55);
-}
-.panel-info span { color: var(--gold); }
-.panel-slider {
-  border-top: 1px solid rgba(112,184,255,.14);
-  padding: .65rem .85rem .75rem;
-  background: rgba(8,17,31,.6);
-}
-.panel-slider label {
-  display: block;
-  font-size: .72rem;
-  font-weight: 800;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--soft);
-  margin-bottom: .42rem;
-}
-.angle-slider {
-  width: 100%;
-  accent-color: var(--blue);
-  cursor: pointer;
-}
-.angle-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: .75rem;
-  margin-top: .42rem;
-  flex-wrap: wrap;
-  font-size: .78rem;
-  color: var(--dim);
-}
-.angle-meta span strong { color: var(--text); font-weight: 800; }
+@media(max-width:760px){ .derive-grid{ grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
+
+<!-- Ambient blobs — exact toc.html -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- Sidebar — exact toc.html structure -->
 <aside class="site-sidebar">
   <a class="sidebar-brand" href="toc.html">ETC Center Table</a>
-  <div class="sidebar-copy">Use the intro, sandbox, search page, and ToC from one sticky navigation rail.</div>
+  <div class="sidebar-copy">Navigate the intro, sandbox, barycentric search, and repository summary from one sticky sidebar.</div>
   <nav class="sidebar-nav">
     <a class="sidebar-link" href="intro.html"><span>Introduction</span><small>Intro</small></a>
     <a class="sidebar-link active" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
@@ -210,14 +274,31 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
   </nav>
 </aside>
 
-<h1>ETC Loci Sandbox — Thales Configuration</h1>
-<p class="subtitle">
-  <strong><span class="math-inline">\(A=(1,0)\)</span></strong> and <strong><span class="math-inline">\(B=(-1,0)\)</span></strong> are fixed while <strong>\(C\)</strong> moves on the unit circle.
-  The loci use exact rational parametric forms <strong><span class="math-inline">\(x(t),y(t)\)</span></strong> with <strong><span class="math-inline">\(t=\tan(\theta/4)\)</span></strong>,
-  obtained by normalizing barycentric weights
-  <span class="math-inline">\(\bar a = 1-t^2\)</span>, <span class="math-inline">\(\bar b = 2t\)</span>, <span class="math-inline">\(\bar c = 1+t^2\)</span>
-  and applying the Weierstrass half-angle identities.
-</p>
+<!-- Page content (z-index above blobs) -->
+<div class="page">
+
+  <!-- ── Hero header — exact toc.html pattern ── -->
+  <header>
+    <p class="eyebrow"><span class="eyebrow-dot"></span>Thales Configuration · Live Viewer</p>
+    <h1>
+      <span class="title-etc">ETC Loci Sandbox</span>
+      <span class="title-sub">Discovery Sandbox — Thales Configuration</span>
+    </h1>
+    <p class="subtitle">
+      <strong>\(A=(1,0)\)</strong> and <strong>\(B=(-1,0)\)</strong> are fixed while <strong>\(C\)</strong>
+      moves on the unit circle. The loci use exact rational parametric forms \(x(t),y(t)\)
+      with \(t=\tan(\theta/4)\), obtained by normalising barycentric weights
+      \(\bar{a}=1-t^2\), \(\bar{b}=2t\), \(\bar{c}=1+t^2\)
+      and applying the Weierstrass half-angle identities.
+    </p>
+    <!-- Stat pills — exact toc.html .stat-row pattern -->
+    <div class="stat-row">
+      <span class="stat-pill"><strong>6</strong>&nbsp;ETC centers</span>
+      <span class="stat-pill"><strong>Rational</strong>&nbsp;parametric loci</span>
+      <span class="stat-pill"><strong>JSXGraph</strong>&nbsp;live board</span>
+      <span class="stat-pill"><strong>∠C = 90°</strong>&nbsp;always</span>
+    </div>
+  </header>
 
 <section class="derive-box">
   <h2 class="section-title">Compact derivation</h2>
@@ -341,6 +422,7 @@ h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin-bottom: .25rem; l
   </div>
 
 </div><!-- /panels -->
+</div><!-- /.page -->
 
 <script>
 // ═══════════════════════════════════════════════════════════════
