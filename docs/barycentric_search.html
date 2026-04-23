@@ -1,295 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ETC Center Table — Barycentric Search</title>
-  <link rel="stylesheet" href="etc-shared.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETC Center Table — Barycentric Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Figtree (body) + Fraunces (display) — exact match with toc.html -->
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 
-  <style>
-    /* Search-page specific layout refinements */
-    .search-controls {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 12px;
-    }
+<style>
+/* ── Design tokens — exact match with toc.html ──────────────────── */
+:root {
+  --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a; --surface3:#102846;
+  --border:#24456a; --accent:#70b8ff; --accent-2:#3ea6ff;
+  --gold:#ffd479; --mint:#59e1a8; --violet:#b792ff;
+  --text:#f7fbff; --muted:#b7c8e6; --soft:#8fa8ca; --radius:14px;
+  --font:'Figtree',system-ui,sans-serif;
+  --display:'Fraunces',serif;
+  --mono:'JetBrains Mono',monospace;
+  --shadow:0 18px 44px rgba(1,8,20,.34);
+  --glow:0 0 0 1px rgba(112,184,255,.18),0 16px 44px rgba(31,111,235,.16);
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:var(--font); font-weight:500; letter-spacing:.01em;
+  padding:1.2rem 1.2rem 1.2rem 17.5rem;
+  min-height:100vh; overflow-x:hidden;
+}
+/* Dot-grid background — exact toc.html */
+body::before {
+  content:''; position:fixed; inset:0;
+  background-image:radial-gradient(rgba(112,184,255,.09) 1px,transparent 1px);
+  background-size:28px 28px; pointer-events:none; z-index:0;
+}
+/* Ambient blobs */
+.blob { position:fixed; border-radius:50%; pointer-events:none; z-index:0; filter:blur(110px); }
+.blob-1 { width:720px;height:480px;top:-200px;left:50%;transform:translateX(-50%);
+  background:radial-gradient(ellipse at 40% 50%,rgba(255,212,121,.11) 0%,rgba(183,146,255,.06) 55%,transparent 75%); }
+.blob-2 { width:500px;height:500px;bottom:-160px;right:-80px;
+  background:radial-gradient(ellipse,rgba(89,225,168,.09) 0%,transparent 65%); }
+.blob-3 { width:300px;height:300px;bottom:20%;left:-60px;
+  background:radial-gradient(ellipse,rgba(112,184,255,.10) 0%,transparent 65%); }
 
-    .filter-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 22px;
-    }
+/* ── Sidebar — exact toc.html ────────────────────────────────────── */
+.site-sidebar {
+  position:fixed; left:1rem; top:1rem; width:15rem; z-index:20;
+  background:linear-gradient(180deg,rgba(14,26,43,.97) 0%,rgba(8,17,31,.98) 100%);
+  border:1px solid var(--border); border-radius:16px; padding:1rem .9rem;
+  box-shadow:var(--shadow); display:flex; flex-direction:column; gap:.85rem;
+}
+.sidebar-brand { font-size:.95rem; font-weight:800; color:#fff; text-decoration:none; letter-spacing:-.02em; }
+.sidebar-copy  { font-size:.76rem; line-height:1.55; color:var(--muted); }
+.sidebar-nav   { display:grid; gap:.45rem; }
+.sidebar-link {
+  display:flex; align-items:center; justify-content:space-between; gap:.55rem;
+  padding:.55rem .7rem; border-radius:10px; text-decoration:none;
+  color:var(--muted); font-size:.82rem; font-weight:700;
+  border:1px solid transparent; background:rgba(9,20,35,.35); transition:all .16s ease;
+}
+.sidebar-link:hover,
+.sidebar-link.active { color:#fff; border-color:rgba(112,184,255,.3); background:rgba(19,35,58,.9); box-shadow:var(--glow); }
+.sidebar-link small { font-size:.72rem; color:var(--soft); }
 
-    .filter-row .etc-filter-label { margin-right: 4px; }
+/* ── Page wrapper ────────────────────────────────────────────────── */
+.page { position:relative; z-index:1; max-width:980px; }
 
-    .filter-group {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+/* ── Eyebrow — exact toc.html ───────────────────────────────────── */
+.eyebrow {
+  display:inline-flex; align-items:center; gap:.7rem;
+  font-size:.68rem; font-weight:600; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:1.5rem; opacity:.9;
+}
+.eyebrow-dot {
+  width:5px; height:5px; border-radius:50%;
+  background:var(--gold); box-shadow:0 0 6px var(--gold);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
 
-    .rows-select-wrap {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+/* ── Hero title — exact toc.html Fraunces treatment ─────────────── */
+h1 {
+  font-family:var(--display); font-size:clamp(2.4rem,6vw,3.8rem);
+  font-weight:900; line-height:1.0; letter-spacing:-.02em; color:#fff; margin-bottom:1.2rem;
+}
+.title-etc {
+  display:block;
+  background:linear-gradient(110deg,#ffffff 0%,var(--gold) 40%,var(--accent) 65%,var(--mint) 100%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+.title-sub {
+  display:block; font-family:var(--font); font-weight:500; font-size:.38em;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--soft);
+  -webkit-text-fill-color:var(--soft); margin-top:.8rem;
+}
 
-    /* Sortable column indicator */
-    .etc-table thead th.sorted::after {
-      content: ' ▲';
-      font-size: 0.6em;
-      color: var(--accent-blue);
-    }
+/* ── Subtitle ────────────────────────────────────────────────────── */
+.subtitle { font-size:.92rem; font-weight:400; color:var(--muted); line-height:1.8; max-width:58ch; margin-bottom:1.1rem; }
 
-    /* Truncate long expressions */
-    .col-mono { max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+/* ── Stat pills — exact toc.html ───────────────────────────────── */
+.stat-row  { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1rem; margin-bottom:1.4rem; }
+.stat-pill { display:flex; align-items:center; gap:.5rem; padding:.42em 1em; background:var(--surface); border:1px solid var(--border); border-radius:30px; font-size:.71rem; font-weight:500; color:var(--muted); }
+.stat-pill strong { font-weight:700; color:var(--text); }
 
-    @media (max-width: 900px) {
-      .search-controls { grid-template-columns: 1fr; }
-      .rows-select-wrap { margin-left: 0; }
-    }
-  </style>
+/* ── Status banner ───────────────────────────────────────────────── */
+.banner {
+  border-radius:var(--radius); padding:.85rem 1rem; font-size:.82rem;
+  margin-bottom:1.2rem; display:flex; align-items:flex-start; gap:.7rem;
+  box-shadow:var(--shadow);
+}
+.banner--success {
+  background:rgba(89,225,168,.06); border:1px solid rgba(89,225,168,.22); color:#7df2bf;
+}
+.banner strong { font-weight:700; color:#a7f3d0; }
+
+/* ── Search bar ──────────────────────────────────────────────────── */
+.search-controls {
+  display:grid; grid-template-columns:1fr auto auto;
+  gap:.6rem; align-items:center; margin-bottom:.7rem;
+}
+@media(max-width:700px){ .search-controls{grid-template-columns:1fr} }
+
+.search-bar {
+  display:flex; align-items:center; gap:.6rem;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  padding:.6rem .9rem;
+}
+.search-bar input {
+  flex:1; background:none; border:none; outline:none;
+  color:var(--text); font-family:var(--font); font-size:.86rem; font-weight:500;
+}
+.search-bar input::placeholder { color:var(--soft); }
+
+.filter-select {
+  background:var(--surface); border:1px solid var(--border); border-radius:8px;
+  color:var(--muted); font-family:var(--font); font-size:.78rem; font-weight:600;
+  padding:.45rem 2rem .45rem .75rem; cursor:pointer; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238fa8ca'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right .7rem center;
+  transition:border-color .15s;
+}
+.filter-select:hover { border-color:var(--accent); }
+
+/* ── Filter row ──────────────────────────────────────────────────── */
+.filter-row {
+  display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem;
+}
+.filter-label { font-size:.75rem; font-weight:700; color:var(--soft); margin-right:.2rem; }
+.filter-btn {
+  background:none; border:1px solid rgba(112,184,255,.18); border-radius:999px;
+  padding:.3rem .85rem; font-size:.76rem; font-weight:700;
+  font-family:var(--font); color:var(--muted); cursor:pointer;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.filter-btn:hover { background:rgba(255,255,255,.06); color:var(--text); }
+.filter-btn.active {
+  background:var(--accent); border-color:var(--accent); color:#08111f;
+}
+.rows-wrap { margin-left:auto; }
+
+/* ── Count row ───────────────────────────────────────────────────── */
+.count-row { font-size:.78rem; color:var(--soft); margin-bottom:.8rem; }
+.count-row strong { color:var(--text); font-weight:700; }
+
+/* ── Data table ──────────────────────────────────────────────────── */
+.table-wrap {
+  overflow-x:auto; border-radius:var(--radius); border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+table { width:100%; border-collapse:collapse; font-size:.8rem; }
+thead tr { background:var(--surface); border-bottom:1px solid var(--border); }
+thead th {
+  padding:.7rem 1rem; text-align:left; font-weight:700; font-size:.66rem;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--soft);
+  white-space:nowrap; user-select:none; cursor:pointer;
+}
+thead th.sorted { color:var(--accent); }
+thead th.sorted::after { content:' ▲'; font-size:.6em; }
+tbody tr { border-bottom:1px solid var(--border); transition:background .14s; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:var(--surface); }
+tbody td { padding:.65rem 1rem; color:var(--muted); vertical-align:middle; }
+.col-center a { color:var(--accent); font-weight:700; font-size:.82rem; }
+.col-name { font-weight:600; color:var(--text); }
+.col-mono { font-family:var(--mono); font-size:.72rem; max-width:200px; overflow:hidden; text-overflow:ellipsis; }
+
+/* ── Direction badges ────────────────────────────────────────────── */
+.badge {
+  display:inline-flex; align-items:center; gap:.3rem; border-radius:999px;
+  padding:.2rem .65rem; font-size:.68rem; font-weight:700; white-space:nowrap;
+  font-family:var(--font);
+}
+.badge--ccw  { background:rgba(89,225,168,.12);  color:var(--mint);   border:1px solid rgba(89,225,168,.25); }
+.badge--cw   { background:rgba(255,100,80,.12);  color:#f87171;       border:1px solid rgba(255,100,80,.25); }
+.badge--euler{ background:rgba(112,184,255,.12); color:var(--accent); border:1px solid rgba(112,184,255,.25); }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media(max-width:980px){
+  body { padding:5.7rem 1rem 1rem; }
+  .site-sidebar { position:fixed; left:1rem; right:1rem; top:.75rem; width:auto; padding:.75rem .8rem; gap:.55rem; }
+  .sidebar-copy { display:none; }
+  .sidebar-nav  { display:flex; gap:.45rem; overflow:auto; }
+  .sidebar-link { white-space:nowrap; min-width:max-content; }
+}
+</style>
 </head>
 <body>
 
-<div class="etc-layout">
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
 
-  <!-- ── Sidebar ── -->
-  <aside class="etc-sidebar">
-    <div>
-      <div class="etc-sidebar__brand-title">ETC Center Table</div>
-      <div class="etc-sidebar__brand-sub">Navigate the intro, sandbox, barycentric search, and repository summary from one sticky sidebar.</div>
-    </div>
+<!-- ── Sidebar — exact toc.html structure, corrected hrefs ── -->
+<aside class="site-sidebar">
+  <a class="sidebar-brand" href="toc.html">ETC Center Table</a>
+  <div class="sidebar-copy">Navigate the intro, sandbox, barycentric search, and repository summary from one sticky sidebar.</div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link" href="intro.html"><span>Introduction</span><small>Intro</small></a>
+    <a class="sidebar-link" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
+    <a class="sidebar-link active" href="barycentric_search.html"><span>Barycentric Search</span><small>Search</small></a>
+    <a class="sidebar-link" href="toc.html"><span>Repository ToC</span><small>Summary</small></a>
+    <a class="sidebar-link" href="https://github.com/MMathster/ETC-Center-Table#readme" target="_blank" rel="noreferrer"><span>GitHub README</span><small>↗</small></a>
+  </nav>
+</aside>
 
-    <ul class="etc-sidebar__nav">
-      <li>
-        <a href="intro.html">
-          <span>Introduction</span>
-          <span class="nav-label">Intro</span>
-        </a>
-      </li>
-      <li>
-        <a href="sandbox.html">
-          <span>Discovery Sandbox</span>
-          <span class="nav-label">Points</span>
-        </a>
-      </li>
-      <li class="active">
-        <a href="search.html">
-          <span>Barycentric Search</span>
-          <span class="nav-label">Search</span>
-        </a>
-      </li>
-      <li>
-        <a href="index.html">
-          <span>Repository ToC</span>
-          <span class="nav-label">Summary</span>
-        </a>
-      </li>
-      <li>
-        <a href="https://github.com/MMathster/ETC-Center-Table" target="_blank" rel="noopener">
-          <span>GitHub README</span>
-          <span class="nav-ext">↗</span>
-        </a>
-      </li>
-    </ul>
-  </aside>
+<div class="page">
 
-  <!-- ── Main ── -->
-  <main class="etc-main">
-
-    <!-- Section label -->
-    <div class="etc-section-label">Encyclopedia of Triangle Centers</div>
-
-    <!-- Hero title — gradient + Playfair, matching ToC page -->
-    <h1 class="etc-hero-title">
-      <span class="ht-gold">Barycentric</span>
-      <span class="ht-sage"> Center</span>
-      <span class="ht-cyan"> Search</span>
+  <!-- ── Hero — exact toc.html eyebrow + Fraunces title pattern ── -->
+  <header>
+    <p class="eyebrow"><span class="eyebrow-dot"></span>Encyclopedia of Triangle Centers</p>
+    <h1>
+      <span class="title-etc">Barycentric Center Search</span>
+      <span class="title-sub">ETC Center Table — Locus Catalog</span>
     </h1>
-
-    <div class="etc-hero-subtitle">ETC Center Table — Locus Catalog</div>
-
-    <p class="etc-hero-body">
+    <p class="subtitle">
       Search and filter triangle centers from the Encyclopedia of Triangle Centers (ETC).
       Data is pre-loaded from the repository — no live network fetch required.
     </p>
-
-    <!-- Pill tags -->
-    <div class="etc-pills">
-      <span class="etc-pill"><strong>64 k+</strong> centers available</span>
-      <span class="etc-pill"><strong>JSON</strong> data format</span>
-      <span class="etc-pill"><strong>SymPy</strong> computed</span>
-      <span class="etc-pill"><strong>Thales</strong> configuration</span>
+    <div class="stat-row">
+      <span class="stat-pill"><strong>64 k+</strong>&nbsp;centers available</span>
+      <span class="stat-pill"><strong>JSON</strong>&nbsp;data format</span>
+      <span class="stat-pill"><strong>SymPy</strong>&nbsp;computed</span>
+      <span class="stat-pill"><strong>Thales</strong>&nbsp;configuration</span>
     </div>
+  </header>
 
-    <!-- Status banner -->
-    <div class="etc-banner etc-banner--success">
-      <span class="etc-banner__icon">✓</span>
-      <span>
-        Loaded static data — <strong>105 centers</strong> from the Thales configuration analysis.
-        Full ETC data (64 k+ centers) requires running the notebook pipeline first.
-      </span>
+  <!-- Status banner -->
+  <div class="banner banner--success">
+    <span>✓</span>
+    <span>Loaded static data — <strong>105 centers</strong> from the Thales configuration analysis. Full ETC data (64 k+ centers) requires running the notebook pipeline first.</span>
+  </div>
+
+  <!-- Search controls -->
+  <div class="search-controls">
+    <div class="search-bar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--soft);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Search by ID, name, or barycentric expression… e.g. X(7), Gergonne, b+c−a">
     </div>
+    <select class="filter-select" id="directionFilter">
+      <option value="">All directions</option>
+      <option value="CCW">CCW only</option>
+      <option value="CW">CW only</option>
+      <option value="Euler">Euler line only</option>
+    </select>
+    <select class="filter-select" id="curveFilter">
+      <option value="">All curves</option>
+      <option value="locus">Locus</option>
+      <option value="circle">Circle</option>
+      <option value="point">Point</option>
+    </select>
+  </div>
 
-    <!-- Search controls -->
-    <div class="search-controls">
-      <div class="etc-search-bar">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search by ID, name, or barycentric expression… e.g. X(7), Gergonne, b+c−a"
-        />
-      </div>
-
-      <select class="etc-select" id="directionFilter">
-        <option value="">All directions</option>
-        <option value="CCW">CCW only</option>
-        <option value="CW">CW only</option>
-        <option value="Euler">Euler line only</option>
+  <!-- Filter row -->
+  <div class="filter-row">
+    <span class="filter-label">Show:</span>
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="euler">Euler line only</button>
+    <button class="filter-btn" data-filter="ccw">CCW only</button>
+    <button class="filter-btn" data-filter="cw">CW only</button>
+    <div class="rows-wrap">
+      <select class="filter-select" id="rowsSelect">
+        <option value="50">50 rows</option>
+        <option value="100">100 rows</option>
+        <option value="200">200 rows</option>
       </select>
-
-      <select class="etc-select" id="curveFilter">
-        <option value="">All curves</option>
-        <option value="locus">Locus</option>
-        <option value="circle">Circle</option>
-        <option value="point">Point</option>
-      </select>
     </div>
+  </div>
 
-    <!-- Filter row -->
-    <div class="filter-row">
-      <span class="etc-filter-label">Show:</span>
-      <div class="filter-group">
-        <button class="etc-filter-btn active" data-filter="all">All</button>
-        <button class="etc-filter-btn" data-filter="euler">Euler line only</button>
-        <button class="etc-filter-btn" data-filter="ccw">CCW only</button>
-        <button class="etc-filter-btn" data-filter="cw">CW only</button>
-      </div>
-      <div class="rows-select-wrap">
-        <select class="etc-select" id="rowsSelect">
-          <option value="50">50 rows</option>
-          <option value="100">100 rows</option>
-          <option value="200">200 rows</option>
-        </select>
-      </div>
-    </div>
+  <!-- Count row -->
+  <div class="count-row" id="countRow">
+    Showing <strong>58</strong> of <strong>58</strong> centers &nbsp;·&nbsp; Page <strong>1</strong> / 2
+  </div>
 
-    <!-- Count row -->
-    <div class="etc-count-row" id="countRow">
-      Showing <strong>58</strong> of <strong>58</strong> centers &nbsp;·&nbsp; Page <strong>1</strong> / 2
-    </div>
+  <!-- Data table -->
+  <div class="table-wrap">
+    <table id="centersTable">
+      <thead>
+        <tr>
+          <th class="sorted">Center</th>
+          <th>Name</th>
+          <th>Barycentric Weights</th>
+          <th>Trilinear</th>
+          <th>Direction</th>
+          <th>Locus Type</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr><td class="col-center"><a href="#">X(1)</a></td><td class="col-name">Incenter</td><td class="col-mono">a : b : c</td><td class="col-mono">1 : 1 : 1</td><td><span class="badge badge--ccw">⟳ CCW</span></td><td>locus</td></tr>
+        <tr><td class="col-center"><a href="#">X(2)</a></td><td class="col-name">Centroid</td><td class="col-mono">1 : 1 : 1</td><td class="col-mono">1/a : 1/b : 1/c</td><td><span class="badge badge--euler">★ Euler</span></td><td>circle r=1/3</td></tr>
+        <tr><td class="col-center"><a href="#">X(3)</a></td><td class="col-name">Circumcenter</td><td class="col-mono">sin 2A : sin 2B : sin 2C</td><td class="col-mono">cos A : cos B : cos C</td><td><span class="badge badge--euler">★ Euler</span></td><td>point (O)</td></tr>
+        <tr><td class="col-center"><a href="#">X(4)</a></td><td class="col-name">Orthocenter</td><td class="col-mono">S<sub>A</sub> : S<sub>B</sub> : S<sub>C</sub></td><td class="col-mono">sec A : sec B : sec C</td><td><span class="badge badge--euler">★ Euler</span></td><td>circle r=1</td></tr>
+        <tr><td class="col-center"><a href="#">X(5)</a></td><td class="col-name">Nine-Point Center</td><td class="col-mono">cos(B−C):cos(C−A):cos(A−B)</td><td class="col-mono">cos(B−C):cos(C−A):cos(A−B)</td><td><span class="badge badge--euler">★ Euler</span></td><td>circle r=1/2</td></tr>
+        <tr><td class="col-center"><a href="#">X(6)</a></td><td class="col-name">Symmedian Point</td><td class="col-mono">a² : b² : c²</td><td class="col-mono">a : b : c</td><td><span class="badge badge--ccw">⟳ CCW</span></td><td>locus</td></tr>
+        <tr><td class="col-center"><a href="#">X(7)</a></td><td class="col-name">Gergonne Point</td><td class="col-mono">1/(s−a) : 1/(s−b) : 1/(s−c)</td><td class="col-mono">(s−b)(s−c) : …</td><td><span class="badge badge--ccw">⟳ CCW</span></td><td>locus</td></tr>
+        <tr><td class="col-center"><a href="#">X(8)</a></td><td class="col-name">Nagel Point</td><td class="col-mono">b+c−a : c+a−b : a+b−c</td><td class="col-mono">(s−a)/a : (s−b)/b : (s−c)/c</td><td><span class="badge badge--cw">↺ CW</span></td><td>locus</td></tr>
+        <tr><td class="col-center"><a href="#">X(9)</a></td><td class="col-name">Mittenpunkt</td><td class="col-mono">a(b+c−a) : b(c+a−b) : c(a+b−c)</td><td class="col-mono">b+c−a : c+a−b : a+b−c</td><td><span class="badge badge--ccw">⟳ CCW</span></td><td>locus</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-    <!-- Data table -->
-    <div class="etc-table-wrap">
-      <table class="etc-table" id="centersTable">
-        <thead>
-          <tr>
-            <th class="sorted">Center ▲</th>
-            <th>Name</th>
-            <th>Barycentric Weights</th>
-            <th>Trilinear</th>
-            <th>Direction</th>
-            <th>Locus Type</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <!-- Rows injected by JS — static sample below -->
-          <tr>
-            <td class="col-center"><a href="#">X(1)</a></td>
-            <td class="col-name">Incenter</td>
-            <td class="col-mono">a : b : c</td>
-            <td class="col-mono">1 : 1 : 1</td>
-            <td><span class="badge badge--ccw">⟳ CCW</span></td>
-            <td>locus</td>
-          </tr>
-          <tr>
-            <td class="col-center"><a href="#">X(2)</a></td>
-            <td class="col-name">Centroid</td>
-            <td class="col-mono">1 : 1 : 1</td>
-            <td class="col-mono">1/a : 1/b : 1/c</td>
-            <td><span class="badge badge--euler">★ Euler</span></td>
-            <td>circle r=1/3</td>
-          </tr>
-          <tr>
-            <td class="col-center"><a href="#">X(3)</a></td>
-            <td class="col-name">Circumcenter</td>
-            <td class="col-mono">sin 2A : sin 2B : sin 2C</td>
-            <td class="col-mono">cos A : cos B : cos C</td>
-            <td><span class="badge badge--euler">★ Euler</span></td>
-            <td>point (O)</td>
-          </tr>
-          <tr>
-            <td class="col-center"><a href="#">X(4)</a></td>
-            <td class="col-name">Orthocenter</td>
-            <td class="col-mono">S<sub>A</sub> : S<sub>B</sub> : S<sub>C</sub></td>
-            <td class="col-mono">sec A : sec B : sec C</td>
-            <td><span class="badge badge--euler">★ Euler</span></td>
-            <td>circle r=1</td>
-          </tr>
-          <tr>
-            <td class="col-center"><a href="#">X(5)</a></td>
-            <td class="col-name">Nine-Point Center</td>
-            <td class="col-mono">cos(B−C):cos(C−A):cos(A−B)</td>
-            <td class="col-mono">cos(B−C):cos(C−A):cos(A−B)</td>
-            <td><span class="badge badge--euler">★ Euler</span></td>
-            <td>circle r=1/2</td>
-          </tr>
-          <tr>
-            <td class="col-center"><a href="#">X(6)</a></td>
-            <td class="col-name">Symmedian Point</td>
-            <td class="col-mono">a² : b² : c²</td>
-            <td class="col-mono">a : b : c</td>
-            <td><span class="badge badge--ccw">⟳ CCW</span></td>
-            <td>locus</td>
-          </tr>
-          <tr>
-            <td class="col-center"><a href="#">X(7)</a></td>
-            <td class="col-name">Gergonne Point</td>
-            <td class="col-mono">1/(s−a) : 1/(s−b) : 1/(s−c)</td>
-            <td class="col-mono">(s−b)(s−c) : …</td>
-            <td><span class="badge badge--ccw">⟳ CCW</span></td>
-            <td>locus</td>
-          </tr>
-          <tr>
-            <td class="col-center"><a href="#">X(8)</a></td>
-            <td class="col-name">Nagel Point</td>
-            <td class="col-mono">b+c−a : c+a−b : a+b−c</td>
-            <td class="col-mono">(s−a)/a : (s−b)/b : (s−c)/c</td>
-            <td><span class="badge badge--cw">↺ CW</span></td>
-            <td>locus</td>
-          </tr>
-          <tr>
-            <td class="col-center"><a href="#">X(9)</a></td>
-            <td class="col-name">Mittenpunkt</td>
-            <td class="col-mono">a(b+c−a) : b(c+a−b) : c(a+b−c)</td>
-            <td class="col-mono">b+c−a : c+a−b : a+b−c</td>
-            <td><span class="badge badge--ccw">⟳ CCW</span></td>
-            <td>locus</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </main>
-</div><!-- /.etc-layout -->
+</div><!-- /.page -->
 
 <script>
-  // Simple filter toggle UI (no-op data — wire to your actual data source)
-  document.querySelectorAll('.etc-filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.etc-filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
   });
+});
 </script>
 </body>
 </html>
