@@ -3,743 +3,608 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETC Center Table — Discovery Sandbox</title>
+<title>ETC Center Table — Barycentric Search</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Exact same fonts as toc.html: Figtree body + Fraunces display -->
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-
-<!-- MathJax (sandbox uses \( \) syntax throughout) -->
-<script>
-window.MathJax = {
-  tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],
-    displayMath: [['\\[', '\\]'], ['$$', '$$']]
-  },
-  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
-};
-</script>
+<!-- MathJax for barycentric expressions -->
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};</script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-
 <!-- JSXGraph -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraph.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraphcore.min.js"></script>
-
 <style>
-/* ── Design tokens — exact match with toc.html ─────────────────── */
 :root {
-  --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a; --surface3:#102846;
-  --border:#24456a; --accent:#70b8ff; --accent-2:#3ea6ff;
-  --gold:#ffd479; --mint:#59e1a8; --violet:#b792ff;
+  --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a;
+  --border:#24456a; --accent:#70b8ff; --gold:#ffd479; --mint:#59e1a8;
   --text:#f7fbff; --muted:#b7c8e6; --soft:#8fa8ca; --radius:14px;
-  --font:'Figtree',system-ui,sans-serif;
-  --display:'Fraunces',serif;
+  --font:'Figtree',system-ui,sans-serif; --display:'Fraunces',serif;
   --mono:'JetBrains Mono',monospace;
   --shadow:0 18px 44px rgba(1,8,20,.34);
   --glow:0 0 0 1px rgba(112,184,255,.18),0 16px 44px rgba(31,111,235,.16);
 }
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-
-body {
+body{
   background:var(--bg); color:var(--text);
   font-family:var(--font); font-weight:500; letter-spacing:.01em;
-  padding:1.2rem 1.2rem 1.2rem 17.5rem;
-  min-height:100vh; overflow-x:hidden;
+  padding:1.2rem 1.2rem 1.2rem 17.5rem; min-height:100vh; overflow-x:hidden;
 }
-
-/* Dot-grid background — exact toc.html */
-body::before {
-  content:'';
-  position:fixed; inset:0;
-  background-image:radial-gradient(rgba(112,184,255,.09) 1px, transparent 1px);
-  background-size:28px 28px;
-  pointer-events:none; z-index:0;
+body::before{
+  content:''; position:fixed; inset:0;
+  background-image:radial-gradient(rgba(112,184,255,.09) 1px,transparent 1px);
+  background-size:28px 28px; pointer-events:none; z-index:0;
 }
+.blob{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(110px)}
+.blob-1{width:720px;height:480px;top:-200px;left:50%;transform:translateX(-50%);
+  background:radial-gradient(ellipse at 40% 50%,rgba(255,212,121,.11) 0%,rgba(183,146,255,.06) 55%,transparent 75%)}
+.blob-2{width:500px;height:500px;bottom:-160px;right:-80px;
+  background:radial-gradient(ellipse,rgba(89,225,168,.09) 0%,transparent 65%)}
+.blob-3{width:300px;height:300px;bottom:20%;left:-60px;
+  background:radial-gradient(ellipse,rgba(112,184,255,.10) 0%,transparent 65%)}
 
-/* Ambient blobs — exact toc.html */
-.blob { position:fixed; border-radius:50%; pointer-events:none; z-index:0; filter:blur(110px); }
-.blob-1 { width:720px; height:480px; top:-200px; left:50%; transform:translateX(-50%);
-  background:radial-gradient(ellipse at 40% 50%,rgba(255,212,121,.11) 0%,rgba(183,146,255,.06) 55%,transparent 75%); }
-.blob-2 { width:500px; height:500px; bottom:-160px; right:-80px;
-  background:radial-gradient(ellipse,rgba(89,225,168,.09) 0%,transparent 65%); }
-.blob-3 { width:300px; height:300px; bottom:20%; left:-60px;
-  background:radial-gradient(ellipse,rgba(112,184,255,.10) 0%,transparent 65%); }
-
-/* ── Sidebar — exact toc.html ──────────────────────────────────── */
-.site-sidebar {
-  position:fixed; left:1rem; top:1rem; width:15rem; z-index:20;
+/* ── Sidebar ── */
+.site-sidebar{
+  position:fixed;left:1rem;top:1rem;width:15rem;z-index:20;
   background:linear-gradient(180deg,rgba(14,26,43,.97) 0%,rgba(8,17,31,.98) 100%);
-  border:1px solid var(--border); border-radius:16px; padding:1rem .9rem;
-  box-shadow:var(--shadow); display:flex; flex-direction:column; gap:.85rem;
+  border:1px solid var(--border);border-radius:16px;padding:1rem .9rem;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.85rem;
 }
-.sidebar-brand { font-size:.95rem; font-weight:800; color:#fff; text-decoration:none; letter-spacing:-.02em; }
-.sidebar-copy  { font-size:.76rem; line-height:1.55; color:var(--muted); }
-.sidebar-nav   { display:grid; gap:.45rem; }
-.sidebar-link  {
-  display:flex; align-items:center; justify-content:space-between; gap:.55rem;
-  padding:.55rem .7rem; border-radius:10px; text-decoration:none;
-  color:var(--muted); font-size:.82rem; font-weight:700;
-  border:1px solid transparent; background:rgba(9,20,35,.35); transition:all .16s ease;
+.sidebar-brand{font-size:.95rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-.02em}
+.sidebar-copy{font-size:.76rem;line-height:1.55;color:var(--muted)}
+.sidebar-nav{display:grid;gap:.45rem}
+.sidebar-link{
+  display:flex;align-items:center;justify-content:space-between;gap:.55rem;
+  padding:.55rem .7rem;border-radius:10px;text-decoration:none;
+  color:var(--muted);font-size:.82rem;font-weight:700;
+  border:1px solid transparent;background:rgba(9,20,35,.35);transition:all .16s ease;
 }
-.sidebar-link:hover,
-.sidebar-link.active { color:#fff; border-color:rgba(112,184,255,.3); background:rgba(19,35,58,.9); box-shadow:var(--glow); }
-.sidebar-link small { font-size:.72rem; color:var(--soft); }
+.sidebar-link:hover,.sidebar-link.active{color:#fff;border-color:rgba(112,184,255,.3);background:rgba(19,35,58,.9);box-shadow:var(--glow)}
+.sidebar-link small{font-size:.72rem;color:var(--soft)}
 
-/* ── Page wrapper (sits above blobs) ───────────────────────────── */
-.page { position:relative; z-index:1; max-width:980px; }
+/* ── Page ── */
+.page{position:relative;z-index:1;max-width:980px}
 
-/* ── Eyebrow — exact toc.html ──────────────────────────────────── */
-.eyebrow {
-  display:inline-flex; align-items:center; gap:.7rem;
-  font-size:.68rem; font-weight:600; letter-spacing:.28em; text-transform:uppercase;
-  color:var(--gold); margin-bottom:1.5rem; opacity:.9;
-}
-.eyebrow-dot {
-  width:5px; height:5px; border-radius:50%;
-  background:var(--gold); box-shadow:0 0 6px var(--gold);
-  animation:pulse 2.4s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%,100%{ opacity:1; transform:scale(1); }
-  50%    { opacity:.4; transform:scale(.7); }
-}
+/* ── Eyebrow ── */
+.eyebrow{display:inline-flex;align-items:center;gap:.7rem;font-size:.68rem;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;opacity:.9}
+.eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
 
-/* ── Hero title — exact toc.html Fraunces treatment ────────────── */
-h1 {
-  font-family:var(--display);
-  font-size:clamp(2.4rem,6vw,3.8rem);
-  font-weight:900; line-height:1.0;
-  letter-spacing:-.02em; color:#fff;
-  margin-bottom:1.2rem;
-}
-/* Multi-stop gradient: white → gold → blue → mint, matching toc.html exactly */
-.title-etc {
-  display:block;
-  background:linear-gradient(110deg,#ffffff 0%,var(--gold) 40%,var(--accent) 65%,var(--mint) 100%);
-  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
-}
-/* Small-caps subtitle line below main title */
-.title-sub {
-  display:block;
-  font-family:var(--font);
-  font-weight:500;
-  font-size:.38em;
-  letter-spacing:.22em;
-  text-transform:uppercase;
-  color:var(--soft);
-  -webkit-text-fill-color:var(--soft);
-  margin-top:.8rem;
-}
+/* ── Hero title ── */
+h1{font-family:var(--display);font-size:clamp(2.4rem,6vw,3.8rem);font-weight:900;line-height:1.0;letter-spacing:-.02em;color:#fff;margin-bottom:1.2rem}
+.title-etc{display:block;background:linear-gradient(110deg,#fff 0%,var(--gold) 40%,var(--accent) 65%,var(--mint) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.title-sub{display:block;font-family:var(--font);font-weight:500;font-size:.38em;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);-webkit-text-fill-color:var(--soft);margin-top:.8rem}
 
-/* ── Subtitle prose ─────────────────────────────────────────────── */
-.subtitle {
-  font-size:.92rem; font-weight:400;
-  color:var(--muted); line-height:1.8; max-width:58ch;
-  margin-bottom:1.1rem;
-}
-.math-inline { white-space:nowrap; }
-.mjx-container { color:inherit; }
+.subtitle{font-size:.92rem;color:var(--muted);line-height:1.8;max-width:58ch;margin-bottom:1.1rem}
+.stat-row{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem;margin-bottom:1.4rem}
+.stat-pill{display:flex;align-items:center;gap:.5rem;padding:.42em 1em;background:var(--surface);border:1px solid var(--border);border-radius:30px;font-size:.71rem;font-weight:500;color:var(--muted)}
+.stat-pill strong{font-weight:700;color:var(--text)}
 
-/* ── Stat pills — exact toc.html .stat-row / .stat-pill ───────── */
-.stat-row  { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1rem; margin-bottom:1.4rem; }
-.stat-pill {
-  display:flex; align-items:center; gap:.5rem;
-  padding:.42em 1em;
-  background:var(--surface); border:1px solid var(--border); border-radius:30px;
-  font-size:.71rem; font-weight:500; color:var(--muted);
-}
-.stat-pill strong { font-weight:700; color:var(--text); }
+/* ── Banner ── */
+.banner{border-radius:var(--radius);padding:.85rem 1rem;font-size:.82rem;margin-bottom:1.2rem;display:flex;align-items:flex-start;gap:.7rem;box-shadow:var(--shadow)}
+.banner--success{background:rgba(89,225,168,.06);border:1px solid rgba(89,225,168,.22);color:#7df2bf}
+.banner strong{font-weight:700;color:#a7f3d0}
 
-/* ── Derive box (compact derivation card) ───────────────────────── */
-.derive-box {
-  margin-bottom:1rem; padding:.9rem 1rem;
+/* ── Search controls ── */
+.search-controls{display:grid;grid-template-columns:1fr auto auto;gap:.6rem;align-items:center;margin-bottom:.7rem}
+@media(max-width:700px){.search-controls{grid-template-columns:1fr}}
+.search-bar{display:flex;align-items:center;gap:.6rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.6rem .9rem;transition:border-color .15s}
+.search-bar:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(112,184,255,.12)}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--font);font-size:.86rem;font-weight:500}
+.search-bar input::placeholder{color:var(--soft)}
+.filter-select{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:var(--font);font-size:.78rem;font-weight:600;padding:.45rem 2rem .45rem .75rem;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238fa8ca'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7rem center;transition:border-color .15s}
+.filter-select:hover{border-color:var(--accent)}
+
+/* ── Filter row ── */
+.filter-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.filter-label{font-size:.75rem;font-weight:700;color:var(--soft);margin-right:.2rem}
+.filter-btn{background:none;border:1px solid rgba(112,184,255,.18);border-radius:999px;padding:.3rem .85rem;font-size:.76rem;font-weight:700;font-family:var(--font);color:var(--muted);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.filter-btn:hover{background:rgba(255,255,255,.06);color:var(--text)}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#08111f}
+.rows-wrap{margin-left:auto}
+
+/* ── Count row ── */
+.count-row{font-size:.78rem;color:var(--soft);margin-bottom:.8rem}
+.count-row strong{color:var(--text);font-weight:700}
+
+/* ── Table ── */
+.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:1.5rem}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead tr{background:var(--surface);border-bottom:1px solid var(--border)}
+thead th{padding:.7rem 1rem;text-align:left;font-weight:700;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);white-space:nowrap;user-select:none;cursor:pointer}
+thead th.sorted{color:var(--accent)}
+thead th.sorted::after{content:' ▲';font-size:.6em}
+tbody tr{border-bottom:1px solid var(--border);transition:background .14s,box-shadow .14s;cursor:pointer;position:relative}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(112,184,255,.06)}
+tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
+.col-center{color:var(--accent);font-weight:700;font-size:.82rem;font-family:var(--mono)}
+.col-name{font-weight:600;color:var(--text)}
+.col-mono{font-family:var(--mono);font-size:.72rem;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:.3rem;border-radius:999px;padding:.2rem .65rem;font-size:.68rem;font-weight:700;white-space:nowrap;font-family:var(--font)}
+.badge--ccw{background:rgba(89,225,168,.12);color:var(--mint);border:1px solid rgba(89,225,168,.25)}
+.badge--cw{background:rgba(255,100,80,.12);color:#f87171;border:1px solid rgba(255,100,80,.25)}
+.badge--euler{background:rgba(112,184,255,.12);color:var(--accent);border:1px solid rgba(112,184,255,.25)}
+
+/* ── Pagination ── */
+.pagination{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-top:.8rem}
+.page-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:var(--font);font-size:.78rem;font-weight:700;padding:.35rem .75rem;cursor:pointer;transition:all .15s}
+.page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--text);box-shadow:var(--glow)}
+.page-btn.active{background:var(--accent);border-color:var(--accent);color:#08111f}
+.page-btn:disabled{opacity:.3;cursor:default}
+.page-info{font-size:.75rem;color:var(--soft);margin-left:.5rem}
+
+/* ── Hover tooltip popup ── */
+.hover-popup{
+  position:fixed;z-index:1000;
+  width:340px;
+  background:linear-gradient(180deg,rgba(14,26,43,.98) 0%,rgba(8,17,31,.99) 100%);
+  border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:0 24px 60px rgba(1,8,20,.6),var(--glow);
+  pointer-events:none;opacity:0;transition:opacity .15s ease;
+  overflow:hidden;
+}
+.hover-popup.visible{opacity:1}
+.popup-header{padding:.65rem .85rem .5rem;border-bottom:1px solid var(--border);background:rgba(16,40,70,.5)}
+.popup-id{font-family:var(--mono);font-size:.72rem;color:var(--accent);font-weight:600;margin-bottom:.18rem}
+.popup-name{font-size:.9rem;font-weight:800;color:var(--text)}
+.popup-bary{font-family:var(--mono);font-size:.73rem;color:var(--muted);margin-top:.22rem;line-height:1.4}
+.popup-board-wrap{width:100%;height:220px;background:#fff;position:relative}
+.popup-jxgbox{position:absolute;inset:0;width:100%;height:100%}
+.popup-footer{padding:.5rem .85rem;font-size:.72rem;color:var(--soft);border-top:1px solid var(--border)}
+
+/* ── Detail panel (click) ── */
+.detail-panel{
   background:linear-gradient(180deg,rgba(16,30,48,.96) 0%,rgba(8,17,31,.98) 100%);
-  border:1px solid var(--border); border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  border:1px solid rgba(112,184,255,.25);border-radius:var(--radius);
+  padding:1rem 1.1rem;margin-bottom:1.2rem;box-shadow:var(--shadow);
+  display:none;
 }
-.derive-box:hover { transform:translateY(-2px); border-color:rgba(112,184,255,.58); box-shadow:var(--glow); }
-.derive-box p { font-size:.84rem; line-height:1.68; color:var(--muted); }
-.derive-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; margin-top:.65rem; }
-.derive-card {
-  padding:.75rem .8rem; border-radius:12px;
-  background:rgba(9,20,35,.52); border:1px solid rgba(112,184,255,.18);
-}
-.derive-card strong { display:block; margin-bottom:.28rem; color:#fff; }
+.detail-panel.open{display:block}
+.detail-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.8rem}
+.detail-id{font-family:var(--mono);font-size:.82rem;color:var(--accent);font-weight:700}
+.detail-name{font-size:1.1rem;font-weight:800;color:var(--text);margin-top:.15rem}
+.detail-bary{font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-top:.3rem;line-height:1.5}
+.detail-close{background:none;border:1px solid var(--border);border-radius:6px;color:var(--soft);font-family:var(--font);font-size:.78rem;font-weight:700;padding:.28rem .7rem;cursor:pointer;transition:border-color .15s,color .15s;flex-shrink:0}
+.detail-close:hover{border-color:var(--accent);color:var(--text)}
+.detail-board-wrap{width:100%;height:360px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;position:relative}
+.detail-jxgbox{position:absolute;inset:0;width:100%;height:100%}
+.detail-legend{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.6rem;font-size:.78rem;color:var(--muted)}
+.detail-legend span{display:flex;align-items:center;gap:.35rem;padding:.2rem .55rem;border:1px solid rgba(112,184,255,.16);border-radius:999px;background:rgba(8,19,33,.56);font-weight:600}
+.dl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 
-/* ── Section title rule (shared with intro/sandbox) ─────────────── */
-.section-title {
-  display:flex; align-items:center; gap:.8rem;
-  font-size:1.02rem; font-weight:800; color:#fff;
-  line-height:1.2; margin-bottom:.6rem;
-}
-.section-title::after {
-  content:''; flex:1; height:1px;
-  background:linear-gradient(90deg,rgba(112,184,255,.34) 0%,rgba(112,184,255,0) 100%);
-}
-
-/* ── JSXGraph panels ─────────────────────────────────────────────── */
-.panels { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-@media(max-width:720px){ .panels { grid-template-columns:1fr; } }
-
-.panel {
-  background:linear-gradient(180deg,rgba(15,28,46,.97) 0%,rgba(9,18,31,.99) 100%);
-  border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden;
-  box-shadow:var(--shadow);
-  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-}
-.panel:hover { transform:translateY(-2px); border-color:rgba(112,184,255,.58); box-shadow:var(--glow); }
-.panel:nth-child(1){ border-color:#345b87; }
-.panel:nth-child(2){ border-color:#575ea3; }
-
-.panel-head { padding:.75rem 1rem .55rem; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(17,39,67,.8) 0%,rgba(10,24,40,.4) 100%); }
-.panel-head h2 { font-size:1.04rem; font-weight:800; color:var(--text); }
-.panel-head p  { font-size:.79rem; color:var(--muted); margin-top:.2rem; font-weight:600; }
-
-.board-wrap { position:relative; width:100%; padding-bottom:100%; background:#070b14; }
-.jxgbox { position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; }
-
-.panel-ctrl {
-  display:flex; align-items:center; gap:.6rem;
-  padding:.55rem .8rem; border-top:1px solid var(--border); flex-wrap:wrap;
-}
-
-/* Slider area */
-.panel-slider { border-top:1px solid rgba(112,184,255,.14); padding:.65rem .85rem .75rem; background:rgba(8,17,31,.6); }
-.panel-slider label { display:block; font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); margin-bottom:.42rem; }
-.angle-slider { width:100%; accent-color:var(--accent); cursor:pointer; }
-.angle-meta { display:flex; justify-content:space-between; gap:.75rem; margin-top:.42rem; flex-wrap:wrap; font-size:.78rem; color:var(--muted); }
-.angle-meta span strong { color:var(--text); font-weight:800; }
-
-/* Theta readout */
-.panel-info { padding:.42rem .9rem; border-top:1px solid var(--border); font-size:.8rem; font-family:var(--mono); color:var(--muted); min-height:1.7rem; background:rgba(10,20,35,.55); }
-.panel-info span { color:var(--gold); }
-
-/* Buttons */
-.btn {
-  font-family:var(--font); font-size:.82rem; font-weight:800;
-  border:none; border-radius:8px; padding:.38rem .95rem;
-  cursor:pointer; user-select:none;
-  transition:opacity .15s, transform .1s, box-shadow .15s, filter .15s;
-}
-.btn:hover:not(:disabled){ box-shadow:0 0 0 1px rgba(255,255,255,.08),0 14px 30px rgba(31,111,235,.18); filter:brightness(1.04); transform:translateY(-1px); }
-.btn:active { transform:scale(.95); }
-.btn:disabled { opacity:.35; pointer-events:none; }
-.btn-go   { background:linear-gradient(180deg,#1be0a0 0%,#0fb87e 100%); color:#071a14; }
-.btn-stop { background:linear-gradient(180deg,#ff9b7e 0%,#f86a45 100%); color:#1a0a07; }
-
-/* Legend chips */
-.chips { display:flex; gap:.4rem; flex-wrap:wrap; flex:1; justify-content:flex-end; }
-.chip { display:flex; align-items:center; gap:6px; font-size:.77rem; font-weight:700; color:var(--text); background:rgba(9,20,35,.38); border:1px solid rgba(112,184,255,.14); border-radius:999px; padding:.18rem .45rem; }
-.dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-
-/* Formula box inside panels */
-.fbox { border-top:1px solid var(--border); background:linear-gradient(180deg,#102543 0%,#0b192d 100%); font-family:var(--mono); font-size:.83rem; line-height:1.9; padding:.68rem .9rem; }
-.fbox-title { font-family:var(--font); font-size:.74rem; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:var(--soft); margin-bottom:.38rem; }
-.frow { display:flex; gap:.6rem; align-items:baseline; flex-wrap:wrap; }
-.fx   { color:#ffe19b; }
-.fy   { color:#d1bbff; }
-.fnote{ font-size:.77rem; color:#e4efff; margin-top:.32rem; font-family:var(--font); font-weight:600; }
-
-/* ── Responsive ─────────────────────────────────────────────────── */
+/* ── Responsive ── */
 @media(max-width:980px){
-  body { padding:5.7rem 1rem 1rem; }
-  .site-sidebar { position:fixed; left:1rem; right:1rem; top:.75rem; width:auto; padding:.75rem .8rem; gap:.55rem; }
-  .sidebar-copy { display:none; }
-  .sidebar-nav  { display:flex; gap:.45rem; overflow:auto; }
-  .sidebar-link { white-space:nowrap; min-width:max-content; }
+  body{padding:5.7rem 1rem 1rem}
+  .site-sidebar{position:fixed;left:1rem;right:1rem;top:.75rem;width:auto;padding:.75rem .8rem;gap:.55rem}
+  .sidebar-copy{display:none}
+  .sidebar-nav{display:flex;gap:.45rem;overflow:auto}
+  .sidebar-link{white-space:nowrap;min-width:max-content}
+  .hover-popup{display:none}
 }
-@media(max-width:760px){ .derive-grid{ grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
-
-<!-- Ambient blobs — exact toc.html -->
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
 <div class="blob blob-3"></div>
 
-<!-- Sidebar — exact toc.html structure -->
 <aside class="site-sidebar">
   <a class="sidebar-brand" href="toc.html">ETC Center Table</a>
   <div class="sidebar-copy">Navigate the intro, sandbox, barycentric search, and repository summary from one sticky sidebar.</div>
   <nav class="sidebar-nav">
     <a class="sidebar-link" href="intro.html"><span>Introduction</span><small>Intro</small></a>
-    <a class="sidebar-link active" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
-    <a class="sidebar-link" href="barycentric_search.html"><span>Barycentric Search</span><small>Search</small></a>
+    <a class="sidebar-link" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
+    <a class="sidebar-link active" href="barycentric_search.html"><span>Barycentric Search</span><small>Search</small></a>
     <a class="sidebar-link" href="toc.html"><span>Repository ToC</span><small>Summary</small></a>
     <a class="sidebar-link" href="https://github.com/MMathster/ETC-Center-Table#readme" target="_blank" rel="noreferrer"><span>GitHub README</span><small>↗</small></a>
   </nav>
 </aside>
 
-<!-- Page content (z-index above blobs) -->
 <div class="page">
-
-  <!-- ── Hero header — exact toc.html pattern ── -->
   <header>
-    <p class="eyebrow"><span class="eyebrow-dot"></span>Thales Configuration · Live Viewer</p>
+    <p class="eyebrow"><span class="eyebrow-dot"></span>Encyclopedia of Triangle Centers</p>
     <h1>
-      <span class="title-etc">ETC Loci Sandbox</span>
-      <span class="title-sub">Discovery Sandbox — Thales Configuration</span>
+      <span class="title-etc">Barycentric Center Search</span>
+      <span class="title-sub">ETC Center Table — Locus Catalog</span>
     </h1>
-    <p class="subtitle">
-      <strong>\(A=(1,0)\)</strong> and <strong>\(B=(-1,0)\)</strong> are fixed while <strong>\(C\)</strong>
-      moves on the unit circle. The loci use exact rational parametric forms \(x(t),y(t)\)
-      with \(t=\tan(\theta/4)\), obtained by normalising barycentric weights
-      \(\bar{a}=1-t^2\), \(\bar{b}=2t\), \(\bar{c}=1+t^2\)
-      and applying the Weierstrass half-angle identities.
-    </p>
-    <!-- Stat pills — exact toc.html .stat-row pattern -->
+    <p class="subtitle">Search and filter triangle centers from the Encyclopedia of Triangle Centers (ETC). Data is pre-loaded from the repository — no live network fetch required.</p>
     <div class="stat-row">
-      <span class="stat-pill"><strong>6</strong>&nbsp;ETC centers</span>
-      <span class="stat-pill"><strong>Rational</strong>&nbsp;parametric loci</span>
-      <span class="stat-pill"><strong>JSXGraph</strong>&nbsp;live board</span>
-      <span class="stat-pill"><strong>∠C = 90°</strong>&nbsp;always</span>
+      <span class="stat-pill"><strong id="totalCount">102</strong>&nbsp;centers loaded</span>
+      <span class="stat-pill"><strong>JSON</strong>&nbsp;data format</span>
+      <span class="stat-pill"><strong>JSXGraph</strong>&nbsp;live loci</span>
+      <span class="stat-pill"><strong>Thales</strong>&nbsp;configuration</span>
     </div>
   </header>
 
-<section class="derive-box">
-  <h2 class="section-title">Compact derivation</h2>
-  <p>
-    With \(A=(1,0)\), \(B=(-1,0)\), and \(C=(\cos\theta,\sin\theta)\), each center starts from a barycentric triple \((u:v:w)\). The Thales normalization turns the Cartesian conversion into
-    \[
-      x=\frac{u-v+w\cos\theta}{u+v+w},\qquad
-      y=\frac{w\sin\theta}{u+v+w}.
-    \]
-    Using the substitution \(t = \tan \frac{\theta}{4}\), we replace trigonometric terms by rational ones:
-    \[
-      \cos\theta = \frac{1-t^2}{1+t^2},\qquad
-      \sin\theta = \frac{2t}{1+t^2}.
-    \]
-  </p>
-  <div class="derive-grid">
-    <div class="derive-card">
-      <strong>Why this matters</strong>
-      The locus formulas become rational in \(t\), which is why the viewer can plot exact-looking curves so smoothly.
-    </div>
-    <div class="derive-card">
-      <strong>How to use the sandbox</strong>
-      Move the angle slider, compare the radian and degree readouts, and inspect how the plotted center responds to the same parameter \(t\).
-    </div>
-  </div>
-</section>
-
-<div class="panels">
-
-  <!-- Panel 1: X(1) · X(2) · X(8) -->
-  <div class="panel">
-    <div class="panel-head">
-      <h2 class="section-title">Incenter · Centroid · Nagel Point</h2>
-      <p>X(1) : X(2) : X(8)</p>
-    </div>
-    <div class="board-wrap"><div id="box1" class="jxgbox"></div></div>
-    <div class="panel-ctrl">
-      <button class="btn btn-go"   id="p1-start">▶ Start</button>
-      <button class="btn btn-stop" id="p1-stop" disabled>■ Stop</button>
-      <div class="chips">
-        <div class="chip"><div class="dot" style="background:#ff7043"></div><span>\(C\)</span></div>
-        <div class="chip"><div class="dot" style="background:#ffd166"></div><span>\(X(1)\)</span></div>
-        <div class="chip"><div class="dot" style="background:#b388ff"></div><span>\(X(2)\)</span></div>
-        <div class="chip"><div class="dot" style="background:#06d6a0"></div><span>\(X(8)\)</span></div>
-      </div>
-    </div>
-    <div class="panel-info" id="p1-info">\(\theta\) = —</div>
-    <div class="panel-slider">
-      <label for="p1-angle">Angle slider</label>
-      <input class="angle-slider" type="range" id="p1-angle" min="0" max="6.283185307179586" step="0.002" value="1.0471975511965976">
-      <div class="angle-meta">
-        <span id="p1-rad"><strong>Radians:</strong> —</span>
-        <span id="p1-deg"><strong>Degrees:</strong> —</span>
-      </div>
-    </div>
-    <div class="fbox">
-      <div class="fbox-title">Parametric curves — $t = \tan\frac{\theta}{4}$, $t \in (0,1)$</div>
-      <div style="margin-bottom:.4rem">
-        <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(1) Incenter — degree 2</div>
-        <div class="frow"><span class="fx">\(x = -\dfrac{t^2 + 2t - 1}{t^2 + 1}\)</span></div>
-        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t)}{t^2 + 1}\)</span></div>
-      </div>
-      <div style="margin-bottom:.4rem">
-        <div style="color:#b388ff;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(2) Centroid — degree 4, locus is circle r = 1/3</div>
-        <div class="frow"><span class="fx">\(x = \dfrac{(t^2-2t-1)(t^2+2t-1)}{3(t^2+1)^2}\)</span></div>
-        <div class="frow"><span class="fy">\(y = \dfrac{4t(1-t^2)}{3(t^2+1)^2}\)</span></div>
-      </div>
+  <!-- Detail panel — appears when a row is clicked -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-top">
       <div>
-        <div style="color:#06d6a0;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(8) Nagel — degree 4, y ≥ 0 for t ∈ (0,1)</div>
-        <div class="frow"><span class="fx">\(x = \dfrac{(t^2+2t-1)(3t^2-2t+1)}{(t^2+1)^2}\)</span></div>
-        <div class="frow"><span class="fy">\(y = \dfrac{4t^2(1-t)^2}{(t^2+1)^2}\)</span></div>
+        <div class="detail-id" id="detailId">—</div>
+        <div class="detail-name" id="detailName">—</div>
+        <div class="detail-bary" id="detailBary">—</div>
       </div>
+      <button class="detail-close" onclick="closeDetail()">✕ Close</button>
+    </div>
+    <div class="detail-board-wrap">
+      <div class="detail-jxgbox" id="detailBoard"></div>
+    </div>
+    <div class="detail-legend">
+      <span><span class="dl-dot" style="background:#58a6ff"></span>A, B fixed</span>
+      <span><span class="dl-dot" style="background:#f78166"></span>C on circle</span>
+      <span><span class="dl-dot" style="background:#f0b429"></span>X<sub>n</sub> locus</span>
+      <span><span class="dl-dot" style="background:#3fb950"></span>circumcircle</span>
     </div>
   </div>
 
-  <!-- Panel 2: X(5) · X(6) · X(11) -->
-  <div class="panel">
-    <div class="panel-head">
-      <h2 class="section-title">Nine-Point · Symmedian · Feuerbach</h2>
-      <p>X(5) : X(6) : X(11)</p>
-    </div>
-    <div class="board-wrap"><div id="box2" class="jxgbox"></div></div>
-    <div class="panel-ctrl">
-      <button class="btn btn-go"   id="p2-start">▶ Start</button>
-      <button class="btn btn-stop" id="p2-stop" disabled>■ Stop</button>
-      <div class="chips">
-        <div class="chip"><div class="dot" style="background:#ff7043"></div><span>\(C\)</span></div>
-        <div class="chip"><div class="dot" style="background:#ffd166"></div><span>\(X(5)\)</span></div>
-        <div class="chip"><div class="dot" style="background:#4da6ff"></div><span>\(X(6)\)</span></div>
-        <div class="chip"><div class="dot" style="background:#f78c6c"></div><span>\(X(11)\)</span></div>
-      </div>
-    </div>
-    <div class="panel-info" id="p2-info">\(\theta\) = —</div>
-    <div class="panel-slider">
-      <label for="p2-angle">Angle slider</label>
-      <input class="angle-slider" type="range" id="p2-angle" min="0" max="6.283185307179586" step="0.002" value="1.5707963267948966">
-      <div class="angle-meta">
-        <span id="p2-rad"><strong>Radians:</strong> —</span>
-        <span id="p2-deg"><strong>Degrees:</strong> —</span>
-      </div>
-    </div>
-    <div class="fbox">
-      <div class="fbox-title">Parametric curves — $t = \tan\frac{\theta}{4}$, $t \in (0,1)$</div>
-      <div style="margin-bottom:.4rem">
-        <div style="color:#ffd166;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(5) Nine-Point — degree 4, locus is circle r = 1/2</div>
-        <div class="frow"><span class="fx">\(x = \dfrac{(t^2-2t-1)(t^2+2t-1)}{2(t^2+1)^2}\)</span></div>
-        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t^2)}{(t^2+1)^2}\)</span></div>
-      </div>
-      <div style="margin-bottom:.4rem">
-        <div style="color:#4da6ff;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(6) Symmedian — degree 4, locus is unit circle (= C)</div>
-        <div class="frow"><span class="fx">\(x = \dfrac{(t^2-2t-1)(t^2+2t-1)}{(t^2+1)^2}\)</span></div>
-        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t^2)}{(t^2+1)^2}\)</span></div>
-        <div class="fnote">\(X(2), X(5), X(6)\) share the same numerator factor, which visually echoes Euler-line collinearity.</div>
-      </div>
-      <div>
-        <div style="color:#f78c6c;font-weight:600;font-size:.72rem;margin-bottom:.15rem">X(11) Feuerbach — degree 6, smooth on t ∈ (0,1)</div>
-        <div class="frow"><span class="fx">\(x = \dfrac{(t^2+2t-1)(t^4-6t^3+2t-1)}{(t^2+1)^2(5t^2-4t+1)}\)</span></div>
-        <div class="frow"><span class="fy">\(y = \dfrac{2t(1-t)(t^2+2t-1)^2}{(t^2+1)^2(5t^2-4t+1)}\)</span></div>
-      </div>
-    </div>
+  <div class="banner banner--success">
+    <span>✓</span>
+    <span>Loaded static data — <strong id="loadedCount">102 centers</strong> from the Thales configuration analysis. Full ETC data (64 k+ centers) requires running the notebook pipeline first.</span>
   </div>
 
-</div><!-- /panels -->
+  <div class="search-controls">
+    <div class="search-bar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--soft);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Search by ID, name, or barycentric expression… e.g. X(7), Gergonne, b+c−a" autocomplete="off">
+    </div>
+    <select class="filter-select" id="rowsSelect">
+      <option value="25">25 rows</option>
+      <option value="50" selected>50 rows</option>
+      <option value="100">100 rows</option>
+      <option value="999">All rows</option>
+    </select>
+    <select class="filter-select" id="sortSelect">
+      <option value="id">Sort: ID</option>
+      <option value="name">Sort: Name</option>
+    </select>
+  </div>
+
+  <div class="count-row" id="countRow">Showing <strong>—</strong> of <strong>—</strong> centers</div>
+
+  <div class="table-wrap">
+    <table id="centersTable">
+      <thead>
+        <tr>
+          <th class="sorted" data-col="id">Center</th>
+          <th data-col="name">Name</th>
+          <th>Barycentric Weights</th>
+          <th>Has Locus</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="pagination" id="pagination"></div>
 </div><!-- /.page -->
 
+<!-- Hover popup (mouse-follow) -->
+<div class="hover-popup" id="hoverPopup">
+  <div class="popup-header">
+    <div class="popup-id" id="popupId">—</div>
+    <div class="popup-name" id="popupName">—</div>
+    <div class="popup-bary" id="popupBary">—</div>
+  </div>
+  <div class="popup-board-wrap">
+    <div class="popup-jxgbox" id="popupBoard"></div>
+  </div>
+  <div class="popup-footer">Click row to open full interactive viewer</div>
+</div>
+
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  Rational parametric formulas derived from t = tan(θ/4)
-//  Normalised weights: ā = 1−t², b̄ = 2t, c̄ = 1+t²
-//  cosθ = (t⁴−6t²+1)/(1+t²)²   sinθ = 4t(1−t²)/(1+t²)²
-//
-//  All formulas return [x, y] as JS numbers for a given t.
-//  t ∈ (0,1)  → upper half (θ ∈ (0,π),  sinθ > 0)
-//  t ∈ (-1,0) → lower half (θ ∈ (-π,0), sinθ < 0)
-// ═══════════════════════════════════════════════════════════════
+// ── Centers data (embedded from barycentric_index.json) ──────────
+const ALL_CENTERS = [{"center_id":"X(3)","name":"Circumcenter","source_page":"ETC.html","barycentrics":["sin 2A : sin 2B : sin 2C"],"search_text":"X(3) | Circumcenter | sin 2A : sin 2B : sin 2C"},{"center_id":"X(4)","name":"Orthocenter (= C here)","source_page":"ETC.html","barycentrics":["SA : SB : SC"],"search_text":"X(4) | Orthocenter (= C here) | SA : SB : SC"},{"center_id":"X(5)","name":"Nine-Point Center","source_page":"ETC.html","barycentrics":["cos(B-C):cos(C-A):cos(A-B)"],"search_text":"X(5) | Nine-Point Center | cos(B-C):cos(C-A):cos(A-B)"},{"center_id":"X(6)","name":"Symmedian Point","source_page":"ETC.html","barycentrics":["a² : b² : c²"],"search_text":"X(6) | Symmedian Point | a² : b² : c²"},{"center_id":"X(7)","name":"Gergonne Point","source_page":"ETC.html","barycentrics":["1/(s−a) : 1/(s−b) : 1/(s−c)"],"search_text":"X(7) | Gergonne Point | 1/(s−a) : 1/(s−b) : 1/(s−c)"},{"center_id":"X(8)","name":"Nagel Point","source_page":"ETC.html","barycentrics":["b+c−a : c+a−b : a+b−c"],"search_text":"X(8) | Nagel Point | b+c−a : c+a−b : a+b−c"},{"center_id":"X(9)","name":"Mittenpunkt","source_page":"ETC.html","barycentrics":["a(b+c−a):b(c+a−b):c(a+b−c)"],"search_text":"X(9) | Mittenpunkt | a(b+c−a):b(c+a−b):c(a+b−c)"},{"center_id":"X(10)","name":"Spieker Center","source_page":"ETC.html","barycentrics":["b+c : c+a : a+b"],"search_text":"X(10) | Spieker Center | b+c : c+a : a+b"},{"center_id":"X(11)","name":"Feuerbach Point","source_page":"ETC.html","barycentrics":["(b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)"],"search_text":"X(11) | Feuerbach Point | (b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)"},{"center_id":"X(12)","name":"Extouchpoint-midpoint","source_page":"ETC.html","barycentrics":["a/(b+c+a)²:…"],"search_text":"X(12) | Extouchpoint-midpoint | a/(b+c+a)²:…"},{"center_id":"X(13)","name":"Fermat Point 1 (isog conj X14)","source_page":"ETC.html","barycentrics":["1/(SA+√3·S):…"],"search_text":"X(13) | Fermat Point 1 (isog conj X14) | 1/(SA+√3·S):…"},{"center_id":"X(14)","name":"Fermat Point 2","source_page":"ETC.html","barycentrics":["1/(SA-√3·S):…"],"search_text":"X(14) | Fermat Point 2 | 1/(SA-√3·S):…"},{"center_id":"X(15)","name":"Isogonic Point 1","source_page":"ETC.html","barycentrics":["sin(A+π/3):sin(B+π/3):sin(C+π/3)"],"search_text":"X(15) | Isogonic Point 1 | sin(A+π/3):sin(B+π/3):sin(C+π/3)"},{"center_id":"X(16)","name":"Isogonic Point 2","source_page":"ETC.html","barycentrics":["sin(A-π/3):sin(B-π/3):sin(C-π/3)"],"search_text":"X(16) | Isogonic Point 2 | sin(A-π/3):sin(B-π/3):sin(C-π/3)"},{"center_id":"X(17)","name":"Napoleon Pt 1","source_page":"ETC.html","barycentrics":["1/(SA+√3·S):… (=X13 variant)"],"search_text":"X(17) | Napoleon Pt 1 | 1/(SA+√3·S):… (=X13 variant)"},{"center_id":"X(18)","name":"Napoleon Pt 2","source_page":"ETC.html","barycentrics":["SA-√3·S:…"],"search_text":"X(18) | Napoleon Pt 2 | SA-√3·S:…"},{"center_id":"X(19)","name":"Clawson Point (isog conj X63)","source_page":"ETC.html","barycentrics":["tan A:tan B:tan C"],"search_text":"X(19) | Clawson Point (isog conj X63) | tan A:tan B:tan C"},{"center_id":"X(20)","name":"de Longchamps Point","source_page":"ETC.html","barycentrics":["-SA·(SB-SC)²+…  ≈ SA+SB+3SC variant"],"search_text":"X(20) | de Longchamps Point | -SA·(SB-SC)²+…  ≈ SA+SB+3SC variant"},{"center_id":"X(21)","name":"Schiffler Point","source_page":"ETC.html","barycentrics":["1/(b+c):…"],"search_text":"X(21) | Schiffler Point | 1/(b+c):…"},{"center_id":"X(22)","name":"Exeter Point","source_page":"ETC.html","barycentrics":["a²(b⁴+c⁴-a⁴):…"],"search_text":"X(22) | Exeter Point | a²(b⁴+c⁴-a⁴):…"},{"center_id":"X(23)","name":"Far-Out Point","source_page":"ETC.html","barycentrics":["a²(a⁴-b²c²):…"],"search_text":"X(23) | Far-Out Point | a²(a⁴-b²c²):…"},{"center_id":"X(25)","name":"Homothetic Center (orthic and tangential)","source_page":"ETC.html","barycentrics":["a²/SA:…"],"search_text":"X(25) | Homothetic Center (orthic and tangential) | a²/SA:…"},{"center_id":"X(31)","name":"2nd Power Point","source_page":"ETC.html","barycentrics":["a³:b³:c³ (trilinear a²:…)"],"search_text":"X(31) | 2nd Power Point | a³:b³:c³ (trilinear a²:…)"},{"center_id":"X(32)","name":"3rd Power Point","source_page":"ETC.html","barycentrics":["a⁴:b⁴:c⁴"],"search_text":"X(32) | 3rd Power Point | a⁴:b⁴:c⁴"},{"center_id":"X(35)","name":"Intersection AP₁ with BC … isog 1st isog of X36","source_page":"ETC.html","barycentrics":["a²(b²+c²-a²-bc):…"],"search_text":"X(35) | Intersection AP₁ with BC … isog 1st isog of X36 | a²(b²+c²-a²-bc):…"},{"center_id":"X(36)","name":"Inverse of Incenter in circumcircle","source_page":"ETC.html","barycentrics":["a(a²-b²-bc-c²):…  simplified"],"search_text":"X(36) | Inverse of Incenter in circumcircle | a(a²-b²-bc-c²):…  simplified"},{"center_id":"X(37)","name":"Crosspoint of X1,X2 (harmonic mean)","source_page":"ETC.html","barycentrics":["ab+ac : bc+ba : ca+cb"],"search_text":"X(37) | Crosspoint of X1,X2 (harmonic mean) | ab+ac : bc+ba : ca+cb"},{"center_id":"X(39)","name":"Brocard Midpoint (X3 of medial)","source_page":"ETC.html","barycentrics":["a²(b²+c²):…"],"search_text":"X(39) | Brocard Midpoint (X3 of medial) | a²(b²+c²):…"},{"center_id":"X(40)","name":"Bevan Point (circumcenter of excentral)","source_page":"ETC.html","barycentrics":["−a(b²+c²−a²−2bc):…"],"search_text":"X(40) | Bevan Point (circumcenter of excentral) | −a(b²+c²−a²−2bc):…"},{"center_id":"X(41)","name":"Crosspoint of X1 and X6","source_page":"ETC.html","barycentrics":["a²(b+c-a):…"],"search_text":"X(41) | Crosspoint of X1 and X6 | a²(b+c-a):…"},{"center_id":"X(42)","name":"Crosssum of X1 and X2","source_page":"ETC.html","barycentrics":["a(b+c):…"],"search_text":"X(42) | Crosssum of X1 and X2 | a(b+c):…"},{"center_id":"X(43)","name":"X(1) of medial triangle","source_page":"ETC.html","barycentrics":["bc(b+c-a):…"],"search_text":"X(43) | X(1) of medial triangle | bc(b+c-a):…"},{"center_id":"X(44)","name":"X(1)-beth conjugate of X(44)","source_page":"ETC.html","barycentrics":["a(b+c-2a):…"],"search_text":"X(44) | X(1)-beth conjugate of X(44) | a(b+c-2a):…"},{"center_id":"X(45)","name":"Complement of X(44)","source_page":"ETC.html","barycentrics":["a(2b+2c-a):…"],"search_text":"X(45) | Complement of X(44) | a(2b+2c-a):…"},{"center_id":"X(46)","name":"X(4) of excentral triangle","source_page":"ETC.html","barycentrics":["a(cos B cos C - cos A):…"],"search_text":"X(46) | X(4) of excentral triangle | a(cos B cos C - cos A):…"},{"center_id":"X(55)","name":"Insimilicenter of circumcircle and incircle","source_page":"ETC.html","barycentrics":["a(b+c-a):…"],"search_text":"X(55) | Insimilicenter of circumcircle and incircle | a(b+c-a):…"},{"center_id":"X(56)","name":"Exsimilicenter (isog conj X55)","source_page":"ETC.html","barycentrics":["a/(b+c-a):…"],"search_text":"X(56) | Exsimilicenter (isog conj X55) | a/(b+c-a):…"},{"center_id":"X(57)","name":"Isogonal conj of X9","source_page":"ETC.html","barycentrics":["1/(b+c-a):…"],"search_text":"X(57) | Isogonal conj of X9 | 1/(b+c-a):…"},{"center_id":"X(58)","name":"Isogonal conj of X10","source_page":"ETC.html","barycentrics":["a²/(b+c):…"],"search_text":"X(58) | Isogonal conj of X10 | a²/(b+c):…"},{"center_id":"X(59)","name":"Isogonal conj of X11","source_page":"ETC.html","barycentrics":["a/((s-b)(s-c)):…"],"search_text":"X(59) | Isogonal conj of X11 | a/((s-b)(s-c)):…"},{"center_id":"X(63)","name":"Isogonal conj of X19","source_page":"ETC.html","barycentrics":["a/tan A:…  = a cos A:…"],"search_text":"X(63) | Isogonal conj of X19 | a/tan A:…  = a cos A:…"},{"center_id":"X(65)","name":"Isogonal conj of X21","source_page":"ETC.html","barycentrics":["a/(tan B+tan C):…"],"search_text":"X(65) | Isogonal conj of X21 | a/(tan B+tan C):…"},{"center_id":"X(69)","name":"Isotomic conj of X25  (symmedian point of anticomp)","source_page":"ETC.html","barycentrics":["b²c²(b²+c²-a²):…"],"search_text":"X(69) | Isotomic conj of X25  (symmedian point of anticomp) | b²c²(b²+c²-a²):…"},{"center_id":"X(75)","name":"Isotomic conj of X31","source_page":"ETC.html","barycentrics":["bc:ca:ab"],"search_text":"X(75) | Isotomic conj of X31 | bc:ca:ab"},{"center_id":"X(76)","name":"Isotomic conj of X32","source_page":"ETC.html","barycentrics":["b²c²:c²a²:a²b²"],"search_text":"X(76) | Isotomic conj of X32 | b²c²:c²a²:a²b²"},{"center_id":"X(79)","name":"Isogonal conj of X35","source_page":"ETC.html","barycentrics":["1/(2SA+bc):…"],"search_text":"X(79) | Isogonal conj of X35 | 1/(2SA+bc):…"},{"center_id":"X(80)","name":"Reflection of X1 in X11 variant","source_page":"ETC.html","barycentrics":["(b+c-a)/(b-a+c):…  simplified"],"search_text":"X(80) | Reflection of X1 in X11 variant | (b+c-a)/(b-a+c):…  simplified"},{"center_id":"X(81)","name":"Isogonal conj of X42","source_page":"ETC.html","barycentrics":["b+c:c+a:a+b → reciprocal of…  a/(b+c):…"],"search_text":"X(81) | Isogonal conj of X42 | b+c:c+a:a+b → reciprocal of…  a/(b+c):…"},{"center_id":"X(82)","name":"Isogonal conj of X38","source_page":"ETC.html","barycentrics":["a/(b²+c²):…"],"search_text":"X(82) | Isogonal conj of X38 | a/(b²+c²):…"},{"center_id":"X(83)","name":"Isogonal conj of X39","source_page":"ETC.html","barycentrics":["1/(b²+c²):…"],"search_text":"X(83) | Isogonal conj of X39 | 1/(b²+c²):…"},{"center_id":"X(85)","name":"Isotomic conj of X41","source_page":"ETC.html","barycentrics":["bc/(b+c-a):…"],"search_text":"X(85) | Isotomic conj of X41 | bc/(b+c-a):…"},{"center_id":"X(86)","name":"Isotomic conj of X42","source_page":"ETC.html","barycentrics":["bc(b+c):…"],"search_text":"X(86) | Isotomic conj of X42 | bc(b+c):…"},{"center_id":"X(88)","name":"Isogonal conj of X44","source_page":"ETC.html","barycentrics":["a/(2a-b-c):…"],"search_text":"X(88) | Isogonal conj of X44 | a/(2a-b-c):…"},{"center_id":"X(89)","name":"Isogonal conj of X45","source_page":"ETC.html","barycentrics":["a/(2b+2c-a):…"],"search_text":"X(89) | Isogonal conj of X45 | a/(2b+2c-a):…"},{"center_id":"X(98)","name":"Tarry Point (isog conj of Steiner)","source_page":"ETC.html","barycentrics":["SA(SB-SC)²:…"],"search_text":"X(98) | Tarry Point (isog conj of Steiner) | SA(SB-SC)²:…"},{"center_id":"X(99)","name":"Steiner Point","source_page":"ETC.html","barycentrics":["1/(b²-c²):…"],"search_text":"X(99) | Steiner Point | 1/(b²-c²):…"},{"center_id":"X(100)","name":"Anticomplement of Feuerbach","source_page":"ETC.html","barycentrics":["1/(b-c):…"],"search_text":"X(100) | Anticomplement of Feuerbach | 1/(b-c):…"},{"center_id":"X(101)","name":"Isog conj of X514 (trilinear: a/(b-c))","source_page":"ETC.html","barycentrics":["a²/(b-c):…"],"search_text":"X(101) | Isog conj of X514 (trilinear: a/(b-c)) | a²/(b-c):…"},{"center_id":"X(105)","name":"Isog conj of X518","source_page":"ETC.html","barycentrics":["1/(a(b+c)-b²-c²):…"],"search_text":"X(105) | Isog conj of X518 | 1/(a(b+c)-b²-c²):…"},{"center_id":"X(110)","name":"Focus of Kiepert parabola","source_page":"ETC.html","barycentrics":["a²/(b²-c²):…"],"search_text":"X(110) | Focus of Kiepert parabola | a²/(b²-c²):…"},{"center_id":"X(111)","name":"Parry Point","source_page":"ETC.html","barycentrics":["a²/(2a²-b²-c²):…"],"search_text":"X(111) | Parry Point | a²/(2a²-b²-c²):…"},{"center_id":"X(114)","name":"Center of Kiepert hyperbola","source_page":"ETC.html","barycentrics":["SA(SB-SC)²+…  midpoint X113 X4"],"search_text":"X(114) | Center of Kiepert hyperbola | SA(SB-SC)²+…  midpoint X113 X4"},{"center_id":"X(115)","name":"Center of Kiepert circumconic","source_page":"ETC.html","barycentrics":["(b²-c²)²:…"],"search_text":"X(115) | Center of Kiepert circumconic | (b²-c²)²:…"},{"center_id":"X(116)","name":"Tripole of Euler line","source_page":"ETC.html","barycentrics":["(SB-SC)²:…"],"search_text":"X(116) | Tripole of Euler line | (SB-SC)²:…"},{"center_id":"X(119)","name":"Complement of X(11)","source_page":"ETC.html","barycentrics":["(b+c-a)(b²+c²-a²):…"],"search_text":"X(119) | Complement of X(11) | (b+c-a)(b²+c²-a²):…"},{"center_id":"X(120)","name":"Complement of X(105)","source_page":"ETC.html","barycentrics":["b²+c²-a(b+c):…"],"search_text":"X(120) | Complement of X(105) | b²+c²-a(b+c):…"},{"center_id":"X(121)","name":"Complement of X(106)","source_page":"ETC.html","barycentrics":["bc(b+c-a-bc/a):…  → a(b+c-2a)²:…"],"search_text":"X(121) | Complement of X(106) | bc(b+c-a-bc/a):…  → a(b+c-2a)²:…"},{"center_id":"X(125)","name":"Center of Jerabek hyperbola","source_page":"ETC.html","barycentrics":["a²(b²-c²)²·SA:…"],"search_text":"X(125) | Center of Jerabek hyperbola | a²(b²-c²)²·SA:…"},{"center_id":"X(126)","name":"Midpoint of X3 and X111","source_page":"ETC.html","barycentrics":["a²(2a²-b²-c²):…"],"search_text":"X(126) | Midpoint of X3 and X111 | a²(2a²-b²-c²):…"},{"center_id":"X(127)","name":"Midpoint X3 and X112","source_page":"ETC.html","barycentrics":["a²·SA(SB-SC)²:…"],"search_text":"X(127) | Midpoint X3 and X112 | a²·SA(SB-SC)²:…"},{"center_id":"X(140)","name":"Complement of X5","source_page":"ETC.html","barycentrics":["a²(b²+c²)+bc(b²+c²-a²):…"],"search_text":"X(140) | Complement of X5 | a²(b²+c²)+bc(b²+c²-a²):…"},{"center_id":"X(141)","name":"Complement of X6","source_page":"ETC.html","barycentrics":["b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)"],"search_text":"X(141) | Complement of X6 | b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)"},{"center_id":"X(142)","name":"Complement of X7","source_page":"ETC.html","barycentrics":["(b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…"],"search_text":"X(142) | Complement of X7 | (b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…"},{"center_id":"X(144)","name":"Anticomplement of X7","source_page":"ETC.html","barycentrics":["(b-c)²+a(b+c-2a):…"],"search_text":"X(144) | Anticomplement of X7 | (b-c)²+a(b+c-2a):…"},{"center_id":"X(145)","name":"Anticomplement of X8","source_page":"ETC.html","barycentrics":["(b+c-3a):…"],"search_text":"X(145) | Anticomplement of X8 | (b+c-3a):…"},{"center_id":"X(162)","name":"Isog conj of X525 (trilinear:a/(b²-c²))","source_page":"ETC.html","barycentrics":["a³/(b²-c²):…"],"search_text":"X(162) | Isog conj of X525 (trilinear:a/(b²-c²)) | a³/(b²-c²):…"},{"center_id":"X(174)","name":"Isog conj of X175 (midcircle)","source_page":"ETC.html","barycentrics":["sin(A/2):sin(B/2):sin(C/2)"],"search_text":"X(174) | Isog conj of X175 (midcircle) | sin(A/2):sin(B/2):sin(C/2)"},{"center_id":"X(175)","name":"Isog conj of X174","source_page":"ETC.html","barycentrics":["1/sin(A/2):…"],"search_text":"X(175) | Isog conj of X174 | 1/sin(A/2):…"},{"center_id":"X(176)","name":"Isotomic conj X174","source_page":"ETC.html","barycentrics":["bc/sin(A/2):…"],"search_text":"X(176) | Isotomic conj X174 | bc/sin(A/2):…"},{"center_id":"X(178)","name":"Midcircle of incircle and A-excircle (approx)","source_page":"ETC.html","barycentrics":["cos(A/2):cos(B/2):cos(C/2)"],"search_text":"X(178) | Midcircle of incircle and A-excircle (approx) | cos(A/2):cos(B/2):cos(C/2)"},{"center_id":"X(181)","name":"Isog conj of X314","source_page":"ETC.html","barycentrics":["a²/((b+c)(s-a)):…"],"search_text":"X(181) | Isog conj of X314 | a²/((b+c)(s-a)):…"},{"center_id":"X(182)","name":"Midpoint of X3 and X6","source_page":"ETC.html","barycentrics":["a²(b²+c²-a²):…"],"search_text":"X(182) | Midpoint of X3 and X6 | a²(b²+c²-a²):…"},{"center_id":"X(184)","name":"Crosssum of X3 and X6","source_page":"ETC.html","barycentrics":["a⁴(b²+c²-a²):…"],"search_text":"X(184) | Crosssum of X3 and X6 | a⁴(b²+c²-a²):…"},{"center_id":"X(186)","name":"Inverse of X4 in circumcircle","source_page":"ETC.html","barycentrics":["a²(a⁴-b⁴-c⁴+b²c²):…"],"search_text":"X(186) | Inverse of X4 in circumcircle | a²(a⁴-b⁴-c⁴+b²c²):…"},{"center_id":"X(187)","name":"Schoute Center","source_page":"ETC.html","barycentrics":["a²(2a²-b²-c²):…"],"search_text":"X(187) | Schoute Center | a²(2a²-b²-c²):…"},{"center_id":"X(190)","name":"Isotomic conj of X44","source_page":"ETC.html","barycentrics":["bc(b+c-2a):…"],"search_text":"X(190) | Isotomic conj of X44 | bc(b+c-2a):…"},{"center_id":"X(192)","name":"Crosspoint of X1 and X75","source_page":"ETC.html","barycentrics":["bc(c+a-b):…  variant"],"search_text":"X(192) | Crosspoint of X1 and X75 | bc(c+a-b):…  variant"},{"center_id":"X(193)","name":"Isotomic conj of X69","source_page":"ETC.html","barycentrics":["a²(b²+c²)-b²c²:…  = a²SA:…"],"search_text":"X(193) | Isotomic conj of X69 | a²(b²+c²)-b²c²:…  = a²SA:…"},{"center_id":"X(200)","name":"Isog conj X269 (Mittenpunkt variant)","source_page":"ETC.html","barycentrics":["a(b+c-a)²:…"],"search_text":"X(200) | Isog conj X269 (Mittenpunkt variant) | a(b+c-a)²:…"},{"center_id":"X(210)","name":"Isog conj X1170","source_page":"ETC.html","barycentrics":["a(b+c-a)²:…  (same as X200 up to sign — see ETC)"],"search_text":"X(210) | Isog conj X1170 | a(b+c-a)²:…  (same as X200 up to sign — see ETC)"},{"center_id":"X(213)","name":"Crosspoint X1,X42","source_page":"ETC.html","barycentrics":["a²(b+c):…"],"search_text":"X(213) | Crosspoint X1,X42 | a²(b+c):…"},{"center_id":"X(214)","name":"Harmonic conjugate of X1 wrt X11 X12","source_page":"ETC.html","barycentrics":["a²(b+c-a)²:…"],"search_text":"X(214) | Harmonic conjugate of X1 wrt X11 X12 | a²(b+c-a)²:…"},{"center_id":"X(216)","name":"Kosnita's theorem point","source_page":"ETC.html","barycentrics":["SA(SB·SC):…  → SA·SB:…"],"search_text":"X(216) | Kosnita's theorem point | SA(SB·SC):…  → SA·SB:…"},{"center_id":"X(218)","name":"Isog conj X1445","source_page":"ETC.html","barycentrics":["a²(b+c-a)(a(b+c)-bc):…"],"search_text":"X(218) | Isog conj X1445 | a²(b+c-a)(a(b+c)-bc):…"},{"center_id":"X(220)","name":"Isog conj X279","source_page":"ETC.html","barycentrics":["a²(b+c-a)²/(bc):…"],"search_text":"X(220) | Isog conj X279 | a²(b+c-a)²/(bc):…"},{"center_id":"X(222)","name":"Isog conj X281 (3rd Conway pt)","source_page":"ETC.html","barycentrics":["a·cos²(A/2)/(b+c-a):…"],"search_text":"X(222) | Isog conj X281 (3rd Conway pt) | a·cos²(A/2)/(b+c-a):…"},{"center_id":"X(223)","name":"Isog conj X282","source_page":"ETC.html","barycentrics":["a(b+c-a)/(b²+c²-a²):…"],"search_text":"X(223) | Isog conj X282 | a(b+c-a)/(b²+c²-a²):…"},{"center_id":"X(226)","name":"Isog conj X284","source_page":"ETC.html","barycentrics":["bc/(b+c-a):…"],"search_text":"X(226) | Isog conj X284 | bc/(b+c-a):…"},{"center_id":"X(230)","name":"Crossdiff X2,X6 (Euler-line tripole)","source_page":"ETC.html","barycentrics":["SA·SB:SB·SC:SC·SA → simplified"],"search_text":"X(230) | Crossdiff X2,X6 (Euler-line tripole) | SA·SB:SB·SC:SC·SA → simplified"},{"center_id":"X(232)","name":"Crossdiff X3,X6","source_page":"ETC.html","barycentrics":["a²·SA(SB-SC)²:…"],"search_text":"X(232) | Crossdiff X3,X6 | a²·SA(SB-SC)²:…"},{"center_id":"X(233)","name":"Nine-point circle inverse of X5","source_page":"ETC.html","barycentrics":["a⁴(b²-c²)²:…"],"search_text":"X(233) | Nine-point circle inverse of X5 | a⁴(b²-c²)²:…"},{"center_id":"X(236)","name":"Midpoint X175 X176","source_page":"ETC.html","barycentrics":["cos(A/2)+cos(B/2)+cos(C/2):…  variant"],"search_text":"X(236) | Midpoint X175 X176 | cos(A/2)+cos(B/2)+cos(C/2):…  variant"}];
 
-const XT = {
-
-  "X(1)": t => {
-    // x = −(t² + 2t − 1)/(t² + 1)
-    // y = 2t(1 − t)/(t² + 1)
-    const d = t*t + 1;
-    return [-(t*t + 2*t - 1) / d,
-              2*t*(1 - t) / d];
+// ── Known rational locus formulas (subset with exact parametrics) ─
+// t = tan(θ/4), upper half t∈(0,1); lower half mirrors y
+const LOCUS_FORMULAS = {
+  "X(1)": t => { const d=t*t+1; return [-(t*t+2*t-1)/d, 2*t*(1-t)/d]; },
+  "X(2)": t => { const d=3*(t*t+1)*(t*t+1); return [(t*t-2*t-1)*(t*t+2*t-1)/d, 4*t*(1-t*t)/d]; },
+  "X(3)": t => [0, 0],  // fixed at origin
+  "X(4)": t => { const d=1+t*t; return [(1-t*t*t*t)/d/d, 4*t*(1-t*t)/d/d]; }, // = C in Thales
+  "X(5)": t => { const d=(t*t+1)*(t*t+1); return [(t*t-2*t-1)*(t*t+2*t-1)/(2*d), 2*t*(1-t*t)/d]; },
+  "X(6)": t => { const d=(t*t+1)*(t*t+1); return [(t*t-2*t-1)*(t*t+2*t-1)/d, 2*t*(1-t*t)/d]; },
+  "X(7)": t => {
+    // Gergonne: approx via b2c from known barycentrics
+    const a=2*Math.abs(1-t*t)/(1+t*t), b=4*t/(1+t*t), c=2;
+    const sp=(a+b+c)/2;
+    const u=1/(sp-a),v=1/(sp-b),w=1/(sp-c);
+    const th=4*Math.atan(t), cos=Math.cos(th), sin=Math.sin(th);
+    const s=u+v+w; return [(u-v+w*cos)/s,(w*sin)/s];
   },
-
-  "X(2)": t => {
-    // x = (t²−2t−1)(t²+2t−1) / [3(t²+1)²]
-    // y = 4t(1−t²) / [3(t²+1)²]
-    const d = 3*(t*t + 1)*(t*t + 1);
-    return [(t*t - 2*t - 1)*(t*t + 2*t - 1) / d,
-              4*t*(1 - t*t) / d];
+  "X(8)": t => { const d=(t*t+1)*(t*t+1); return [(t*t+2*t-1)*(3*t*t-2*t+1)/d, 4*t*t*(1-t)*(1-t)/d]; },
+  "X(9)": t => {
+    const th=4*Math.atan(t), a=2*Math.abs(Math.cos(th/2)), b=2*Math.abs(Math.sin(th/2)), c=2;
+    const u=a*(b+c-a),v=b*(c+a-b),w=c*(a+b-c);
+    const s=u+v+w; return [(u-v+w*Math.cos(th))/s,(w*Math.sin(th))/s];
   },
-
-  "X(5)": t => {
-    // x = (t²−2t−1)(t²+2t−1) / [2(t²+1)²]
-    // y = 2t(1−t²) / (t²+1)²
-    const d = (t*t + 1)*(t*t + 1);
-    return [(t*t - 2*t - 1)*(t*t + 2*t - 1) / (2*d),
-              2*t*(1 - t*t) / d];
-  },
-
-  "X(6)": t => {
-    // x = (t²−2t−1)(t²+2t−1) / (t²+1)²
-    // y = 2t(1−t²) / (t²+1)²
-    const d = (t*t + 1)*(t*t + 1);
-    return [(t*t - 2*t - 1)*(t*t + 2*t - 1) / d,
-              2*t*(1 - t*t) / d];
-  },
-
-  "X(8)": t => {
-    // x = (t²+2t−1)(3t²−2t+1) / (t²+1)²
-    // y = 4t²(1−t)² / (t²+1)²
-    const d = (t*t + 1)*(t*t + 1);
-    return [(t*t + 2*t - 1)*(3*t*t - 2*t + 1) / d,
-              4*t*t*(1 - t)*(1 - t) / d];
-  },
-
   "X(11)": t => {
-    // x = (t²+2t−1)(t⁴−6t³+2t−1) / [(t²+1)²(5t²−4t+1)]
-    // y = 2t(1−t)(t²+2t−1)² / [(t²+1)²(5t²−4t+1)]
-    const d1 = (t*t + 1)*(t*t + 1);
-    const d2 = 5*t*t - 4*t + 1;          // no real roots → never zero on t∈(-1,1)
-    const d  = d1 * d2;
-    const A  = t*t + 2*t - 1;
-    return [A*(t*t*t*t - 6*t*t*t + 2*t - 1) / d,
-            2*t*(1 - t)*A*A / d];
+    const d1=(t*t+1)*(t*t+1), d2=5*t*t-4*t+1, d=d1*d2, A=t*t+2*t-1;
+    return [A*(t*t*t*t-6*t*t*t+2*t-1)/d, 2*t*(1-t)*A*A/d];
   },
-
 };
 
-// Convert state.angle (θ) to t = tan(θ/4) for the UPPER half (0,π).
-// For θ ∈ (π, 2π) — the lower half — we mirror: use t = tan((2π−θ)/4)
-// so the dot follows the lower reflection of the locus (y negated).
-function tFromTheta(theta) {
-  // Normalise to [0, 2π)
-  let th = ((theta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-  if (th > Math.PI) th = 2 * Math.PI - th;   // fold into [0, π]
-  return Math.tan(th / 4);
-}
+function hasFormula(id) { return id in LOCUS_FORMULAS; }
 
-// Whether θ is in the lower half (π, 2π) — y must be negated
+function tFromTheta(theta) {
+  let th = ((theta % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+  if (th > Math.PI) th = 2*Math.PI - th;
+  return Math.tan(th/4);
+}
 function isLowerHalf(theta) {
-  let th = ((theta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  let th = ((theta % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
   return th > Math.PI;
 }
-
-// Evaluate a formula safely — return [NaN, NaN] if out of range
 function evalFormula(id, t) {
   try {
-    const [x, y] = XT[id](t);
-    if (!isFinite(x) || !isFinite(y) || Math.abs(x) > 3 || Math.abs(y) > 3)
-      return [NaN, NaN];
-    return [x, y];
-  } catch(e) { return [NaN, NaN]; }
+    const [x,y] = LOCUS_FORMULAS[id](t);
+    if (!isFinite(x)||!isFinite(y)||Math.abs(x)>2.5||Math.abs(y)>2.5) return [NaN,NaN];
+    return [x,y];
+  } catch(e){ return [NaN,NaN]; }
 }
-
-// Build locus point arrays for t ∈ (-1,0)∪(0,1), with NaN gaps at jumps
 function buildLocus(id) {
-  // t = tan(θ/4) is defined on (0, 1) for θ ∈ (0, π)  [upper semicircle].
-  // The lower half is obtained by reflecting y → −y, because:
-  //   • the formulas depend on side lengths a, b, c (symmetric in |θ|),
-  //   • sinθ changes sign while cosθ is unchanged when θ → −θ,
-  //   • so x(−θ) = x(θ)  and  y(−θ) = −y(θ)  for all six centers.
-  const xs = [], ys = [];
-  const STEPS   = 500;
-  const EPS     = 0.004;   // skip t near 0 (C→A) and t near 1 (C→B)
-  const MAX_JMP = 0.15;
-  let prevX = NaN, prevY = NaN;
-
-  // ── Collect upper-half points, t ∈ (EPS, 1−EPS) ──────────────
-  const upperPts = [];
-  for (let i = 0; i <= STEPS; i++) {
-    const t = EPS + (1 - 2*EPS) * i / STEPS;
-    upperPts.push(evalFormula(id, t));
+  const xs=[],ys=[];
+  const STEPS=400, EPS=0.006, MAX_JMP=0.15;
+  let prevX=NaN, prevY=NaN;
+  const upper=[];
+  for (let i=0;i<=STEPS;i++){
+    const t=EPS+(1-2*EPS)*i/STEPS;
+    upper.push(evalFormula(id,t));
   }
-
-  // Push upper half with NaN gap detection
-  for (const [x, y] of upperPts) {
-    if (isFinite(x) && isFinite(y)) {
-      if (isFinite(prevX) && Math.hypot(x-prevX, y-prevY) > MAX_JMP) {
-        xs.push(NaN); ys.push(NaN);
-      }
-      xs.push(x); ys.push(y);
-      prevX = x; prevY = y;
-    } else {
-      if (isFinite(prevX)) { xs.push(NaN); ys.push(NaN); }
-      prevX = NaN; prevY = NaN;
-    }
+  for (const [x,y] of upper){
+    if(isFinite(x)&&isFinite(y)){
+      if(isFinite(prevX)&&Math.hypot(x-prevX,y-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
+      xs.push(x);ys.push(y);prevX=x;prevY=y;
+    } else { if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);} prevX=NaN;prevY=NaN; }
   }
-
-  // Gap separating the two halves
-  xs.push(NaN); ys.push(NaN);
-  prevX = NaN; prevY = NaN;
-
-  // ── Reflect upper half: y → −y, traverse in reverse so the path
-  //    continues smoothly from where the upper half ended ────────
-  for (let i = upperPts.length - 1; i >= 0; i--) {
-    const [x, y] = upperPts[i];
-    if (isFinite(x) && isFinite(y)) {
-      const yr = -y;   // reflection about x-axis
-      if (isFinite(prevX) && Math.hypot(x-prevX, yr-prevY) > MAX_JMP) {
-        xs.push(NaN); ys.push(NaN);
-      }
-      xs.push(x); ys.push(yr);
-      prevX = x; prevY = yr;
-    } else {
-      if (isFinite(prevX)) { xs.push(NaN); ys.push(NaN); }
-      prevX = NaN; prevY = NaN;
-    }
+  xs.push(NaN);ys.push(NaN);prevX=NaN;prevY=NaN;
+  for (let i=upper.length-1;i>=0;i--){
+    const [x,y]=upper[i];
+    if(isFinite(x)&&isFinite(y)){
+      const yr=-y;
+      if(isFinite(prevX)&&Math.hypot(x-prevX,yr-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
+      xs.push(x);ys.push(yr);prevX=x;prevY=yr;
+    } else { if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);} prevX=NaN;prevY=NaN; }
   }
-
-  return [xs, ys];
+  return [xs,ys];
 }
 
-// ── JSXGraph board factory ────────────────────────────────────────
-function makeBoard(id) {
-  return JXG.JSXGraph.initBoard(id, {
-    boundingbox: [-1.6, 1.6, 1.6, -1.6],
-    keepaspectratio: true,
+// ── Build a JSXGraph board showing C moving + locus (if formula exists) ──
+let detailBoard = null;
+let detailState = {angle: Math.PI/3};
+let detailAnimId = null;
+
+function makeThalesBoard(domId, state, centerId, compact) {
+  const bb = compact ? [-1.7,1.7,1.7,-1.7] : [-1.65,1.65,1.65,-1.65];
+  const b = JXG.JSXGraph.initBoard(domId, {
+    boundingbox: bb, keepaspectratio: true,
     axis: true, grid: true,
-    showCopyright: false, showNavigation: false,
-    defaultAxes: {
-      x: { strokeColor: '#2a3550', ticks: { label: { fontSize: 9, fillColor: '#8fa3c8' } } },
-      y: { strokeColor: '#2a3550', ticks: { label: { fontSize: 9, fillColor: '#8fa3c8' } } },
-    },
+    showCopyright: false, showNavigation: !compact,
+    defaultAxes:{
+      x:{strokeColor:'#2a3550',ticks:{label:{fontSize:8,fillColor:'#8fa3c8'}}},
+      y:{strokeColor:'#2a3550',ticks:{label:{fontSize:8,fillColor:'#8fa3c8'}}},
+    }
   });
+
+  // Circumcircle
+  b.create('circle',[[0,0],[1,0]],{strokeColor:'#3fb950',strokeWidth:compact?1.5:2,fixed:true,highlight:false,name:''});
+
+  // A, B, O
+  b.create('point',[-1,0],{name:'A',fixed:true,fillColor:'#58a6ff',strokeColor:'#fff',strokeWidth:1.5,size:compact?3:5,label:{fontSize:compact?9:12,color:'#58a6ff',offset:[-16,-13]}});
+  b.create('point',[1,0],{name:'B',fixed:true,fillColor:'#58a6ff',strokeColor:'#fff',strokeWidth:1.5,size:compact?3:5,label:{fontSize:compact?9:12,color:'#58a6ff',offset:[6,-13]}});
+  b.create('point',[0,0],{name:'',fixed:true,fillColor:'#8fa3c8',strokeColor:'#8fa3c8',size:2,label:{fontSize:0}});
+
+  // C
+  const ptC = b.create('point',[()=>Math.cos(state.angle),()=>Math.sin(state.angle)],{
+    name:'C',fixed:true,fillColor:'#f78166',strokeColor:'#fff',strokeWidth:1.5,size:compact?3:5,
+    label:{fontSize:compact?9:12,color:'#f78166',offset:[6,8]}
+  });
+  b.create('segment',[[-1,0],[()=>Math.cos(state.angle),()=>Math.sin(state.angle)]],{strokeColor:'#58a6ff',strokeWidth:1.5,opacity:.6});
+  b.create('segment',[[1,0],[()=>Math.cos(state.angle),()=>Math.sin(state.angle)]],{strokeColor:'#58a6ff',strokeWidth:1.5,opacity:.6});
+  b.create('segment',[[-1,0],[1,0]],{strokeColor:'#58a6ff',strokeWidth:1.5,opacity:.6});
+
+  // Locus + moving dot if formula known
+  if (hasFormula(centerId)) {
+    const [xs,ys] = buildLocus(centerId);
+    b.create('curve',[xs,ys],{strokeColor:'#f0b429',strokeWidth:compact?2:2.5,highlight:false,name:''});
+    b.create('point',[
+      ()=>{ const t=tFromTheta(state.angle); const [x]=evalFormula(centerId,t); return isFinite(x)?x:NaN; },
+      ()=>{ const t=tFromTheta(state.angle); const [,y]=evalFormula(centerId,t);
+            if(!isFinite(y))return NaN; return isLowerHalf(state.angle)?-y:y; }
+    ],{name:centerId,fixed:true,fillColor:'#f0b429',strokeColor:'#fff',strokeWidth:1.5,size:compact?4:6,
+       label:{fontSize:compact?9:11,color:'#f0b429',offset:[7,6]}});
+  }
+  return b;
 }
 
-// ── Thales geometry (fixed elements) ─────────────────────────────
-function addThalesGeometry(board, state) {
-  board.create('circle', [[0,0],[1,0]], {
-    strokeColor: '#06d6a0', strokeWidth: 2,
-    fixed: true, highlight: false, name: '',
+// ── Table state ──────────────────────────────────────────────────
+let filtered = [...ALL_CENTERS];
+let currentPage = 1;
+let rowsPerPage = 50;
+let sortCol = 'id';
+
+function numericId(id){ return parseInt(id.replace(/\D/g,''))||0; }
+
+function applyFilters() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  filtered = ALL_CENTERS.filter(c => {
+    if (!q) return true;
+    return c.center_id.toLowerCase().includes(q) ||
+           c.name.toLowerCase().includes(q) ||
+           (c.barycentrics||[]).some(b=>b.toLowerCase().includes(q));
   });
-  const ptA = board.create('point', [-1, 0], {
-    name: 'A', fixed: true,
-    fillColor: '#4da6ff', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 12, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
-             color: '#4da6ff', offset: [-18, -14] },
-  });
-  const ptB = board.create('point', [1, 0], {
-    name: 'B', fixed: true,
-    fillColor: '#4da6ff', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 12, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
-             color: '#4da6ff', offset: [8, -14] },
-  });
-  board.create('point', [0, 0], {
-    name: 'O', fixed: true,
-    fillColor: '#8fa3c8', strokeColor: '#8fa3c8', size: 3,
-    label: { fontSize: 10, color: '#8fa3c8', offset: [5, -12] },
-  });
-  const ptC = board.create('point',
-    [() => Math.cos(state.angle), () => Math.sin(state.angle)],
-    { name: 'C', fixed: true,
-      fillColor: '#ff7043', strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-      label: { fontSize: 12, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
-               color: '#ff7043', offset: [7, 9] },
-    });
-  board.create('segment', [ptA, ptB], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
-  board.create('segment', [ptA, ptC], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
-  board.create('segment', [ptB, ptC], { strokeColor: '#4da6ff', strokeWidth: 2, opacity: 0.7 });
-  board.create('line', [[0,0],[()=>Math.cos(state.angle),()=>Math.sin(state.angle)]], {
-    strokeColor: '#b388ff', strokeWidth: 1.5, dash: 3, highlight: false, name: '',
-  });
-  return ptC;
+  filtered.sort((a,b)=> sortCol==='name'
+    ? a.name.localeCompare(b.name)
+    : numericId(a.center_id)-numericId(b.center_id));
+  currentPage = 1;
+  render();
 }
 
-// ── Add one center: locus curve + moving dot ──────────────────────
-// Locus is built from the exact rational formula via buildLocus().
-// Moving dot evaluates the formula at the current t = tan(state.angle/4).
-function addCenter(board, state, formulaId, color, label) {
-  // Pre-computed locus curve
-  const [xs, ys] = buildLocus(formulaId);
-  board.create('curve', [xs, ys], {
-    strokeColor: color, strokeWidth: 2.5,
-    highlight: false, name: '',
+function render() {
+  rowsPerPage = parseInt(document.getElementById('rowsSelect').value);
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total/rowsPerPage));
+  if (currentPage > pages) currentPage = pages;
+  const start = (currentPage-1)*rowsPerPage;
+  const slice = filtered.slice(start, start+rowsPerPage);
+
+  document.getElementById('countRow').innerHTML =
+    `Showing <strong>${start+1}–${Math.min(start+rowsPerPage,total)}</strong> of <strong>${total}</strong> centers`;
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  slice.forEach(c => {
+    const bary = (c.barycentrics||[])[0] || '—';
+    const hasLocus = hasFormula(c.center_id);
+    const tr = document.createElement('tr');
+    tr.dataset.id = c.center_id;
+    tr.innerHTML = `
+      <td class="col-center">${c.center_id}</td>
+      <td class="col-name">${c.name}</td>
+      <td class="col-mono" title="${bary}">${bary}</td>
+      <td>${hasLocus ? '<span class="badge badge--ccw">✓ Yes</span>' : '<span style="color:var(--soft);font-size:.72rem">—</span>'}</td>
+    `;
+    tr.addEventListener('mouseenter', e => showPopup(e, c));
+    tr.addEventListener('mousemove',  e => movePopup(e));
+    tr.addEventListener('mouseleave', hidePopup);
+    tr.addEventListener('click',      () => openDetail(c));
+    tbody.appendChild(tr);
   });
 
-  // Moving dot: re-evaluated on every board.update()
-  board.create('point', [
-    () => { const t = tFromTheta(state.angle);
-            const [x] = evalFormula(formulaId, t); return isFinite(x) ? x : 0; },
-    () => { const t = tFromTheta(state.angle);
-            const [,y] = evalFormula(formulaId, t);
-            if (!isFinite(y)) return 0;
-            return isLowerHalf(state.angle) ? -y : y; },
-  ], {
-    name: label, fixed: true,
-    fillColor: color, strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
-    label: { fontSize: 11, fontFamily: 'Figtree,sans-serif', fontWeight: 700,
-             color, offset: [8, 6] },
-  });
+  renderPagination(pages);
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  Panel 1 — X(1) Incenter, X(2) Centroid, X(8) Nagel
-// ══════════════════════════════════════════════════════════════════
-const st1 = { angle: Math.PI / 3 };
-const b1  = makeBoard('box1');
-addThalesGeometry(b1, st1);
-addCenter(b1, st1, 'X(1)', '#ffd166', 'X(1)');
-addCenter(b1, st1, 'X(2)', '#b388ff', 'X(2)');
-addCenter(b1, st1, 'X(8)', '#06d6a0', 'X(8)');
+function renderPagination(pages) {
+  const el = document.getElementById('pagination');
+  el.innerHTML = '';
+  if (pages <= 1) return;
+  const addBtn = (label, pg, active, disabled) => {
+    const b = document.createElement('button');
+    b.className = 'page-btn' + (active?' active':'');
+    b.textContent = label;
+    b.disabled = disabled;
+    b.addEventListener('click', ()=>{ currentPage=pg; render(); });
+    el.appendChild(b);
+  };
+  addBtn('‹', currentPage-1, false, currentPage<=1);
+  const maxShow = 7;
+  let lo=Math.max(1,currentPage-3), hi=Math.min(pages,lo+maxShow-1);
+  if(hi-lo<maxShow-1) lo=Math.max(1,hi-maxShow+1);
+  if(lo>1){ addBtn('1',1,false,false); if(lo>2){const s=document.createElement('span');s.textContent='…';s.style.cssText='color:var(--soft);padding:0 .3rem';el.appendChild(s);} }
+  for(let p=lo;p<=hi;p++) addBtn(p,p,p===currentPage,false);
+  if(hi<pages){ if(hi<pages-1){const s=document.createElement('span');s.textContent='…';s.style.cssText='color:var(--soft);padding:0 .3rem';el.appendChild(s);} addBtn(pages,pages,false,false); }
+  addBtn('›', currentPage+1, false, currentPage>=pages);
+  const info = document.createElement('span');
+  info.className='page-info'; info.textContent=`Page ${currentPage} / ${pages}`;
+  el.appendChild(info);
+}
 
-// ══════════════════════════════════════════════════════════════════
-//  Panel 2 — X(5) Nine-Point, X(6) Symmedian, X(11) Feuerbach
-// ══════════════════════════════════════════════════════════════════
-const st2 = { angle: Math.PI / 2 };
-const b2  = makeBoard('box2');
-addThalesGeometry(b2, st2);
-addCenter(b2, st2, 'X(5)', '#ffd166', 'X(5)');
-addCenter(b2, st2, 'X(6)', '#4da6ff', 'X(6)');
-addCenter(b2, st2, 'X(11)', '#f78c6c', 'X(11)');
+// ── Hover popup ─────────────────────────────────────────────────
+let popupBoard = null;
+let popupCenterId = null;
+let popupTimer = null;
 
-// ══════════════════════════════════════════════════════════════════
-//  Animation engine — shared factory
-// ══════════════════════════════════════════════════════════════════
-function makeAnimator(state, board, infoId, startId, stopId, sliderId, radId, degId) {
-  let animId  = null;
-  let lastTs  = null;
-  const SPEED = 1.0;   // rad/s
-  const TWO_PI = 2 * Math.PI;
-  const sliderEl  = document.getElementById(sliderId);
-  const radEl     = document.getElementById(radId);
-  const degEl     = document.getElementById(degId);
-  const startBtn  = document.getElementById(startId);
-  const stopBtn   = document.getElementById(stopId);
+function showPopup(e, center) {
+  clearTimeout(popupTimer);
+  const popup = document.getElementById('hoverPopup');
+  document.getElementById('popupId').textContent = center.center_id;
+  document.getElementById('popupName').textContent = center.name;
+  document.getElementById('popupBary').textContent = (center.barycentrics||[])[0] || '—';
 
-  function updateReadout() {
-    const deg = (state.angle * 180 / Math.PI).toFixed(1);
-    const tVal = Math.tan(state.angle / 4).toFixed(4);
-    document.getElementById(infoId).innerHTML =
-      `&theta; = <span>${state.angle.toFixed(3)}</span> rad &nbsp;|&nbsp; ` +
-      `${deg}&deg; &nbsp;|&nbsp; t = tan(&theta;/4) = <span>${tVal}</span>`;
-    radEl.innerHTML = `<strong>Radians:</strong> ${state.angle.toFixed(3)}`;
-    degEl.innerHTML = `<strong>Degrees:</strong> ${deg}&deg;`;
-    sliderEl.value = state.angle;
+  if (popupCenterId !== center.center_id) {
+    popupCenterId = center.center_id;
+    // Destroy old board
+    if (popupBoard) { try{ JXG.JSXGraph.freeBoard(popupBoard); }catch(e){} popupBoard=null; }
+    document.getElementById('popupBoard').innerHTML='';
+    const st = {angle: Math.PI/3};
+    popupBoard = makeThalesBoard('popupBoard', st, center.center_id, true);
+    // Gentle auto-animate
+    let pAnim = null, pLast = null;
+    function pStep(ts){ if(!pLast) pLast=ts; const dt=Math.min((ts-pLast)/1000,.1); pLast=ts; st.angle=(st.angle+0.6*dt)%(2*Math.PI); popupBoard.update(); pAnim=requestAnimationFrame(pStep); }
+    popupTimer = setTimeout(()=>{ pAnim=requestAnimationFrame(pStep); popup._popupAnim=pAnim; }, 80);
+    if (popup._popupAnim) { cancelAnimationFrame(popup._popupAnim); popup._popupAnim=null; }
   }
 
-  function step(ts) {
-    if (lastTs === null) lastTs = ts;
-    const dt = Math.min((ts - lastTs) / 1000, 0.1);
-    lastTs = ts;
-
-    state.angle += SPEED * dt;
-    if (state.angle > TWO_PI) state.angle -= TWO_PI;  // wrap right edge → left edge
-
-    board.update();
-    updateReadout();
-
-    animId = requestAnimationFrame(step);
-  }
-
-  sliderEl.addEventListener('input', () => {
-    state.angle = parseFloat(sliderEl.value);
-    board.update();
-    updateReadout();
-  });
-
-  startBtn.addEventListener('click', () => {
-    if (animId) return;
-    lastTs = null;
-    animId = requestAnimationFrame(step);
-    startBtn.disabled = true;
-    stopBtn.disabled  = false;
-  });
-
-  stopBtn.addEventListener('click', () => {
-    if (animId) { cancelAnimationFrame(animId); animId = null; }
-    lastTs = null;
-    startBtn.disabled = false;
-    stopBtn.disabled  = true;
-  });
-
-  updateReadout();
+  movePopup(e);
+  popup.classList.add('visible');
 }
 
-makeAnimator(st1, b1, 'p1-info', 'p1-start', 'p1-stop', 'p1-angle', 'p1-rad', 'p1-deg');
-makeAnimator(st2, b2, 'p2-info', 'p2-start', 'p2-stop', 'p2-angle', 'p2-rad', 'p2-deg');
+function movePopup(e) {
+  const popup = document.getElementById('hoverPopup');
+  const W=popup.offsetWidth||340, H=popup.offsetHeight||310;
+  const vw=window.innerWidth, vh=window.innerHeight;
+  let left = e.clientX + 14;
+  let top  = e.clientY - H/2;
+  if (left+W > vw-10) left = e.clientX - W - 14;
+  if (top < 8) top = 8;
+  if (top+H > vh-8) top = vh-H-8;
+  popup.style.left = left+'px';
+  popup.style.top  = top+'px';
+}
 
+function hidePopup() {
+  const popup = document.getElementById('hoverPopup');
+  popup.classList.remove('visible');
+  clearTimeout(popupTimer);
+  if (popup._popupAnim){ cancelAnimationFrame(popup._popupAnim); popup._popupAnim=null; }
+}
+
+// ── Detail panel (click) ─────────────────────────────────────────
+let detailAnimId2 = null;
+let detailState2 = {angle: Math.PI/3};
+
+function openDetail(center) {
+  hidePopup();
+  // Stop any previous animation
+  if (detailAnimId2){ cancelAnimationFrame(detailAnimId2); detailAnimId2=null; }
+  // Destroy old board
+  if (detailBoard){ try{ JXG.JSXGraph.freeBoard(detailBoard); }catch(e){} detailBoard=null; }
+  document.getElementById('detailBoard').innerHTML='';
+
+  document.getElementById('detailId').textContent = center.center_id;
+  document.getElementById('detailName').textContent = center.name;
+  document.getElementById('detailBary').textContent = (center.barycentrics||[]).join('  ;  ') || '—';
+
+  const panel = document.getElementById('detailPanel');
+  panel.classList.add('open');
+  panel.scrollIntoView({behavior:'smooth', block:'start'});
+
+  detailState2 = {angle: Math.PI/3};
+  detailBoard = makeThalesBoard('detailBoard', detailState2, center.center_id, false);
+
+  // Auto-animate the detail board
+  let lastTs = null;
+  function step(ts){
+    if(!lastTs) lastTs=ts;
+    const dt=Math.min((ts-lastTs)/1000,.1); lastTs=ts;
+    detailState2.angle=(detailState2.angle+0.5*dt)%(2*Math.PI);
+    detailBoard.update();
+    detailAnimId2=requestAnimationFrame(step);
+  }
+  detailAnimId2=requestAnimationFrame(step);
+}
+
+function closeDetail(){
+  if(detailAnimId2){cancelAnimationFrame(detailAnimId2);detailAnimId2=null;}
+  document.getElementById('detailPanel').classList.remove('open');
+}
+
+// ── Wire up controls ──────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('rowsSelect').addEventListener('change', applyFilters);
+document.getElementById('sortSelect').addEventListener('change', e=>{ sortCol=e.target.value; applyFilters(); });
+document.querySelectorAll('thead th[data-col]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    sortCol=th.dataset.col;
+    document.querySelectorAll('thead th').forEach(t=>t.classList.remove('sorted'));
+    th.classList.add('sorted');
+    applyFilters();
+  });
+});
+
+// ── Initial render ───────────────────────────────────────────────
+applyFilters();
 </script>
 </body>
 </html>
