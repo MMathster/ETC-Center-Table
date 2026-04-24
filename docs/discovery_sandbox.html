@@ -490,10 +490,20 @@ const XT = {
 
 };
 
-// Convert state.angle (θ) to t = tan(θ/4), clipped away from singularities
+// Convert state.angle (θ) to t = tan(θ/4) for the UPPER half (0,π).
+// For θ ∈ (π, 2π) — the lower half — we mirror: use t = tan((2π−θ)/4)
+// so the dot follows the lower reflection of the locus (y negated).
 function tFromTheta(theta) {
-  const signedTheta = theta > Math.PI ? theta - 2 * Math.PI : theta;
-  return Math.tan(signedTheta / 4);
+  // Normalise to [0, 2π)
+  let th = ((theta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  if (th > Math.PI) th = 2 * Math.PI - th;   // fold into [0, π]
+  return Math.tan(th / 4);
+}
+
+// Whether θ is in the lower half (π, 2π) — y must be negated
+function isLowerHalf(theta) {
+  let th = ((theta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  return th > Math.PI;
 }
 
 // Evaluate a formula safely — return [NaN, NaN] if out of range
@@ -633,7 +643,9 @@ function addCenter(board, state, formulaId, color, label) {
     () => { const t = tFromTheta(state.angle);
             const [x] = evalFormula(formulaId, t); return isFinite(x) ? x : 0; },
     () => { const t = tFromTheta(state.angle);
-            const [,y] = evalFormula(formulaId, t); return isFinite(y) ? y : 0; },
+            const [,y] = evalFormula(formulaId, t);
+            if (!isFinite(y)) return 0;
+            return isLowerHalf(state.angle) ? -y : y; },
   ], {
     name: label, fixed: true,
     fillColor: color, strokeColor: '#ffffff', strokeWidth: 1.5, size: 5,
