@@ -297,32 +297,132 @@ tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
 const ALL_CENTERS = [{"center_id":"X(3)","name":"Circumcenter","source_page":"ETC.html","barycentrics":["sin 2A : sin 2B : sin 2C"],"search_text":"X(3) | Circumcenter | sin 2A : sin 2B : sin 2C"},{"center_id":"X(4)","name":"Orthocenter (= C here)","source_page":"ETC.html","barycentrics":["SA : SB : SC"],"search_text":"X(4) | Orthocenter (= C here) | SA : SB : SC"},{"center_id":"X(5)","name":"Nine-Point Center","source_page":"ETC.html","barycentrics":["cos(B-C):cos(C-A):cos(A-B)"],"search_text":"X(5) | Nine-Point Center | cos(B-C):cos(C-A):cos(A-B)"},{"center_id":"X(6)","name":"Symmedian Point","source_page":"ETC.html","barycentrics":["a² : b² : c²"],"search_text":"X(6) | Symmedian Point | a² : b² : c²"},{"center_id":"X(7)","name":"Gergonne Point","source_page":"ETC.html","barycentrics":["1/(s−a) : 1/(s−b) : 1/(s−c)"],"search_text":"X(7) | Gergonne Point | 1/(s−a) : 1/(s−b) : 1/(s−c)"},{"center_id":"X(8)","name":"Nagel Point","source_page":"ETC.html","barycentrics":["b+c−a : c+a−b : a+b−c"],"search_text":"X(8) | Nagel Point | b+c−a : c+a−b : a+b−c"},{"center_id":"X(9)","name":"Mittenpunkt","source_page":"ETC.html","barycentrics":["a(b+c−a):b(c+a−b):c(a+b−c)"],"search_text":"X(9) | Mittenpunkt | a(b+c−a):b(c+a−b):c(a+b−c)"},{"center_id":"X(10)","name":"Spieker Center","source_page":"ETC.html","barycentrics":["b+c : c+a : a+b"],"search_text":"X(10) | Spieker Center | b+c : c+a : a+b"},{"center_id":"X(11)","name":"Feuerbach Point","source_page":"ETC.html","barycentrics":["(b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)"],"search_text":"X(11) | Feuerbach Point | (b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)"},{"center_id":"X(12)","name":"Extouchpoint-midpoint","source_page":"ETC.html","barycentrics":["a/(b+c+a)²:…"],"search_text":"X(12) | Extouchpoint-midpoint | a/(b+c+a)²:…"},{"center_id":"X(13)","name":"Fermat Point 1 (isog conj X14)","source_page":"ETC.html","barycentrics":["1/(SA+√3·S):…"],"search_text":"X(13) | Fermat Point 1 (isog conj X14) | 1/(SA+√3·S):…"},{"center_id":"X(14)","name":"Fermat Point 2","source_page":"ETC.html","barycentrics":["1/(SA-√3·S):…"],"search_text":"X(14) | Fermat Point 2 | 1/(SA-√3·S):…"},{"center_id":"X(15)","name":"Isogonic Point 1","source_page":"ETC.html","barycentrics":["sin(A+π/3):sin(B+π/3):sin(C+π/3)"],"search_text":"X(15) | Isogonic Point 1 | sin(A+π/3):sin(B+π/3):sin(C+π/3)"},{"center_id":"X(16)","name":"Isogonic Point 2","source_page":"ETC.html","barycentrics":["sin(A-π/3):sin(B-π/3):sin(C-π/3)"],"search_text":"X(16) | Isogonic Point 2 | sin(A-π/3):sin(B-π/3):sin(C-π/3)"},{"center_id":"X(17)","name":"Napoleon Pt 1","source_page":"ETC.html","barycentrics":["1/(SA+√3·S):… (=X13 variant)"],"search_text":"X(17) | Napoleon Pt 1 | 1/(SA+√3·S):… (=X13 variant)"},{"center_id":"X(18)","name":"Napoleon Pt 2","source_page":"ETC.html","barycentrics":["SA-√3·S:…"],"search_text":"X(18) | Napoleon Pt 2 | SA-√3·S:…"},{"center_id":"X(19)","name":"Clawson Point (isog conj X63)","source_page":"ETC.html","barycentrics":["tan A:tan B:tan C"],"search_text":"X(19) | Clawson Point (isog conj X63) | tan A:tan B:tan C"},{"center_id":"X(20)","name":"de Longchamps Point","source_page":"ETC.html","barycentrics":["-SA·(SB-SC)²+…  ≈ SA+SB+3SC variant"],"search_text":"X(20) | de Longchamps Point | -SA·(SB-SC)²+…  ≈ SA+SB+3SC variant"},{"center_id":"X(21)","name":"Schiffler Point","source_page":"ETC.html","barycentrics":["1/(b+c):…"],"search_text":"X(21) | Schiffler Point | 1/(b+c):…"},{"center_id":"X(22)","name":"Exeter Point","source_page":"ETC.html","barycentrics":["a²(b⁴+c⁴-a⁴):…"],"search_text":"X(22) | Exeter Point | a²(b⁴+c⁴-a⁴):…"},{"center_id":"X(23)","name":"Far-Out Point","source_page":"ETC.html","barycentrics":["a²(a⁴-b²c²):…"],"search_text":"X(23) | Far-Out Point | a²(a⁴-b²c²):…"},{"center_id":"X(25)","name":"Homothetic Center (orthic and tangential)","source_page":"ETC.html","barycentrics":["a²/SA:…"],"search_text":"X(25) | Homothetic Center (orthic and tangential) | a²/SA:…"},{"center_id":"X(31)","name":"2nd Power Point","source_page":"ETC.html","barycentrics":["a³:b³:c³ (trilinear a²:…)"],"search_text":"X(31) | 2nd Power Point | a³:b³:c³ (trilinear a²:…)"},{"center_id":"X(32)","name":"3rd Power Point","source_page":"ETC.html","barycentrics":["a⁴:b⁴:c⁴"],"search_text":"X(32) | 3rd Power Point | a⁴:b⁴:c⁴"},{"center_id":"X(35)","name":"Intersection AP₁ with BC … isog 1st isog of X36","source_page":"ETC.html","barycentrics":["a²(b²+c²-a²-bc):…"],"search_text":"X(35) | Intersection AP₁ with BC … isog 1st isog of X36 | a²(b²+c²-a²-bc):…"},{"center_id":"X(36)","name":"Inverse of Incenter in circumcircle","source_page":"ETC.html","barycentrics":["a(a²-b²-bc-c²):…  simplified"],"search_text":"X(36) | Inverse of Incenter in circumcircle | a(a²-b²-bc-c²):…  simplified"},{"center_id":"X(37)","name":"Crosspoint of X1,X2 (harmonic mean)","source_page":"ETC.html","barycentrics":["ab+ac : bc+ba : ca+cb"],"search_text":"X(37) | Crosspoint of X1,X2 (harmonic mean) | ab+ac : bc+ba : ca+cb"},{"center_id":"X(39)","name":"Brocard Midpoint (X3 of medial)","source_page":"ETC.html","barycentrics":["a²(b²+c²):…"],"search_text":"X(39) | Brocard Midpoint (X3 of medial) | a²(b²+c²):…"},{"center_id":"X(40)","name":"Bevan Point (circumcenter of excentral)","source_page":"ETC.html","barycentrics":["−a(b²+c²−a²−2bc):…"],"search_text":"X(40) | Bevan Point (circumcenter of excentral) | −a(b²+c²−a²−2bc):…"},{"center_id":"X(41)","name":"Crosspoint of X1 and X6","source_page":"ETC.html","barycentrics":["a²(b+c-a):…"],"search_text":"X(41) | Crosspoint of X1 and X6 | a²(b+c-a):…"},{"center_id":"X(42)","name":"Crosssum of X1 and X2","source_page":"ETC.html","barycentrics":["a(b+c):…"],"search_text":"X(42) | Crosssum of X1 and X2 | a(b+c):…"},{"center_id":"X(43)","name":"X(1) of medial triangle","source_page":"ETC.html","barycentrics":["bc(b+c-a):…"],"search_text":"X(43) | X(1) of medial triangle | bc(b+c-a):…"},{"center_id":"X(44)","name":"X(1)-beth conjugate of X(44)","source_page":"ETC.html","barycentrics":["a(b+c-2a):…"],"search_text":"X(44) | X(1)-beth conjugate of X(44) | a(b+c-2a):…"},{"center_id":"X(45)","name":"Complement of X(44)","source_page":"ETC.html","barycentrics":["a(2b+2c-a):…"],"search_text":"X(45) | Complement of X(44) | a(2b+2c-a):…"},{"center_id":"X(46)","name":"X(4) of excentral triangle","source_page":"ETC.html","barycentrics":["a(cos B cos C - cos A):…"],"search_text":"X(46) | X(4) of excentral triangle | a(cos B cos C - cos A):…"},{"center_id":"X(55)","name":"Insimilicenter of circumcircle and incircle","source_page":"ETC.html","barycentrics":["a(b+c-a):…"],"search_text":"X(55) | Insimilicenter of circumcircle and incircle | a(b+c-a):…"},{"center_id":"X(56)","name":"Exsimilicenter (isog conj X55)","source_page":"ETC.html","barycentrics":["a/(b+c-a):…"],"search_text":"X(56) | Exsimilicenter (isog conj X55) | a/(b+c-a):…"},{"center_id":"X(57)","name":"Isogonal conj of X9","source_page":"ETC.html","barycentrics":["1/(b+c-a):…"],"search_text":"X(57) | Isogonal conj of X9 | 1/(b+c-a):…"},{"center_id":"X(58)","name":"Isogonal conj of X10","source_page":"ETC.html","barycentrics":["a²/(b+c):…"],"search_text":"X(58) | Isogonal conj of X10 | a²/(b+c):…"},{"center_id":"X(59)","name":"Isogonal conj of X11","source_page":"ETC.html","barycentrics":["a/((s-b)(s-c)):…"],"search_text":"X(59) | Isogonal conj of X11 | a/((s-b)(s-c)):…"},{"center_id":"X(63)","name":"Isogonal conj of X19","source_page":"ETC.html","barycentrics":["a/tan A:…  = a cos A:…"],"search_text":"X(63) | Isogonal conj of X19 | a/tan A:…  = a cos A:…"},{"center_id":"X(65)","name":"Isogonal conj of X21","source_page":"ETC.html","barycentrics":["a/(tan B+tan C):…"],"search_text":"X(65) | Isogonal conj of X21 | a/(tan B+tan C):…"},{"center_id":"X(69)","name":"Isotomic conj of X25  (symmedian point of anticomp)","source_page":"ETC.html","barycentrics":["b²c²(b²+c²-a²):…"],"search_text":"X(69) | Isotomic conj of X25  (symmedian point of anticomp) | b²c²(b²+c²-a²):…"},{"center_id":"X(75)","name":"Isotomic conj of X31","source_page":"ETC.html","barycentrics":["bc:ca:ab"],"search_text":"X(75) | Isotomic conj of X31 | bc:ca:ab"},{"center_id":"X(76)","name":"Isotomic conj of X32","source_page":"ETC.html","barycentrics":["b²c²:c²a²:a²b²"],"search_text":"X(76) | Isotomic conj of X32 | b²c²:c²a²:a²b²"},{"center_id":"X(79)","name":"Isogonal conj of X35","source_page":"ETC.html","barycentrics":["1/(2SA+bc):…"],"search_text":"X(79) | Isogonal conj of X35 | 1/(2SA+bc):…"},{"center_id":"X(80)","name":"Reflection of X1 in X11 variant","source_page":"ETC.html","barycentrics":["(b+c-a)/(b-a+c):…  simplified"],"search_text":"X(80) | Reflection of X1 in X11 variant | (b+c-a)/(b-a+c):…  simplified"},{"center_id":"X(81)","name":"Isogonal conj of X42","source_page":"ETC.html","barycentrics":["b+c:c+a:a+b → reciprocal of…  a/(b+c):…"],"search_text":"X(81) | Isogonal conj of X42 | b+c:c+a:a+b → reciprocal of…  a/(b+c):…"},{"center_id":"X(82)","name":"Isogonal conj of X38","source_page":"ETC.html","barycentrics":["a/(b²+c²):…"],"search_text":"X(82) | Isogonal conj of X38 | a/(b²+c²):…"},{"center_id":"X(83)","name":"Isogonal conj of X39","source_page":"ETC.html","barycentrics":["1/(b²+c²):…"],"search_text":"X(83) | Isogonal conj of X39 | 1/(b²+c²):…"},{"center_id":"X(85)","name":"Isotomic conj of X41","source_page":"ETC.html","barycentrics":["bc/(b+c-a):…"],"search_text":"X(85) | Isotomic conj of X41 | bc/(b+c-a):…"},{"center_id":"X(86)","name":"Isotomic conj of X42","source_page":"ETC.html","barycentrics":["bc(b+c):…"],"search_text":"X(86) | Isotomic conj of X42 | bc(b+c):…"},{"center_id":"X(88)","name":"Isogonal conj of X44","source_page":"ETC.html","barycentrics":["a/(2a-b-c):…"],"search_text":"X(88) | Isogonal conj of X44 | a/(2a-b-c):…"},{"center_id":"X(89)","name":"Isogonal conj of X45","source_page":"ETC.html","barycentrics":["a/(2b+2c-a):…"],"search_text":"X(89) | Isogonal conj of X45 | a/(2b+2c-a):…"},{"center_id":"X(98)","name":"Tarry Point (isog conj of Steiner)","source_page":"ETC.html","barycentrics":["SA(SB-SC)²:…"],"search_text":"X(98) | Tarry Point (isog conj of Steiner) | SA(SB-SC)²:…"},{"center_id":"X(99)","name":"Steiner Point","source_page":"ETC.html","barycentrics":["1/(b²-c²):…"],"search_text":"X(99) | Steiner Point | 1/(b²-c²):…"},{"center_id":"X(100)","name":"Anticomplement of Feuerbach","source_page":"ETC.html","barycentrics":["1/(b-c):…"],"search_text":"X(100) | Anticomplement of Feuerbach | 1/(b-c):…"},{"center_id":"X(101)","name":"Isog conj of X514 (trilinear: a/(b-c))","source_page":"ETC.html","barycentrics":["a²/(b-c):…"],"search_text":"X(101) | Isog conj of X514 (trilinear: a/(b-c)) | a²/(b-c):…"},{"center_id":"X(105)","name":"Isog conj of X518","source_page":"ETC.html","barycentrics":["1/(a(b+c)-b²-c²):…"],"search_text":"X(105) | Isog conj of X518 | 1/(a(b+c)-b²-c²):…"},{"center_id":"X(110)","name":"Focus of Kiepert parabola","source_page":"ETC.html","barycentrics":["a²/(b²-c²):…"],"search_text":"X(110) | Focus of Kiepert parabola | a²/(b²-c²):…"},{"center_id":"X(111)","name":"Parry Point","source_page":"ETC.html","barycentrics":["a²/(2a²-b²-c²):…"],"search_text":"X(111) | Parry Point | a²/(2a²-b²-c²):…"},{"center_id":"X(114)","name":"Center of Kiepert hyperbola","source_page":"ETC.html","barycentrics":["SA(SB-SC)²+…  midpoint X113 X4"],"search_text":"X(114) | Center of Kiepert hyperbola | SA(SB-SC)²+…  midpoint X113 X4"},{"center_id":"X(115)","name":"Center of Kiepert circumconic","source_page":"ETC.html","barycentrics":["(b²-c²)²:…"],"search_text":"X(115) | Center of Kiepert circumconic | (b²-c²)²:…"},{"center_id":"X(116)","name":"Tripole of Euler line","source_page":"ETC.html","barycentrics":["(SB-SC)²:…"],"search_text":"X(116) | Tripole of Euler line | (SB-SC)²:…"},{"center_id":"X(119)","name":"Complement of X(11)","source_page":"ETC.html","barycentrics":["(b+c-a)(b²+c²-a²):…"],"search_text":"X(119) | Complement of X(11) | (b+c-a)(b²+c²-a²):…"},{"center_id":"X(120)","name":"Complement of X(105)","source_page":"ETC.html","barycentrics":["b²+c²-a(b+c):…"],"search_text":"X(120) | Complement of X(105) | b²+c²-a(b+c):…"},{"center_id":"X(121)","name":"Complement of X(106)","source_page":"ETC.html","barycentrics":["bc(b+c-a-bc/a):…  → a(b+c-2a)²:…"],"search_text":"X(121) | Complement of X(106) | bc(b+c-a-bc/a):…  → a(b+c-2a)²:…"},{"center_id":"X(125)","name":"Center of Jerabek hyperbola","source_page":"ETC.html","barycentrics":["a²(b²-c²)²·SA:…"],"search_text":"X(125) | Center of Jerabek hyperbola | a²(b²-c²)²·SA:…"},{"center_id":"X(126)","name":"Midpoint of X3 and X111","source_page":"ETC.html","barycentrics":["a²(2a²-b²-c²):…"],"search_text":"X(126) | Midpoint of X3 and X111 | a²(2a²-b²-c²):…"},{"center_id":"X(127)","name":"Midpoint X3 and X112","source_page":"ETC.html","barycentrics":["a²·SA(SB-SC)²:…"],"search_text":"X(127) | Midpoint X3 and X112 | a²·SA(SB-SC)²:…"},{"center_id":"X(140)","name":"Complement of X5","source_page":"ETC.html","barycentrics":["a²(b²+c²)+bc(b²+c²-a²):…"],"search_text":"X(140) | Complement of X5 | a²(b²+c²)+bc(b²+c²-a²):…"},{"center_id":"X(141)","name":"Complement of X6","source_page":"ETC.html","barycentrics":["b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)"],"search_text":"X(141) | Complement of X6 | b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)"},{"center_id":"X(142)","name":"Complement of X7","source_page":"ETC.html","barycentrics":["(b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…"],"search_text":"X(142) | Complement of X7 | (b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…"},{"center_id":"X(144)","name":"Anticomplement of X7","source_page":"ETC.html","barycentrics":["(b-c)²+a(b+c-2a):…"],"search_text":"X(144) | Anticomplement of X7 | (b-c)²+a(b+c-2a):…"},{"center_id":"X(145)","name":"Anticomplement of X8","source_page":"ETC.html","barycentrics":["(b+c-3a):…"],"search_text":"X(145) | Anticomplement of X8 | (b+c-3a):…"},{"center_id":"X(162)","name":"Isog conj of X525 (trilinear:a/(b²-c²))","source_page":"ETC.html","barycentrics":["a³/(b²-c²):…"],"search_text":"X(162) | Isog conj of X525 (trilinear:a/(b²-c²)) | a³/(b²-c²):…"},{"center_id":"X(174)","name":"Isog conj of X175 (midcircle)","source_page":"ETC.html","barycentrics":["sin(A/2):sin(B/2):sin(C/2)"],"search_text":"X(174) | Isog conj of X175 (midcircle) | sin(A/2):sin(B/2):sin(C/2)"},{"center_id":"X(175)","name":"Isog conj of X174","source_page":"ETC.html","barycentrics":["1/sin(A/2):…"],"search_text":"X(175) | Isog conj of X174 | 1/sin(A/2):…"},{"center_id":"X(176)","name":"Isotomic conj X174","source_page":"ETC.html","barycentrics":["bc/sin(A/2):…"],"search_text":"X(176) | Isotomic conj X174 | bc/sin(A/2):…"},{"center_id":"X(178)","name":"Midcircle of incircle and A-excircle (approx)","source_page":"ETC.html","barycentrics":["cos(A/2):cos(B/2):cos(C/2)"],"search_text":"X(178) | Midcircle of incircle and A-excircle (approx) | cos(A/2):cos(B/2):cos(C/2)"},{"center_id":"X(181)","name":"Isog conj of X314","source_page":"ETC.html","barycentrics":["a²/((b+c)(s-a)):…"],"search_text":"X(181) | Isog conj of X314 | a²/((b+c)(s-a)):…"},{"center_id":"X(182)","name":"Midpoint of X3 and X6","source_page":"ETC.html","barycentrics":["a²(b²+c²-a²):…"],"search_text":"X(182) | Midpoint of X3 and X6 | a²(b²+c²-a²):…"},{"center_id":"X(184)","name":"Crosssum of X3 and X6","source_page":"ETC.html","barycentrics":["a⁴(b²+c²-a²):…"],"search_text":"X(184) | Crosssum of X3 and X6 | a⁴(b²+c²-a²):…"},{"center_id":"X(186)","name":"Inverse of X4 in circumcircle","source_page":"ETC.html","barycentrics":["a²(a⁴-b⁴-c⁴+b²c²):…"],"search_text":"X(186) | Inverse of X4 in circumcircle | a²(a⁴-b⁴-c⁴+b²c²):…"},{"center_id":"X(187)","name":"Schoute Center","source_page":"ETC.html","barycentrics":["a²(2a²-b²-c²):…"],"search_text":"X(187) | Schoute Center | a²(2a²-b²-c²):…"},{"center_id":"X(190)","name":"Isotomic conj of X44","source_page":"ETC.html","barycentrics":["bc(b+c-2a):…"],"search_text":"X(190) | Isotomic conj of X44 | bc(b+c-2a):…"},{"center_id":"X(192)","name":"Crosspoint of X1 and X75","source_page":"ETC.html","barycentrics":["bc(c+a-b):…  variant"],"search_text":"X(192) | Crosspoint of X1 and X75 | bc(c+a-b):…  variant"},{"center_id":"X(193)","name":"Isotomic conj of X69","source_page":"ETC.html","barycentrics":["a²(b²+c²)-b²c²:…  = a²SA:…"],"search_text":"X(193) | Isotomic conj of X69 | a²(b²+c²)-b²c²:…  = a²SA:…"},{"center_id":"X(200)","name":"Isog conj X269 (Mittenpunkt variant)","source_page":"ETC.html","barycentrics":["a(b+c-a)²:…"],"search_text":"X(200) | Isog conj X269 (Mittenpunkt variant) | a(b+c-a)²:…"},{"center_id":"X(210)","name":"Isog conj X1170","source_page":"ETC.html","barycentrics":["a(b+c-a)²:…  (same as X200 up to sign — see ETC)"],"search_text":"X(210) | Isog conj X1170 | a(b+c-a)²:…  (same as X200 up to sign — see ETC)"},{"center_id":"X(213)","name":"Crosspoint X1,X42","source_page":"ETC.html","barycentrics":["a²(b+c):…"],"search_text":"X(213) | Crosspoint X1,X42 | a²(b+c):…"},{"center_id":"X(214)","name":"Harmonic conjugate of X1 wrt X11 X12","source_page":"ETC.html","barycentrics":["a²(b+c-a)²:…"],"search_text":"X(214) | Harmonic conjugate of X1 wrt X11 X12 | a²(b+c-a)²:…"},{"center_id":"X(216)","name":"Kosnita's theorem point","source_page":"ETC.html","barycentrics":["SA(SB·SC):…  → SA·SB:…"],"search_text":"X(216) | Kosnita's theorem point | SA(SB·SC):…  → SA·SB:…"},{"center_id":"X(218)","name":"Isog conj X1445","source_page":"ETC.html","barycentrics":["a²(b+c-a)(a(b+c)-bc):…"],"search_text":"X(218) | Isog conj X1445 | a²(b+c-a)(a(b+c)-bc):…"},{"center_id":"X(220)","name":"Isog conj X279","source_page":"ETC.html","barycentrics":["a²(b+c-a)²/(bc):…"],"search_text":"X(220) | Isog conj X279 | a²(b+c-a)²/(bc):…"},{"center_id":"X(222)","name":"Isog conj X281 (3rd Conway pt)","source_page":"ETC.html","barycentrics":["a·cos²(A/2)/(b+c-a):…"],"search_text":"X(222) | Isog conj X281 (3rd Conway pt) | a·cos²(A/2)/(b+c-a):…"},{"center_id":"X(223)","name":"Isog conj X282","source_page":"ETC.html","barycentrics":["a(b+c-a)/(b²+c²-a²):…"],"search_text":"X(223) | Isog conj X282 | a(b+c-a)/(b²+c²-a²):…"},{"center_id":"X(226)","name":"Isog conj X284","source_page":"ETC.html","barycentrics":["bc/(b+c-a):…"],"search_text":"X(226) | Isog conj X284 | bc/(b+c-a):…"},{"center_id":"X(230)","name":"Crossdiff X2,X6 (Euler-line tripole)","source_page":"ETC.html","barycentrics":["SA·SB:SB·SC:SC·SA → simplified"],"search_text":"X(230) | Crossdiff X2,X6 (Euler-line tripole) | SA·SB:SB·SC:SC·SA → simplified"},{"center_id":"X(232)","name":"Crossdiff X3,X6","source_page":"ETC.html","barycentrics":["a²·SA(SB-SC)²:…"],"search_text":"X(232) | Crossdiff X3,X6 | a²·SA(SB-SC)²:…"},{"center_id":"X(233)","name":"Nine-point circle inverse of X5","source_page":"ETC.html","barycentrics":["a⁴(b²-c²)²:…"],"search_text":"X(233) | Nine-point circle inverse of X5 | a⁴(b²-c²)²:…"},{"center_id":"X(236)","name":"Midpoint X175 X176","source_page":"ETC.html","barycentrics":["cos(A/2)+cos(B/2)+cos(C/2):…  variant"],"search_text":"X(236) | Midpoint X175 X176 | cos(A/2)+cos(B/2)+cos(C/2):…  variant"}];
 
 // ── Known rational locus formulas (subset with exact parametrics) ─
-// t = tan(θ/4), upper half t∈(0,1); lower half mirrors y
+// ── Parametric helpers — t = tan(θ/4), t∈(EPS,1-EPS) for upper half ──────────
+// A=(1,0), B=(-1,0), C=(cosθ,sinθ).  c=|AB|=2 always.
+// cosθ = (1−6t²+t⁴)/(1+t²)²   sinθ = 4t(1−t²)/(1+t²)²
+// a=|BC|=2(1−t²)/(1+t²)  b=|CA|=4t/(1+t²)  [t∈(0,1)]
+// Barycentric→Cartesian: x=(u−v+w·cosθ)/(u+v+w), y=w·sinθ/(u+v+w)
+
+function triParams(t) {
+  const t2=t*t, t4=t2*t2, d2=(1+t2)*(1+t2);
+  const cosT=(1-6*t2+t4)/d2, sinT=4*t*(1-t2)/d2;
+  const a=2*(1-t2)/(1+t2), b=4*t/(1+t2), c=2;
+  const a2=a*a, b2=b*b, c2=c*c;
+  const sp=(a+b+c)/2;
+  const SA=(b2+c2-a2)/2, SB=(a2+c2-b2)/2; // SC=0 always (right angle at C)
+  const S=sinT; // area = sinθ (since area=½·|AB|·|sinθ|·... = sinθ for c=2)
+  return {a,b,c,a2,b2,c2,sp,SA,SB,SC:0,S,cosT,sinT};
+}
+
+// Convert barycentric weights to Cartesian
+function b2c(u,v,w,cosT,sinT){
+  const s=u+v+w; if(Math.abs(s)<1e-12)return[NaN,NaN];
+  return[(u-v+w*cosT)/s, w*sinT/s];
+}
+
+// Build locus from a weight function wfn(p)→[u,v,w] where p=triParams(t)
+function buildLocusWfn(wfn) {
+  const xs=[],ys=[];
+  const STEPS=600, EPS=0.005, MAX_JMP=0.12;
+  let prevX=NaN, prevY=NaN;
+  const upper=[];
+  for(let i=0;i<=STEPS;i++){
+    const t=EPS+(1-2*EPS)*i/STEPS;
+    try{
+      const p=triParams(t);
+      const [u,v,w]=wfn(p);
+      const [x,y]=b2c(u,v,w,p.cosT,p.sinT);
+      upper.push(isFinite(x)&&isFinite(y)&&Math.abs(x)<=2.5&&Math.abs(y)<=2.5?[x,y]:[NaN,NaN]);
+    }catch(e){upper.push([NaN,NaN]);}
+  }
+  // upper half
+  for(const[x,y] of upper){
+    if(isFinite(x)&&isFinite(y)){
+      if(isFinite(prevX)&&Math.hypot(x-prevX,y-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
+      xs.push(x);ys.push(y);prevX=x;prevY=y;
+    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
+  }
+  xs.push(NaN);ys.push(NaN);prevX=NaN;prevY=NaN;
+  // lower half — reflect y
+  for(let i=upper.length-1;i>=0;i--){
+    const[x,y]=upper[i];
+    if(isFinite(x)&&isFinite(y)){
+      const yr=-y;
+      if(isFinite(prevX)&&Math.hypot(x-prevX,yr-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
+      xs.push(x);ys.push(yr);prevX=x;prevY=yr;
+    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
+  }
+  return[xs,ys];
+}
+
+// ── Exact rational locus formulas (t = tan(θ/4)) ─────────────────────────────
+// All derived from barycentric→Cartesian with A=(1,0), B=(−1,0).
+// Upper half only; buildLocus reflects for lower half.
 const LOCUS_FORMULAS = {
+  // X(1) Incenter  a:b:c
   "X(1)": t => { const d=t*t+1; return [-(t*t+2*t-1)/d, 2*t*(1-t)/d]; },
-  "X(2)": t => { const d=3*(t*t+1)*(t*t+1); return [(t*t-2*t-1)*(t*t+2*t-1)/d, 4*t*(1-t*t)/d]; },
-  "X(3)": t => [0, 0],  // fixed at origin
-  "X(4)": t => { const d=1+t*t; return [(1-t*t*t*t)/d/d, 4*t*(1-t*t)/d/d]; }, // = C in Thales
-  "X(5)": t => { const d=(t*t+1)*(t*t+1); return [(t*t-2*t-1)*(t*t+2*t-1)/(2*d), 2*t*(1-t*t)/d]; },
-  "X(6)": t => { const d=(t*t+1)*(t*t+1); return [(t*t-2*t-1)*(t*t+2*t-1)/d, 2*t*(1-t*t)/d]; },
-  "X(7)": t => {
-    // Gergonne: approx via b2c from known barycentrics
-    const a=2*Math.abs(1-t*t)/(1+t*t), b=4*t/(1+t*t), c=2;
-    const sp=(a+b+c)/2;
-    const u=1/(sp-a),v=1/(sp-b),w=1/(sp-c);
-    const th=4*Math.atan(t), cos=Math.cos(th), sin=Math.sin(th);
-    const s=u+v+w; return [(u-v+w*cos)/s,(w*sin)/s];
-  },
-  "X(8)": t => { const d=(t*t+1)*(t*t+1); return [(t*t+2*t-1)*(3*t*t-2*t+1)/d, 4*t*t*(1-t)*(1-t)/d]; },
-  "X(9)": t => {
-    const th=4*Math.atan(t), a=2*Math.abs(Math.cos(th/2)), b=2*Math.abs(Math.sin(th/2)), c=2;
-    const u=a*(b+c-a),v=b*(c+a-b),w=c*(a+b-c);
-    const s=u+v+w; return [(u-v+w*Math.cos(th))/s,(w*Math.sin(th))/s];
-  },
-  "X(11)": t => {
-    const d1=(t*t+1)*(t*t+1), d2=5*t*t-4*t+1, d=d1*d2, A=t*t+2*t-1;
-    return [A*(t*t*t*t-6*t*t*t+2*t-1)/d, 2*t*(1-t)*A*A/d];
-  },
+
+  // X(2) Centroid  1:1:1  → (A+B+C)/3 = (cosθ/3, sinθ/3)
+  "X(2)": t => { const d2=(1+t*t)*(1+t*t), t2=t*t;
+                 return [(1-6*t2+t2*t2)/(3*d2), 4*t*(1-t2)/(3*d2)]; },
+
+  // X(3) Circumcenter — fixed at origin in Thales config
+  "X(3)": t => [0, 0],
+
+  // X(4) Orthocenter — equals C in any right-triangle-at-C: locus = unit circle
+  // cosθ=(1−6t²+t⁴)/(1+t²)²   sinθ=4t(1−t²)/(1+t²)²
+  "X(4)": t => { const t2=t*t, d2=(1+t2)*(1+t2);
+                 return [(1-6*t2+t2*t2)/d2, 4*t*(1-t2)/d2]; },
+
+  // X(5) Nine-Point Center — midpoint(O,H) = (cosθ/2, sinθ/2)
+  "X(5)": t => { const t2=t*t, d2=(1+t2)*(1+t2);
+                 return [(1-6*t2+t2*t2)/(2*d2), 2*t*(1-t2)/d2]; },
+
+  // X(6) Symmedian  a²:b²:c² — equals C in Thales: locus = unit circle
+  "X(6)": t => { const t2=t*t, d2=(1+t2)*(1+t2);
+                 return [(1-6*t2+t2*t2)/d2, 4*t*(1-t2)/d2]; },
+
+  // X(7) Gergonne  1/(s−a):1/(s−b):1/(s−c)
+  "X(7)": p => { const {sp,a,b,c,cosT,sinT}=p;
+    const u=1/(sp-a),v=1/(sp-b),w=1/(sp-c); return b2c(u,v,w,cosT,sinT); },
+
+  // X(8) Nagel  (b+c−a):(c+a−b):(a+b−c)
+  "X(8)": t => { const t2=t*t, d2=(1+t2)*(1+t2);
+                 return [(t2+2*t-1)*(3*t2-2*t+1)/d2, 4*t2*(1-t)*(1-t)/d2]; },
+
+  // X(9) Mittenpunkt  a(b+c−a):b(c+a−b):c(a+b−c)
+  "X(9)": p => { const {a,b,c,cosT,sinT}=p;
+    const u=a*(b+c-a),v=b*(c+a-b),w=c*(a+b-c); return b2c(u,v,w,cosT,sinT); },
+
+  // X(10) Spieker  (b+c):(c+a):(a+b)
+  "X(10)": p => { const {a,b,c,cosT,sinT}=p;
+    return b2c(b+c,c+a,a+b,cosT,sinT); },
+
+  // X(11) Feuerbach  exact rational
+  "X(11)": t => { const t2=t*t, d2=(1+t2)*(1+t2), d3=5*t2-4*t+1, d=d2*d3, A=t2+2*t-1;
+                  return [A*(t2*t2-6*t2*t+2*t-1)/d, 2*t*(1-t)*A*A/d]; },
+
+  // X(20) de Longchamps  −SA:−SB:−SC  (reflection of O in H;  = anticomplement of circumcenter)
+  // In Thales: H=C, O=origin, so de Longchamps = 2C−O = 2C = (2cosθ,2sinθ) — outside unit circle
+  "X(20)": t => { const t2=t*t, d2=(1+t2)*(1+t2);
+                  return [2*(1-6*t2+t2*t2)/d2, 8*t*(1-t2)/d2]; },
+
+  // X(21) Schiffler  1/(b+c−a) variant — barycentrics a/(b+c): but ETC uses 1/(b+c):...
+  // Use exact parametric b2c for a/(b+c)
+  "X(21)": p => { const {a,b,c,cosT,sinT}=p;
+    return b2c(a/(b+c), b/(c+a), c/(a+b), cosT, sinT); },
+
+  // X(40) Bevan Point — circumcenter of excentral triangle
+  // Barycentric: −a(b²+c²−a²−2bc):… = −a·(SA−2bc/a... )
+  // = −cos A + 1:… in trilinear. In barycentric: a(−cosA+1):… 
+  // Actually simplest: X(40) = reflection of I in O = 2O−I
+  // O=(0,0), I=X(1). So X(40)=−X(1) coordinates.
+  "X(40)": t => { const d=t*t+1; return [(t*t+2*t-1)/d, -2*t*(1-t)/d]; },
+
+  // X(100) Anticomplement of Feuerbach — 1/(b−c):…
+  "X(100)": p => { const {a,b,c,cosT,sinT}=p;
+    const u=1/(b-c), v=1/(c-a), w=1/(a-b);
+    return b2c(u,v,w,cosT,sinT); },
 };
 
 function hasFormula(id) { return id in LOCUS_FORMULAS; }
@@ -336,38 +436,88 @@ function isLowerHalf(theta) {
   let th = ((theta % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
   return th > Math.PI;
 }
-function evalFormula(id, t) {
+
+// Dispatch: formula may take (t) for exact-polynomial forms, or (triParams) for weight-based forms
+function evalFormulaAt(id, t) {
   try {
-    const [x,y] = LOCUS_FORMULAS[id](t);
-    if (!isFinite(x)||!isFinite(y)||Math.abs(x)>2.5||Math.abs(y)>2.5) return [NaN,NaN];
-    return [x,y];
+    const fn = LOCUS_FORMULAS[id];
+    const p = triParams(t);
+    // If formula takes 1 arg and uses t directly (arity check via .length)
+    const result = fn.length === 1 && typeof fn(t)[0] === 'number' ? fn(t)
+                 : fn.length === 1 ? fn(p)   // p-param formula stored with arity 1 via destructuring
+                 : fn(p);
+    // Simpler: just call fn(t) first; if it returns [NaN,NaN] or throws, call fn(p)
+    return result;
   } catch(e){ return [NaN,NaN]; }
 }
+
+// Unified eval — handles both formula signatures
+function evalFormula(id, t) {
+  try {
+    const fn = LOCUS_FORMULAS[id];
+    const result = fn(t);  // try pure-t first
+    if (Array.isArray(result) && isFinite(result[0]) && isFinite(result[1]) &&
+        Math.abs(result[0])<=2.5 && Math.abs(result[1])<=2.5) return result;
+    // If that failed or returned bad coords, try p-param version
+    const p = triParams(t);
+    const r2 = fn(p);
+    if (!Array.isArray(r2)) return [NaN,NaN];
+    const [x,y]=r2;
+    if(!isFinite(x)||!isFinite(y)||Math.abs(x)>2.5||Math.abs(y)>2.5) return [NaN,NaN];
+    return r2;
+  } catch(e){
+    try {
+      const p = triParams(t);
+      const fn = LOCUS_FORMULAS[id];
+      const [x,y] = fn(p);
+      if(!isFinite(x)||!isFinite(y)||Math.abs(x)>2.5||Math.abs(y)>2.5) return [NaN,NaN];
+      return [x,y];
+    } catch(e2){ return [NaN,NaN]; }
+  }
+}
+
 function buildLocus(id) {
+  // Check if formula uses triParams (p-based)
+  const fn = LOCUS_FORMULAS[id];
+  const useP = fn.length !== 1 || (() => {
+    try { const r=fn(0.5); return !Array.isArray(r); } catch(e){ return true; }
+  })();
+
+  // Use weight-function builder for p-based formulas
+  if (useP || id === "X(7)" || id === "X(9)" || id === "X(10)" ||
+      id === "X(21)" || id === "X(40)" || id === "X(100)") {
+    return buildLocusWfn(p => {
+      const r = fn(p);
+      if (Array.isArray(r)) return r;    // formula returned [x,y] directly via b2c
+      return [NaN, NaN];
+    });
+  }
+
+  // Standard t-based builder with upper/lower reflection
   const xs=[],ys=[];
-  const STEPS=400, EPS=0.006, MAX_JMP=0.15;
+  const STEPS=600, EPS=0.005, MAX_JMP=0.12;
   let prevX=NaN, prevY=NaN;
   const upper=[];
-  for (let i=0;i<=STEPS;i++){
+  for(let i=0;i<=STEPS;i++){
     const t=EPS+(1-2*EPS)*i/STEPS;
     upper.push(evalFormula(id,t));
   }
-  for (const [x,y] of upper){
+  for(const[x,y] of upper){
     if(isFinite(x)&&isFinite(y)){
       if(isFinite(prevX)&&Math.hypot(x-prevX,y-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
       xs.push(x);ys.push(y);prevX=x;prevY=y;
-    } else { if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);} prevX=NaN;prevY=NaN; }
+    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
   }
   xs.push(NaN);ys.push(NaN);prevX=NaN;prevY=NaN;
-  for (let i=upper.length-1;i>=0;i--){
-    const [x,y]=upper[i];
+  for(let i=upper.length-1;i>=0;i--){
+    const[x,y]=upper[i];
     if(isFinite(x)&&isFinite(y)){
       const yr=-y;
       if(isFinite(prevX)&&Math.hypot(x-prevX,yr-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
       xs.push(x);ys.push(yr);prevX=x;prevY=yr;
-    } else { if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);} prevX=NaN;prevY=NaN; }
+    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
   }
-  return [xs,ys];
+  return[xs,ys];
 }
 
 // ── Build a JSXGraph board showing C moving + locus (if formula exists) ──
