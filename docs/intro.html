@@ -4,18 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ETC Center Table — Introduction to Triangle Center Loci</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Figtree (body) + Fraunces (display) — exact match with toc.html -->
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 
-<!-- Shared theme -->
-<link rel="stylesheet" href="etc-shared.css">
-
-<!-- MathJax (kept from original — all JS uses \( \) syntax) -->
+<!-- MathJax -->
 <script>
 window.MathJax = {
-  tex: {
-    inlineMath: [['\\(', '\\)']],
-    displayMath: [['\\[', '\\]'], ['$$', '$$']]
-  },
-  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+  tex: { inlineMath:[['\\(','\\)']], displayMath:[['\\[','\\]'],['$$','$$']] },
+  options: { skipHtmlTags:['script','noscript','style','textarea','pre'] }
 };
 </script>
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
@@ -25,481 +23,478 @@ window.MathJax = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraphcore.min.js"></script>
 
 <style>
-/* ── Override body layout: sidebar is in etc-shared, content flows inside .etc-main ── */
-.etc-main {
-  max-width: 900px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+/* ── Design tokens — exact match with toc.html ──────────────────── */
+:root {
+  --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a; --surface3:#102846;
+  --border:#24456a; --accent:#70b8ff; --accent-2:#3ea6ff;
+  --gold:#ffd479; --mint:#59e1a8; --violet:#b792ff;
+  --text:#f7fbff; --muted:#b7c8e6; --soft:#8fa8ca; --radius:14px;
+  --font:'Figtree',system-ui,sans-serif;
+  --display:'Fraunces',serif;
+  --mono:'JetBrains Mono',monospace;
+  --shadow:0 18px 44px rgba(1,8,20,.34);
+  --glow:0 0 0 1px rgba(112,184,255,.18),0 16px 44px rgba(31,111,235,.16);
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:var(--font); font-weight:500; letter-spacing:.01em;
+  padding:1.2rem 1.2rem 1.2rem 17.5rem;
+  min-height:100vh; overflow-x:hidden;
+}
+/* Dot-grid background — exact toc.html */
+body::before {
+  content:''; position:fixed; inset:0;
+  background-image:radial-gradient(rgba(112,184,255,.09) 1px,transparent 1px);
+  background-size:28px 28px; pointer-events:none; z-index:0;
+}
+/* Ambient blobs */
+.blob { position:fixed; border-radius:50%; pointer-events:none; z-index:0; filter:blur(110px); }
+.blob-1 { width:720px;height:480px;top:-200px;left:50%;transform:translateX(-50%);
+  background:radial-gradient(ellipse at 40% 50%,rgba(255,212,121,.11) 0%,rgba(183,146,255,.06) 55%,transparent 75%); }
+.blob-2 { width:500px;height:500px;bottom:-160px;right:-80px;
+  background:radial-gradient(ellipse,rgba(89,225,168,.09) 0%,transparent 65%); }
+.blob-3 { width:300px;height:300px;bottom:20%;left:-60px;
+  background:radial-gradient(ellipse,rgba(112,184,255,.10) 0%,transparent 65%); }
+
+/* ── Sidebar — exact toc.html ────────────────────────────────────── */
+.site-sidebar {
+  position:fixed; left:1rem; top:1rem; width:15rem; z-index:20;
+  background:linear-gradient(180deg,rgba(14,26,43,.97) 0%,rgba(8,17,31,.98) 100%);
+  border:1px solid var(--border); border-radius:16px; padding:1rem .9rem;
+  box-shadow:var(--shadow); display:flex; flex-direction:column; gap:.85rem;
+}
+.sidebar-brand { font-size:.95rem; font-weight:800; color:#fff; text-decoration:none; letter-spacing:-.02em; }
+.sidebar-copy  { font-size:.76rem; line-height:1.55; color:var(--muted); }
+.sidebar-nav   { display:grid; gap:.45rem; }
+.sidebar-link {
+  display:flex; align-items:center; justify-content:space-between; gap:.55rem;
+  padding:.55rem .7rem; border-radius:10px; text-decoration:none;
+  color:var(--muted); font-size:.82rem; font-weight:700;
+  border:1px solid transparent; background:rgba(9,20,35,.35); transition:all .16s ease;
+}
+.sidebar-link:hover,
+.sidebar-link.active { color:#fff; border-color:rgba(112,184,255,.3); background:rgba(19,35,58,.9); box-shadow:var(--glow); }
+.sidebar-link small { font-size:.72rem; color:var(--soft); }
+
+/* ── Page wrapper ────────────────────────────────────────────────── */
+.page { position:relative; z-index:1; max-width:980px; }
+
+/* ── Eyebrow — exact toc.html ───────────────────────────────────── */
+.eyebrow {
+  display:inline-flex; align-items:center; gap:.7rem;
+  font-size:.68rem; font-weight:600; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:1.5rem; opacity:.9;
+}
+.eyebrow-dot {
+  width:5px; height:5px; border-radius:50%;
+  background:var(--gold); box-shadow:0 0 6px var(--gold);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+/* ── Hero title — exact toc.html Fraunces treatment ─────────────── */
+h1 {
+  font-family:var(--display); font-size:clamp(2.4rem,6vw,3.8rem);
+  font-weight:900; line-height:1.0; letter-spacing:-.02em; color:#fff; margin-bottom:1.2rem;
+}
+.title-etc {
+  display:block;
+  background:linear-gradient(110deg,#ffffff 0%,var(--gold) 40%,var(--accent) 65%,var(--mint) 100%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+.title-sub {
+  display:block; font-family:var(--font); font-weight:500; font-size:.38em;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--soft);
+  -webkit-text-fill-color:var(--soft); margin-top:.8rem;
 }
 
-/* ── Story cards (3-col intro grid) ── */
-.story-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: .8rem;
-  margin: 1rem 0 .9rem;
-}
-.story-card {
-  background: linear-gradient(180deg,rgba(16,30,48,.96) 0%,rgba(8,17,31,.98) 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: .95rem 1rem;
-  box-shadow: 0 18px 44px rgba(1,8,20,.34);
-  transition: transform .18s, box-shadow .18s, border-color .18s;
-}
-.story-card:hover { transform: translateY(-2px); border-color: rgba(112,184,255,.5); }
-.story-card:nth-child(1) { border-color: #2a527d; }
-.story-card:nth-child(2) { border-color: #61518e; }
-.story-card:nth-child(3) { border-color: #38648a; }
-.story-card h2 { font-size: 1rem; color: #fff; margin-bottom: .45rem; font-weight: 800; }
-.story-card p  { font-size: .88rem; color: var(--text-secondary); line-height: 1.68; }
-.story-card ul { margin: .5rem 0 0 1.1rem; color: var(--text-primary); }
-.story-card li { margin: .3rem 0; font-size: .85rem; line-height: 1.62; }
-.story-card strong { color: var(--text-primary); }
-.math-inline { white-space: nowrap; }
+/* ── Subtitle body text ──────────────────────────────────────────── */
+.subtitle { font-size:.92rem; font-weight:400; color:var(--muted); line-height:1.8; max-width:58ch; margin-bottom:1.1rem; }
 
-/* ── Deep dive ── */
-.deep-dive {
-  background: linear-gradient(180deg,rgba(16,30,48,.96) 0%,rgba(8,17,31,.98) 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: .95rem 1rem;
-  margin: .85rem 0;
-  box-shadow: 0 18px 44px rgba(1,8,20,.34);
-  transition: transform .18s, box-shadow .18s, border-color .18s;
-}
-.deep-dive:hover { transform: translateY(-2px); border-color: rgba(112,184,255,.5); }
-.deep-dive h2 { font-size: 1rem; color: #fff; margin-bottom: .45rem; font-weight: 800; }
-.deep-dive p  { font-size: .88rem; color: var(--text-secondary); line-height: 1.68; }
-.deep-dive ul { margin: .5rem 0 0 1.1rem; color: var(--text-primary); }
-.deep-dive li { margin: .3rem 0; font-size: .85rem; line-height: 1.62; }
-.deep-dive strong { color: var(--text-primary); }
-.deep-dive-grid { display: grid; grid-template-columns: 1.2fr .9fr; gap: 1rem; margin-top: .8rem; }
-@media(max-width:760px){ .deep-dive-grid { grid-template-columns: 1fr; } }
+/* ── Stat pills — exact toc.html ───────────────────────────────── */
+.stat-row  { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1rem; margin-bottom:1.8rem; }
+.stat-pill { display:flex; align-items:center; gap:.5rem; padding:.42em 1em; background:var(--surface); border:1px solid var(--border); border-radius:30px; font-size:.71rem; font-weight:500; color:var(--muted); }
+.stat-pill strong { font-weight:700; color:var(--text); }
 
-/* ── Formula blocks ── */
-.formula-block {
-  margin: .7rem 0;
-  padding: .8rem .9rem;
-  background: linear-gradient(180deg,#0f2746 0%,#0a1b32 100%);
-  border: 1px solid #356799;
-  border-radius: 10px;
-  color: #eff7ff;
-  overflow: auto;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-}
+/* ── Section divider ─────────────────────────────────────────────── */
+.divider { border:none; border-top:1px solid var(--border); margin:1.4rem 0; }
 
-/* ── Callout row ── */
-.callout-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: .75rem; margin-top: .8rem; }
-.callout { background: linear-gradient(180deg,#102543 0%,#0b192d 100%); border:1px solid #315f8f; border-radius:10px; padding:.75rem .8rem; }
-.callout:nth-child(2){ background:linear-gradient(180deg,#20284b 0%,#111b33 100%);border-color:#5d61a6; }
-.callout:nth-child(3){ background:linear-gradient(180deg,#0d2a3d 0%,#091a27 100%);border-color:#2e7384; }
-.callout .tag { display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--grad-gold);margin-bottom:.3rem; }
-.callout p { font-size:.83rem;margin:0;color:#dbe8fb; }
-
-/* ── Widget guide ── */
-.widget-guide {
-  background: linear-gradient(180deg,rgba(16,30,48,.96) 0%,rgba(8,17,31,.98) 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: .95rem 1rem;
-  margin: .85rem 0;
-  box-shadow: 0 18px 44px rgba(1,8,20,.34);
-  transition: transform .18s, box-shadow .18s, border-color .18s;
-}
-.widget-guide:hover { transform: translateY(-2px); border-color: rgba(112,184,255,.5); }
-.widget-guide h2 { font-size: 1rem; color: #fff; margin-bottom: .45rem; font-weight: 800; }
-.widget-guide .guide-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.85rem;margin-top:.75rem; }
-.widget-guide p { font-size:.88rem;color:var(--text-secondary);line-height:1.68; }
-.widget-guide strong { color:var(--text-primary); }
-.widget-guide code { font-family:'DM Mono',monospace;font-size:.78rem;color:#e4f1ff;background:#0f2746;padding:.08rem .32rem;border-radius:4px; }
-
-/* ── Section title rule ── */
+/* ── Section title rule ─────────────────────────────────────────── */
 .section-title {
-  display: flex;
-  align-items: center;
-  gap: .8rem;
-  font-size: 1.04rem;
-  color: #fff;
-  margin-bottom: .45rem;
-  font-weight: 800;
-  line-height: 1.2;
+  display:flex; align-items:center; gap:.8rem;
+  font-size:1.02rem; font-weight:800; color:#fff; line-height:1.2; margin-bottom:.6rem;
 }
 .section-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg,rgba(112,184,255,.34) 0%,rgba(112,184,255,0) 100%);
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg,rgba(112,184,255,.34) 0%,rgba(112,184,255,0) 100%);
 }
 
-/* ── JSXGraph board ── */
+/* ── Story cards, deep-dive, widget-guide ────────────────────────── */
+.story-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.8rem; margin:1rem 0 .9rem; }
+.story-card,
+.deep-dive,
+.widget-guide {
+  background:linear-gradient(180deg,rgba(16,30,48,.96) 0%,rgba(8,17,31,.98) 100%);
+  border:1px solid var(--border); border-radius:var(--radius);
+  padding:.95rem 1rem; box-shadow:var(--shadow);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.story-card:hover,.deep-dive:hover,.widget-guide:hover {
+  transform:translateY(-2px); border-color:rgba(112,184,255,.58); box-shadow:var(--glow);
+}
+.story-card:nth-child(1){border-color:#2a527d}
+.story-card:nth-child(2){border-color:#61518e}
+.story-card:nth-child(3){border-color:#38648a}
+.story-card h2,.deep-dive h2,.widget-guide h2 { font-size:1rem; color:#fff; margin-bottom:.45rem; font-weight:800; }
+.story-card p,.story-card li,.deep-dive p,.widget-guide p { font-size:.86rem; color:var(--muted); line-height:1.68; }
+.story-card ul { margin:.45rem 0 0 1.1rem; }
+.story-card strong,.deep-dive strong,.widget-guide strong { color:var(--text); }
+.math-inline { white-space:nowrap; }
+.deep-dive { margin:.85rem 0; }
+.deep-dive-grid { display:grid; grid-template-columns:1.2fr .9fr; gap:1rem; margin-top:.8rem; }
+@media(max-width:760px){ .deep-dive-grid{grid-template-columns:1fr} }
+.widget-guide { margin:.85rem 0; }
+.guide-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.85rem; margin-top:.75rem; }
+.widget-guide code { font-family:var(--mono); font-size:.78rem; color:#e4f1ff; background:#0f2746; padding:.08rem .32rem; border-radius:4px; }
+
+/* ── Formula blocks ─────────────────────────────────────────────── */
+.formula-block {
+  margin:.75rem 0; padding:.82rem .9rem;
+  background:linear-gradient(180deg,#0f2746 0%,#0a1b32 100%);
+  border:1px solid #356799; border-radius:10px;
+  color:#eff7ff; overflow:auto; box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* ── Callout row ─────────────────────────────────────────────────── */
+.callout-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.75rem; margin-top:.8rem; }
+.callout { background:linear-gradient(180deg,#102543 0%,#0b192d 100%); border:1px solid #315f8f; border-radius:10px; padding:.75rem .8rem; }
+.callout:nth-child(2){background:linear-gradient(180deg,#20284b 0%,#111b33 100%);border-color:#5d61a6}
+.callout:nth-child(3){background:linear-gradient(180deg,#0d2a3d 0%,#091a27 100%);border-color:#2e7384}
+.callout .tag { display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);margin-bottom:.3rem; }
+.callout p { font-size:.83rem;margin:0;color:#dbe8fb; }
+
+/* ── JSXGraph board ──────────────────────────────────────────────── */
 .board-wrap {
-  width: 100%;
-  height: 520px;
-  position: relative;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin-top: .85rem;
+  width:100%; height:520px; position:relative;
+  border:1px solid var(--border); border-radius:var(--radius);
+  overflow:hidden; margin-top:.85rem;
 }
-#jxgbox {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: #ffffff;
-}
+#jxgbox { position:absolute; inset:0; width:100%; height:100%; background:#ffffff; }
 
-/* ── Controls ── */
-.controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .6rem;
-  margin-top: .7rem;
-}
-@media(max-width:560px){ .controls { grid-template-columns: 1fr; } }
+/* ── Controls ────────────────────────────────────────────────────── */
+.controls { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; margin-top:.7rem; }
+@media(max-width:560px){ .controls{grid-template-columns:1fr} }
 .ctrl {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: .75rem .95rem;
-  box-shadow: 0 18px 44px rgba(1,8,20,.34);
-  transition: transform .18s, box-shadow .18s, border-color .18s;
-}
-.ctrl:hover { transform: translateY(-2px); border-color: rgba(112,184,255,.5); }
-.ctrl label { display:block;font-size:.72rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.45rem; }
-select, input[type=range] {
-  width: 100%;
-  background: #081321;
-  border: 1px solid #31567c;
-  border-radius: 5px;
-  color: var(--text-primary);
-  font-size: .86rem;
-  padding: .42rem .6rem;
-  outline: none;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 600;
-  transition: border-color .15s, box-shadow .15s;
-}
-select:hover, input[type=range]:hover { border-color: var(--accent-blue); }
-select:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(112,184,255,.16); }
-input[type=range] { padding: 0; cursor: pointer; accent-color: var(--accent-blue); }
-.sub { font-size:.76rem;color:var(--grad-gold);margin-top:.3rem;font-family:'DM Mono',monospace;min-height:1.1em;line-height:1.4; }
-
-/* ── Info bar ── */
-.info {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: .65rem .9rem;
-  margin-top: .7rem;
-  font-size: .8rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
-  gap: .3rem 1.2rem;
-  box-shadow: 0 18px 44px rgba(1,8,20,.34);
-  transition: transform .18s, box-shadow .18s, border-color .18s;
-}
-.info:hover { transform: translateY(-2px); border-color: rgba(112,184,255,.5); }
-.ir { display:flex;gap:.45rem;align-items:baseline; }
-.ir .k { color:var(--text-secondary);white-space:nowrap;min-width:60px; }
-.ir .v { font-family:'DM Mono',monospace;font-size:.74rem; }
-.ir .v.hi { color:var(--grad-gold); }
-
-/* ── Legend ── */
-.leg { display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.55rem;font-size:.78rem;color:var(--text-secondary); }
-.leg span { display:flex;align-items:center;gap:.42rem;padding:.28rem .62rem;border:1px solid rgba(112,184,255,.16);border-radius:999px;background:rgba(8,19,33,.56);font-weight:700; }
-.dot { width:10px;height:10px;border-radius:50%;flex-shrink:0; }
-
-/* ── Settings row ── */
-.settings-row {
-  display:flex;gap:1.2rem;align-items:center;margin-top:.65rem;flex-wrap:wrap;
-  padding:.55rem .85rem;
-  background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-lg);
-  box-shadow:0 18px 44px rgba(1,8,20,.34);
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:.75rem .95rem; box-shadow:var(--shadow);
   transition:transform .18s,box-shadow .18s,border-color .18s;
 }
-.settings-row:hover { transform:translateY(-2px);border-color:rgba(112,184,255,.5); }
-.setting-group { display:flex;align-items:center;gap:.45rem;flex-wrap:wrap; }
-.setting-label { font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);white-space:nowrap; }
-.toggle-set { display:flex;gap:2px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:6px;padding:2px; }
-.tgl { font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;background:transparent;border:none;border-radius:4px;color:var(--text-secondary);padding:.25rem .7rem;cursor:pointer;transition:background .15s,color .15s,box-shadow .15s;white-space:nowrap; }
-.tgl.active { background:linear-gradient(180deg,var(--accent-blue) 0%,#2d7de0 100%);color:#fff;box-shadow:0 10px 24px rgba(62,166,255,.24); }
-.tgl:hover:not(.active){ background:#1b3556;color:var(--text-primary);box-shadow:0 0 0 1px rgba(112,184,255,.16); }
-.tgl-switch { font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;border:1.5px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text-secondary);padding:.25rem .75rem;cursor:pointer;transition:background .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;white-space:nowrap; }
-.tgl-switch:hover { transform:translateY(-1px);box-shadow:0 10px 22px rgba(31,111,235,.14); }
-.tgl-switch.on  { background:#123423;border-color:#31c985;color:#7df2bf; }
-.tgl-switch.off { background:var(--bg-card);border-color:var(--border);color:var(--text-secondary); }
+.ctrl:hover { transform:translateY(-2px); border-color:rgba(112,184,255,.5); box-shadow:var(--glow); }
+.ctrl label { display:block; font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.45rem; }
+select, input[type=range] {
+  width:100%; background:#081321; border:1px solid #31567c; border-radius:5px;
+  color:var(--text); font-size:.86rem; padding:.42rem .6rem; outline:none;
+  font-family:var(--font); font-weight:600; transition:border-color .15s,box-shadow .15s;
+}
+select:hover,input[type=range]:hover { border-color:var(--accent); }
+select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(112,184,255,.16); }
+input[type=range] { padding:0; cursor:pointer; accent-color:var(--accent); }
+.sub { font-size:.76rem; color:var(--gold); margin-top:.3rem; font-family:var(--mono); min-height:1.1em; line-height:1.4; }
 
-/* ── Classification badges ── */
-.class-row { display:flex;gap:.45rem;align-items:center;margin-top:.45rem;flex-wrap:wrap; }
-.badge-euler   { background:#1e3a5f;color:#60a5fa;border:1px solid #2d5a8e; }
-.badge-ccw     { background:#1a3a1a;color:#4ade80;border:1px solid #2d6b2d; }
-.badge-cw      { background:#3b1e1e;color:#f87171;border:1px solid #7c3030; }
-.badge-curve   { background:#252035;color:#c4b5fd;border:1px solid #4c3d8a; }
-.badge-note    { font-size:.71rem;color:var(--text-secondary);font-style:italic; }
+/* ── Info bar ────────────────────────────────────────────────────── */
+.info {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:.65rem .9rem; margin-top:.7rem; font-size:.8rem;
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:.3rem 1.2rem; box-shadow:var(--shadow);
+  transition:transform .18s,box-shadow .18s,border-color .18s;
+}
+.info:hover { transform:translateY(-2px); border-color:rgba(112,184,255,.5); box-shadow:var(--glow); }
+.ir { display:flex; gap:.45rem; align-items:baseline; }
+.ir .k { color:var(--muted); white-space:nowrap; min-width:60px; }
+.ir .v { font-family:var(--mono); font-size:.74rem; }
+.ir .v.hi { color:var(--gold); }
 
-/* ── Coordinate panel ── */
+/* ── Legend ──────────────────────────────────────────────────────── */
+.leg { display:flex; gap:.9rem; flex-wrap:wrap; margin-top:.55rem; font-size:.78rem; color:var(--muted); }
+.leg span { display:flex; align-items:center; gap:.42rem; padding:.28rem .62rem; border:1px solid rgba(112,184,255,.16); border-radius:999px; background:rgba(8,19,33,.56); font-weight:700; }
+.dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+/* ── Settings row ────────────────────────────────────────────────── */
+.settings-row {
+  display:flex; gap:1.2rem; align-items:center; margin-top:.65rem; flex-wrap:wrap;
+  padding:.55rem .85rem; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow); transition:transform .18s,box-shadow .18s,border-color .18s;
+}
+.settings-row:hover { transform:translateY(-2px); border-color:rgba(112,184,255,.5); box-shadow:var(--glow); }
+.setting-group { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; }
+.setting-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); white-space:nowrap; }
+.toggle-set { display:flex; gap:2px; background:var(--surface); border:1.5px solid var(--border); border-radius:6px; padding:2px; }
+.tgl { font-family:var(--font); font-size:.78rem; font-weight:700; background:transparent; border:none; border-radius:4px; color:var(--muted); padding:.25rem .7rem; cursor:pointer; transition:background .15s,color .15s,box-shadow .15s; white-space:nowrap; }
+.tgl.active { background:linear-gradient(180deg,var(--accent) 0%,#2d7de0 100%); color:#fff; box-shadow:0 10px 24px rgba(62,166,255,.24); }
+.tgl:hover:not(.active){ background:#1b3556; color:var(--text); box-shadow:0 0 0 1px rgba(112,184,255,.16); }
+.tgl-switch { font-family:var(--font); font-size:.78rem; font-weight:700; border:1.5px solid var(--border); border-radius:6px; background:var(--surface); color:var(--muted); padding:.25rem .75rem; cursor:pointer; transition:background .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s; white-space:nowrap; }
+.tgl-switch:hover { transform:translateY(-1px); box-shadow:0 10px 22px rgba(31,111,235,.14); }
+.tgl-switch.on  { background:#123423; border-color:#31c985; color:#7df2bf; }
+.tgl-switch.off { background:var(--surface); border-color:var(--border); color:var(--muted); }
+
+/* ── Coord panel ─────────────────────────────────────────────────── */
 .coord-panel {
   background:linear-gradient(180deg,#142744 0%,#0f1c31 100%);
-  border:1.5px solid var(--border);border-radius:var(--radius-lg);
-  padding:.75rem 1rem;margin-top:.6rem;font-size:.83rem;line-height:1.6;
-  box-shadow:0 18px 44px rgba(1,8,20,.34);
-  transition:transform .18s,box-shadow .18s,border-color .18s;
+  border:1.5px solid var(--border); border-radius:var(--radius);
+  padding:.75rem 1rem; margin-top:.6rem; font-size:.83rem; line-height:1.6;
+  box-shadow:var(--shadow); transition:transform .18s,box-shadow .18s,border-color .18s;
 }
-.coord-panel:hover { transform:translateY(-2px);border-color:rgba(112,184,255,.5); }
-.coord-panel .cp-title { font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);margin-bottom:.4rem; }
-.coord-formula { font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent-blue);font-weight:600;margin-bottom:.3rem; }
-.coord-note { font-size:.78rem;color:#d7e5fa;line-height:1.5; }
+.coord-panel:hover { transform:translateY(-2px); border-color:rgba(112,184,255,.5); box-shadow:var(--glow); }
+.cp-title { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:.4rem; }
+.coord-formula { font-family:var(--mono); font-size:.82rem; color:var(--accent); font-weight:600; margin-bottom:.3rem; }
+.coord-note { font-size:.78rem; color:#d7e5fa; line-height:1.5; }
 
-/* ── Anim buttons ── */
-.anim-btn { font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;border:none;border-radius:6px;padding:.35rem .9rem;cursor:pointer;transition:opacity .15s,transform .1s,box-shadow .15s,filter .15s;user-select:none; }
+/* ── Anim buttons ────────────────────────────────────────────────── */
+.anim-btn { font-family:var(--font); font-size:.82rem; font-weight:700; border:none; border-radius:6px; padding:.35rem .9rem; cursor:pointer; transition:opacity .15s,transform .1s,box-shadow .15s,filter .15s; user-select:none; }
 .anim-btn:active { transform:scale(.96); }
-.anim-btn:disabled { opacity:.35;cursor:default;pointer-events:none; }
-.anim-btn:hover:not(:disabled){ box-shadow:0 0 0 1px rgba(255,255,255,.08),0 14px 30px rgba(31,111,235,.18);filter:brightness(1.04); }
-.anim-go   { background:linear-gradient(180deg,#1be0a0 0%,#0fb87e 100%);color:#071a14; }
-.anim-stop { background:linear-gradient(180deg,#ff8f70 0%,#f86a45 100%);color:#1a0a07; }
+.anim-btn:disabled { opacity:.35; cursor:default; pointer-events:none; }
+.anim-btn:hover:not(:disabled){ box-shadow:0 0 0 1px rgba(255,255,255,.08),0 14px 30px rgba(31,111,235,.18); filter:brightness(1.04); }
+.anim-go   { background:linear-gradient(180deg,#1be0a0 0%,#0fb87e 100%); color:#071a14; }
+.anim-stop { background:linear-gradient(180deg,#ff8f70 0%,#f86a45 100%); color:#1a0a07; }
 
-/* ── Construction panel ── */
-.constr-header { display:flex;align-items:center;gap:.6rem;margin-top:.75rem;flex-wrap:wrap; }
-.constr-header h3 { font-size:.85rem;font-weight:700;color:var(--text-primary);flex:1; }
-.btn-constr { font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;border:1.5px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text-primary);padding:.3rem .85rem;cursor:pointer;transition:background .15s,border-color .15s;user-select:none; }
-.btn-constr:hover { border-color:var(--accent-blue);box-shadow:0 12px 26px rgba(31,111,235,.16); }
-.btn-constr.active { background:linear-gradient(180deg,var(--accent-blue) 0%,#2d7de0 100%);border-color:var(--accent-blue);color:#fff; }
-.btn-constr:disabled { opacity:.35;pointer-events:none; }
-.constr-panel { background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-top:.5rem;display:none;box-shadow:0 18px 44px rgba(1,8,20,.34);transition:transform .18s,box-shadow .18s,border-color .18s; }
+/* ── Construction panel ──────────────────────────────────────────── */
+.constr-header { display:flex; align-items:center; gap:.6rem; margin-top:.75rem; flex-wrap:wrap; }
+.constr-header h3 { font-size:.85rem; font-weight:700; color:var(--text); flex:1; }
+.btn-constr { font-family:var(--font); font-size:.78rem; font-weight:700; border:1.5px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text); padding:.3rem .85rem; cursor:pointer; transition:background .15s,border-color .15s; user-select:none; }
+.btn-constr:hover { border-color:var(--accent); box-shadow:0 12px 26px rgba(31,111,235,.16); }
+.btn-constr.active { background:linear-gradient(180deg,var(--accent) 0%,#2d7de0 100%); border-color:var(--accent); color:#fff; }
+.btn-constr:disabled { opacity:.35; pointer-events:none; }
+.constr-panel { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-top:.5rem; display:none; box-shadow:var(--shadow); transition:transform .18s,box-shadow .18s,border-color .18s; }
 .constr-panel.open { display:block; }
-.constr-steps-bar { display:flex;align-items:center;gap:.5rem;padding:.5rem .85rem;border-bottom:1px solid var(--border);background:var(--bg-card); }
-.step-counter { font-family:'DM Mono',monospace;font-size:.75rem;color:var(--text-secondary);flex:1; }
-.step-nav { font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text-primary);padding:.25rem .7rem;cursor:pointer;transition:background .12s; }
+.constr-steps-bar { display:flex; align-items:center; gap:.5rem; padding:.5rem .85rem; border-bottom:1px solid var(--border); background:var(--surface); }
+.step-counter { font-family:var(--mono); font-size:.75rem; color:var(--muted); flex:1; }
+.step-nav { font-family:var(--font); font-size:.78rem; font-weight:700; border:1px solid var(--border); border-radius:5px; background:transparent; color:var(--text); padding:.25rem .7rem; cursor:pointer; transition:background .12s; }
 .step-nav:hover { background:var(--border); }
-.step-nav:disabled { opacity:.3;pointer-events:none; }
-.constr-step-list { padding:.65rem .85rem;max-height:220px;overflow-y:auto; }
-.cstep { display:flex;gap:.65rem;padding:.35rem 0;border-bottom:1px solid #1e2a3a;opacity:.38;transition:opacity .2s; }
-.cstep.done   { opacity:1; }
-.cstep.active { opacity:1;background:#1a2236;border-radius:5px;padding:.35rem .5rem; }
-.cstep-num { font-family:'DM Mono',monospace;font-size:.72rem;font-weight:600;color:var(--accent-blue);min-width:1.6rem;padding-top:.05rem; }
-.cstep-icon { font-size:.82rem;min-width:1.2rem;padding-top:.02rem; }
-.cstep-text { font-size:.8rem;color:var(--text-primary);line-height:1.45; }
-.cstep-tool { font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-radius:3px;padding:.05rem .35rem;display:inline-block;margin-right:.25rem; }
-.tool-compass { background:#1e3a5f;color:#60a5fa; }
-.tool-ruler   { background:#1e3b2a;color:#4ade80; }
-.tool-mark    { background:#3b1e3a;color:#d8b4fe; }
+.step-nav:disabled { opacity:.3; pointer-events:none; }
+.constr-step-list { padding:.65rem .85rem; max-height:220px; overflow-y:auto; }
+.cstep { display:flex; gap:.65rem; padding:.35rem 0; border-bottom:1px solid #1e2a3a; opacity:.38; transition:opacity .2s; }
+.cstep.done  { opacity:1; }
+.cstep.active{ opacity:1; background:#1a2236; border-radius:5px; padding:.35rem .5rem; }
+.cstep-num  { font-family:var(--mono); font-size:.72rem; font-weight:600; color:var(--accent); min-width:1.6rem; padding-top:.05rem; }
+.cstep-icon { font-size:.82rem; min-width:1.2rem; padding-top:.02rem; }
+.cstep-text { font-size:.8rem; color:var(--text); line-height:1.45; }
+.cstep-tool { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; border-radius:3px; padding:.05rem .35rem; display:inline-block; margin-right:.25rem; }
+.tool-compass{ background:#1e3a5f; color:#60a5fa; }
+.tool-ruler  { background:#1e3b2a; color:#4ade80; }
+.tool-mark   { background:#3b1e3a; color:#d8b4fe; }
 
-/* badge base (shared across intro and sandbox) */
-.badge {
-  display:inline-flex;align-items:center;gap:.3rem;
-  font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:700;
-  border-radius:20px;padding:.18rem .65rem;letter-spacing:.02em;
+/* ── Badge base ──────────────────────────────────────────────────── */
+.badge { display:inline-flex; align-items:center; gap:.3rem; font-family:var(--font); font-size:.72rem; font-weight:700; border-radius:20px; padding:.18rem .65rem; letter-spacing:.02em; }
+.badge-euler  { background:#1e3a5f; color:#60a5fa; border:1px solid #2d5a8e; }
+.badge-ccw    { background:#1a3a1a; color:#4ade80; border:1px solid #2d6b2d; }
+.badge-cw     { background:#3b1e1e; color:#f87171; border:1px solid #7c3030; }
+.badge-curve  { background:#252035; color:#c4b5fd; border:1px solid #4c3d8a; }
+.badge-note   { font-size:.71rem; color:var(--muted); font-style:italic; }
+.class-row    { display:flex; gap:.45rem; align-items:center; margin-top:.45rem; flex-wrap:wrap; }
+
+/* ── Responsive — exact toc.html breakpoints ─────────────────────── */
+@media(max-width:980px){
+  body { padding:5.7rem 1rem 1rem; }
+  .site-sidebar { position:fixed; left:1rem; right:1rem; top:.75rem; width:auto; padding:.75rem .8rem; gap:.55rem; }
+  .sidebar-copy { display:none; }
+  .sidebar-nav  { display:flex; gap:.45rem; overflow:auto; }
+  .sidebar-link { white-space:nowrap; min-width:max-content; }
 }
 </style>
 </head>
 <body>
-<div class="etc-layout">
 
-  <!-- ── Sidebar ── -->
-  <aside class="etc-sidebar">
-    <div>
-      <div class="etc-sidebar__brand-title">ETC Center Table</div>
-      <div class="etc-sidebar__brand-sub">Navigate the intro, point sandbox, barycentric search, and repository summary from one sticky sidebar.</div>
-    </div>
-    <ul class="etc-sidebar__nav">
-      <li class="active">
-        <a href="intro.html"><span>Introduction</span><span class="nav-label">Intro</span></a>
-      </li>
-      <li>
-        <a href="discovery_sandbox.html"><span>Discovery Sandbox</span><span class="nav-label">Points</span></a>
-      </li>
-      <li>
-        <a href="barycentric_search.html"><span>Barycentric Search</span><span class="nav-label">Search</span></a>
-      </li>
-      <li>
-        <a href="toc.html"><span>Repository ToC</span><span class="nav-label">Summary</span></a>
-      </li>
-      <li>
-        <a href="https://github.com/MMathster/ETC-Center-Table#readme" target="_blank" rel="noreferrer">
-          <span>GitHub README</span><span class="nav-ext">↗</span>
-        </a>
-      </li>
-    </ul>
-  </aside>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
 
-  <!-- ── Main ── -->
-  <main class="etc-main">
+<!-- ── Sidebar — exact toc.html structure ── -->
+<aside class="site-sidebar">
+  <a class="sidebar-brand" href="toc.html">ETC Center Table</a>
+  <div class="sidebar-copy">Navigate the intro, point sandbox, barycentric search, and repository summary from one sticky sidebar.</div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link active" href="intro.html"><span>Introduction</span><small>Intro</small></a>
+    <a class="sidebar-link" href="discovery_sandbox.html"><span>Discovery Sandbox</span><small>Points</small></a>
+    <a class="sidebar-link" href="barycentric_search.html"><span>Barycentric Search</span><small>Search</small></a>
+    <a class="sidebar-link" href="toc.html"><span>Repository ToC</span><small>Summary</small></a>
+    <a class="sidebar-link" href="https://github.com/MMathster/ETC-Center-Table#readme" target="_blank" rel="noreferrer"><span>GitHub README</span><small>↗</small></a>
+  </nav>
+</aside>
 
-    <!-- Hero — ToC-style gradient header -->
-    <div class="etc-section-label">Triangle Center Loci</div>
+<div class="page">
 
-    <h1 class="etc-hero-title">
-      <span class="ht-gold">Introduction</span><span class="ht-sage"> — Thales</span><span class="ht-cyan"> Circle</span>
+  <!-- ── Hero — exact toc.html eyebrow + Fraunces title pattern ── -->
+  <header>
+    <p class="eyebrow"><span class="eyebrow-dot"></span>Triangle Center Loci</p>
+    <h1>
+      <span class="title-etc">Introduction — Thales Circle</span>
+      <span class="title-sub">Triangle Centers on the Thales Configuration</span>
     </h1>
-
-    <div class="etc-hero-subtitle">Triangle Centers on the Thales Configuration</div>
-
-    <p class="etc-hero-body">
+    <p class="subtitle">
       This explorer follows a moving triangle in the <strong>Thales configuration</strong>:
       \(A=(1,0)\) and \(B=(-1,0)\) stay fixed while \(C=(\cos\theta,\sin\theta)\)
       slides around the unit circle \(x^2+y^2=1\).
       Each choice of \(\theta\) creates a new triangle, and the chosen ETC center \(X_n\) traces a locus.
     </p>
-
-    <div class="etc-pills">
-      <span class="etc-pill"><strong>JSXGraph</strong> live viewer</span>
-      <span class="etc-pill"><strong>Thales</strong> configuration</span>
-      <span class="etc-pill"><strong>ETC</strong> centers X(1)–X(99)</span>
-      <span class="etc-pill"><strong>Euclidean</strong> constructions</span>
+    <div class="stat-row">
+      <span class="stat-pill"><strong>JSXGraph</strong>&nbsp;live viewer</span>
+      <span class="stat-pill"><strong>Thales</strong>&nbsp;configuration</span>
+      <span class="stat-pill"><strong>ETC</strong>&nbsp;centers X(1)–X(99)</span>
+      <span class="stat-pill"><strong>Euclidean</strong>&nbsp;constructions</span>
     </div>
+  </header>
 
-    <hr class="etc-divider">
+  <hr class="divider">
 
-    <!-- Three story cards -->
-    <div class="story-grid">
-      <section class="story-card">
-        <h2 class="section-title">What you are seeing</h2>
-        <p>Think of this page as a synchronized geometry lab: the orange point moves, the triangle updates, and a classical center such as the incenter, centroid, or symmedian point responds instantly.</p>
-        <ul>
-          <li><strong>The blue segment \(AB\)</strong> is fixed and acts like a stable ruler.</li>
-          <li><strong>The orange point \(C\)</strong> is the "input" of the experiment.</li>
-          <li><strong>The gold trace</strong> is the path swept out by the selected center \(X_n\).</li>
+  <!-- Three story cards -->
+  <div class="story-grid">
+    <section class="story-card">
+      <h2 class="section-title">What you are seeing</h2>
+      <p>Think of this page as a synchronized geometry lab: the orange point moves, the triangle updates, and a classical center such as the incenter, centroid, or symmedian point responds instantly.</p>
+      <ul>
+        <li><strong>The blue segment \(AB\)</strong> is fixed and acts like a stable ruler.</li>
+        <li><strong>The orange point \(C\)</strong> is the "input" of the experiment.</li>
+        <li><strong>The gold trace</strong> is the path swept out by the selected center \(X_n\).</li>
+      </ul>
+    </section>
+    <section class="story-card">
+      <h2 class="section-title">Why Thales makes life cleaner</h2>
+      <p>Because \(AB\) is a diameter of the circumcircle, Thales' theorem gives a right angle at \(C\). So every non-degenerate triangle has \(\angle C=90^\circ\).</p>
+      <div class="formula-block">\[a=|BC|=2\left|\cos\frac{\theta}{2}\right|,\quad b=|CA|=2\left|\sin\frac{\theta}{2}\right|,\quad c=2.\]</div>
+      <p>Those side lengths are exactly the data used in the barycentric formulas that define many triangle centers.</p>
+    </section>
+    <section class="story-card">
+      <h2 class="section-title">From classical geometry to coordinates</h2>
+      <p>The README's main idea is that moving centers can be rewritten as rational coordinate formulas, so loci can be computed efficiently and plotted smoothly.</p>
+      <div class="formula-block">\[t=\tan\frac{\theta}{2},\qquad(\cos\theta,\sin\theta)=\left(\frac{1-t^2}{1+t^2},\frac{2t}{1+t^2}\right).\]</div>
+      <p>That substitution turns trigonometric motion into rational motion, useful for symbolic computation.</p>
+    </section>
+  </div>
+
+  <section class="deep-dive">
+    <h2 class="section-title">Deep dive — a Brilliant-style tour of triangle centers</h2>
+    <p>One of the nicest surprises in Euclidean geometry is that very different definitions can produce points that move in a coordinated way. Some centers are defined by <strong>distance</strong>, some by <strong>balancing</strong>, and some by <strong>angle symmetry</strong>, but in this widget they all respond to the same moving vertex \(C\).</p>
+    <div class="deep-dive-grid">
+      <div>
+        <div class="formula-block">\[P=(u:v:w)\quad\longmapsto\quad\left(\frac{u-v+w\cos\theta}{u+v+w},\frac{w\sin\theta}{u+v+w}\right)\]</div>
+        <p>Here \((u:v:w)\) are barycentric weights relative to triangle \(ABC\). The converter translates a classical center into a visible Cartesian point.</p>
+        <ul style="margin:.5rem 0 0 1.1rem">
+          <li style="font-size:.85rem;color:var(--muted);margin:.3rem 0"><strong>Incenter \(X_1\):</strong> balances the side lengths — barycentrics \(a:b:c\).</li>
+          <li style="font-size:.85rem;color:var(--muted);margin:.3rem 0"><strong>Centroid \(X_2\):</strong> average of the vertices — barycentrics \(1:1:1\).</li>
+          <li style="font-size:.85rem;color:var(--muted);margin:.3rem 0"><strong>Nine-point center \(X_5\):</strong> tracks the midpoint geometry of the triangle.</li>
+          <li style="font-size:.85rem;color:var(--muted);margin:.3rem 0"><strong>Symmedian point \(X_6\):</strong> squared side lengths — barycentrics \(a^2:b^2:c^2\).</li>
         </ul>
-      </section>
-      <section class="story-card">
-        <h2 class="section-title">Why Thales makes life cleaner</h2>
-        <p>Because \(AB\) is a diameter of the circumcircle, Thales' theorem gives a right angle at \(C\). So every non-degenerate triangle has \(\angle C=90^\circ\).</p>
-        <div class="formula-block">\[a=|BC|=2\left|\cos\frac{\theta}{2}\right|,\quad b=|CA|=2\left|\sin\frac{\theta}{2}\right|,\quad c=2.\]</div>
-        <p>Those side lengths are exactly the data used in the barycentric formulas that define many triangle centers.</p>
-      </section>
-      <section class="story-card">
-        <h2 class="section-title">From classical geometry to coordinates</h2>
-        <p>The README's main idea is that moving centers can be rewritten as rational coordinate formulas, so loci can be computed efficiently and plotted smoothly.</p>
-        <div class="formula-block">\[t=\tan\frac{\theta}{2},\qquad(\cos\theta,\sin\theta)=\left(\frac{1-t^2}{1+t^2},\frac{2t}{1+t^2}\right).\]</div>
-        <p>That substitution turns trigonometric motion into rational motion, useful for symbolic computation.</p>
-      </section>
-    </div>
-
-    <section class="deep-dive">
-      <h2 class="section-title">Deep dive — a Brilliant-style tour of triangle centers</h2>
-      <p>One of the nicest surprises in Euclidean geometry is that very different definitions can produce points that move in a coordinated way. Some centers are defined by <strong>distance</strong>, some by <strong>balancing</strong>, and some by <strong>angle symmetry</strong>, but in this widget they all respond to the same moving vertex \(C\).</p>
-      <div class="deep-dive-grid">
-        <div>
-          <div class="formula-block">\[P=(u:v:w)\quad\longmapsto\quad\left(\frac{u-v+w\cos\theta}{u+v+w},\frac{w\sin\theta}{u+v+w}\right)\]</div>
-          <p>Here \((u:v:w)\) are barycentric weights relative to triangle \(ABC\). The converter translates a classical center into a visible Cartesian point.</p>
-          <ul>
-            <li><strong>Incenter \(X_1\):</strong> balances the side lengths — barycentrics \(a:b:c\).</li>
-            <li><strong>Centroid \(X_2\):</strong> average of the vertices — barycentrics \(1:1:1\).</li>
-            <li><strong>Nine-point center \(X_5\):</strong> tracks the midpoint geometry of the triangle.</li>
-            <li><strong>Symmedian point \(X_6\):</strong> squared side lengths — barycentrics \(a^2:b^2:c^2\).</li>
-          </ul>
-        </div>
-        <div>
-          <div class="callout-row">
-            <div class="callout">
-              <span class="tag">Euler line moment</span>
-              <p>The circumcenter is \(O=(0,0)\), the orthocenter is \(H=C\), the centroid is \(G=C/3\), and the nine-point center is \(N=C/2\). Several famous centers line up automatically.</p>
-            </div>
-            <div class="callout">
-              <span class="tag">Synchronous motion</span>
-              <p>When \(C\) rotates once, some centers rotate the same direction, some in the opposite direction, and some collapse to especially simple curves such as circles.</p>
-            </div>
-            <div class="callout">
-              <span class="tag">Secondary-school bridge</span>
-              <p>You can read the picture in two ways at once: as compass-and-straightedge geometry and as analytic geometry on the coordinate plane.</p>
-            </div>
+      </div>
+      <div>
+        <div class="callout-row">
+          <div class="callout">
+            <span class="tag">Euler line moment</span>
+            <p>The circumcenter is \(O=(0,0)\), the orthocenter is \(H=C\), the centroid is \(G=C/3\), and the nine-point center is \(N=C/2\). Several famous centers line up automatically.</p>
+          </div>
+          <div class="callout">
+            <span class="tag">Synchronous motion</span>
+            <p>When \(C\) rotates once, some centers rotate the same direction, some in the opposite direction, and some collapse to especially simple curves such as circles.</p>
+          </div>
+          <div class="callout">
+            <span class="tag">Secondary-school bridge</span>
+            <p>You can read the picture in two ways at once: as compass-and-straightedge geometry and as analytic geometry on the coordinate plane.</p>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="widget-guide">
-      <h2 class="section-title">How to read the widget</h2>
-      <div class="guide-grid">
-        <div><p><strong>1. Pick a center.</strong> Use the dropdown to jump among ETC entries. The line just below the selector shows the active barycentric recipe and whether the locus is tagged as a circle, point, or more general curve.</p></div>
-        <div><p><strong>2. Move \(\theta\).</strong> Slide the angle or press <code>Start</code>. Watch the orange vertex move and compare the triangle with the center trace.</p></div>
-        <div><p><strong>3. Switch viewpoints.</strong> The coordinate toggle reveals either barycentric area weights or trilinear distance-to-side interpretations.</p></div>
-        <div><p><strong>4. Use the construction panel.</strong> For selected centers, the step list gives a Euclidean-construction storyline that matches the moving picture above it.</p></div>
+  <section class="widget-guide">
+    <h2 class="section-title">How to read the widget</h2>
+    <div class="guide-grid">
+      <div><p><strong>1. Pick a center.</strong> Use the dropdown to jump among ETC entries. The line below the selector shows the active barycentric recipe and whether the locus is tagged as a circle, point, or more general curve.</p></div>
+      <div><p><strong>2. Move \(\theta\).</strong> Slide the angle or press <code>Start</code>. Watch the orange vertex move and compare the triangle with the center trace.</p></div>
+      <div><p><strong>3. Switch viewpoints.</strong> The coordinate toggle reveals either barycentric area weights or trilinear distance-to-side interpretations.</p></div>
+      <div><p><strong>4. Use the construction panel.</strong> For selected centers, the step list gives a Euclidean-construction storyline that matches the moving picture above it.</p></div>
+    </div>
+  </section>
+
+  <!-- ── JSXGraph live board ── -->
+  <div class="board-wrap">
+    <div id="jxgbox"></div>
+  </div>
+
+  <div class="controls">
+    <div class="ctrl">
+      <label>Triangle center X<sub>n</sub></label>
+      <select id="sel"></select>
+      <div class="sub" id="bary-disp"></div>
+    </div>
+    <div class="ctrl">
+      <label>Angle θ — position of C</label>
+      <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.45rem">
+        <button id="btn-start" class="anim-btn anim-go">▶ Start</button>
+        <button id="btn-stop"  class="anim-btn anim-stop" disabled>■ Stop</button>
       </div>
-    </section>
-
-    <!-- ── JSXGraph live board ── -->
-    <div class="board-wrap">
-      <div id="jxgbox"></div>
+      <input type="range" id="sl-theta" min="-3.1416" max="3.1416" step="0.005" value="-3.1416">
+      <div class="sub" id="theta-disp"></div>
     </div>
+  </div>
 
-    <div class="controls">
-      <div class="ctrl">
-        <label>Triangle center X<sub>n</sub></label>
-        <select id="sel"></select>
-        <div class="sub" id="bary-disp"></div>
+  <div class="info">
+    <div class="ir"><span class="k">C</span><span class="v hi" id="inf-C">—</span></div>
+    <div class="ir"><span class="k">X<sub>n</sub></span><span class="v hi" id="inf-Xn">—</span></div>
+    <div class="ir"><span class="k">a = |BC|</span><span class="v" id="inf-a">—</span></div>
+    <div class="ir"><span class="k">b = |CA|</span><span class="v" id="inf-b">—</span></div>
+    <div class="ir"><span class="k">∠A</span><span class="v" id="inf-A">—</span></div>
+    <div class="ir"><span class="k">∠B</span><span class="v" id="inf-B">—</span></div>
+  </div>
+
+  <div class="leg">
+    <span><span class="dot" style="background:#58a6ff"></span>\(A,B\) fixed</span>
+    <span><span class="dot" style="background:#f78166"></span>\(C\) on the slider</span>
+    <span><span class="dot" style="background:#f0b429"></span>\(X_n\) and its locus</span>
+    <span><span class="dot" style="background:#3fb950"></span>circumcircle</span>
+    <span><span class="dot" style="background:#a371f7"></span>Euler line \((O\!-\!H)\)</span>
+  </div>
+
+  <div class="settings-row">
+    <div class="setting-group">
+      <span class="setting-label">Coordinates</span>
+      <div class="toggle-set" id="toggle-coord">
+        <button class="tgl active" id="btn-bary" onclick="setMode('bary')">Barycentric</button>
+        <button class="tgl" id="btn-tri" onclick="setMode('tri')">Trilinear</button>
       </div>
-      <div class="ctrl">
-        <label>Angle θ — position of C</label>
-        <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.45rem">
-          <button id="btn-start" class="anim-btn anim-go">▶ Start</button>
-          <button id="btn-stop"  class="anim-btn anim-stop" disabled>■ Stop</button>
-        </div>
-        <input type="range" id="sl-theta" min="-3.1416" max="3.1416" step="0.005" value="-3.1416">
-        <div class="sub" id="theta-disp"></div>
-      </div>
+      <button class="tgl-switch" id="btn-coord-overlay" onclick="toggleCoordOverlay()" title="Show/hide geometric interpretation in board">Overlay: ON</button>
     </div>
-
-    <div class="info">
-      <div class="ir"><span class="k">C</span><span class="v hi" id="inf-C">—</span></div>
-      <div class="ir"><span class="k">X<sub>n</sub></span><span class="v hi" id="inf-Xn">—</span></div>
-      <div class="ir"><span class="k">a = |BC|</span><span class="v" id="inf-a">—</span></div>
-      <div class="ir"><span class="k">b = |CA|</span><span class="v" id="inf-b">—</span></div>
-      <div class="ir"><span class="k">∠A</span><span class="v" id="inf-A">—</span></div>
-      <div class="ir"><span class="k">∠B</span><span class="v" id="inf-B">—</span></div>
+    <div class="setting-group">
+      <span class="setting-label">Construction</span>
+      <button class="tgl-switch" id="btn-constr-toggle" onclick="toggleConstruction()" title="Show/hide step-by-step Euclidean construction">Show</button>
     </div>
+  </div>
 
-    <div class="leg">
-      <span><span class="dot" style="background:#58a6ff"></span>\(A,B\) fixed</span>
-      <span><span class="dot" style="background:#f78166"></span>\(C\) on the slider</span>
-      <span><span class="dot" style="background:#f0b429"></span>\(X_n\) and its locus</span>
-      <span><span class="dot" style="background:#3fb950"></span>circumcircle</span>
-      <span><span class="dot" style="background:#a371f7"></span>Euler line \((O\!-\!H)\)</span>
+  <div class="coord-panel" id="coord-panel">
+    <div class="cp-title" id="cp-title">Barycentric coordinates</div>
+    <div class="coord-formula" id="cp-formula">—</div>
+    <div class="coord-note" id="cp-note">Select a center to see its coordinates.</div>
+  </div>
+
+  <div class="constr-header">
+    <h3>⚗ Euclidean Construction</h3>
+  </div>
+
+  <div class="constr-panel" id="constr-panel">
+    <div class="constr-steps-bar">
+      <span class="step-counter" id="step-counter">Step 0 / 0</span>
+      <button class="step-nav" id="btn-prev" onclick="stepBack()" disabled>◀ Back</button>
+      <button class="step-nav" id="btn-next" onclick="stepForward()" disabled>Next ▶</button>
+      <button class="step-nav" id="btn-play-steps" onclick="toggleStepPlay()" disabled>▶ Play</button>
+      <button class="step-nav" id="btn-reset-steps" onclick="resetSteps()" style="margin-left:.3rem">↺ Reset</button>
     </div>
-
-    <div class="settings-row">
-      <div class="setting-group">
-        <span class="setting-label">Coordinates</span>
-        <div class="toggle-set" id="toggle-coord">
-          <button class="tgl active" id="btn-bary" onclick="setMode('bary')">Barycentric</button>
-          <button class="tgl" id="btn-tri" onclick="setMode('tri')">Trilinear</button>
-        </div>
-        <button class="tgl-switch" id="btn-coord-overlay" onclick="toggleCoordOverlay()" title="Show/hide geometric interpretation in board">Overlay: ON</button>
-      </div>
-      <div class="setting-group">
-        <span class="setting-label">Construction</span>
-        <button class="tgl-switch" id="btn-constr-toggle" onclick="toggleConstruction()" title="Show/hide step-by-step Euclidean construction">Show</button>
-      </div>
+    <div class="constr-step-list" id="step-list">
+      <p style="color:var(--muted);font-size:.8rem;padding:.3rem 0">Select a center to see its Euclidean construction.</p>
     </div>
+  </div>
 
-    <div class="coord-panel" id="coord-panel">
-      <div class="cp-title" id="cp-title">Barycentric coordinates</div>
-      <div class="coord-formula" id="cp-formula">—</div>
-      <div class="coord-note" id="cp-note">Select a center to see its coordinates.</div>
-    </div>
-
-    <div class="constr-header">
-      <h3>⚗ Euclidean Construction</h3>
-    </div>
-
-    <div class="constr-panel" id="constr-panel">
-      <div class="constr-steps-bar">
-        <span class="step-counter" id="step-counter">Step 0 / 0</span>
-        <button class="step-nav" id="btn-prev" onclick="stepBack()" disabled>◀ Back</button>
-        <button class="step-nav" id="btn-next" onclick="stepForward()" disabled>Next ▶</button>
-        <button class="step-nav" id="btn-play-steps" onclick="toggleStepPlay()" disabled>▶ Play</button>
-        <button class="step-nav" id="btn-reset-steps" onclick="resetSteps()" style="margin-left:.3rem">↺ Reset</button>
-      </div>
-      <div class="constr-step-list" id="step-list">
-        <p style="color:var(--text-secondary);font-size:.8rem;padding:.3rem 0">Select a center to see its Euclidean construction.</p>
-      </div>
-    </div>
-
-  </main>
-</div><!-- /.etc-layout -->
+</div><!-- /.page -->
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
