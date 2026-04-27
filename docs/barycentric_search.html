@@ -360,6 +360,39 @@ function buildLocusWfn(wfn) {
   return[xs,ys];
 }
 
+
+// Build locus from a cartesian function cfn(p)→[x,y]
+function buildLocusCartesian(cfn) {
+  const xs=[],ys=[];
+  const STEPS=600, EPS=0.005, MAX_JMP=0.12;
+  let prevX=NaN, prevY=NaN;
+  const upper=[];
+  for(let i=0;i<=STEPS;i++){
+    const t=EPS+(1-2*EPS)*i/STEPS;
+    try{
+      const p=triParams(t);
+      const [x,y]=cfn(p);
+      upper.push(isFinite(x)&&isFinite(y)&&Math.abs(x)<=2.5&&Math.abs(y)<=2.5?[x,y]:[NaN,NaN]);
+    }catch(e){upper.push([NaN,NaN]);}
+  }
+  for(const[x,y] of upper){
+    if(isFinite(x)&&isFinite(y)){
+      if(isFinite(prevX)&&Math.hypot(x-prevX,y-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
+      xs.push(x);ys.push(y);prevX=x;prevY=y;
+    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
+  }
+  xs.push(NaN);ys.push(NaN);prevX=NaN;prevY=NaN;
+  for(let i=upper.length-1;i>=0;i--){
+    const[x,y]=upper[i];
+    if(isFinite(x)&&isFinite(y)){
+      const yr=-y;
+      if(isFinite(prevX)&&Math.hypot(x-prevX,yr-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
+      xs.push(x);ys.push(yr);prevX=x;prevY=yr;
+    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
+  }
+  return[xs,ys];
+}
+
 // ── Exact rational locus formulas (t = tan(θ/4)) ─────────────────────────────
 // All derived from barycentric→Cartesian with A=(1,0), B=(−1,0).
 // Upper half only; buildLocus reflects for lower half.
