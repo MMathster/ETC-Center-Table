@@ -13,6 +13,8 @@
 <!-- JSXGraph -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraph.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.2/jsxgraphcore.min.js"></script>
+<!-- Math.js for ETC barycentric expression parsing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
 <style>
 :root {
   --bg:#08111f; --surface:#0e1a2b; --surface2:#13233a;
@@ -462,6 +464,72 @@ const LOCUS_FORMULAS = {
 
 function hasFormula(id) { return id in LOCUS_FORMULAS; }
 
+function addImplicitMultiply(expr) {
+  let out = expr.replace(/\s+/g, '');
+  out = out.replace(/(\d|\))(?=[A-Za-z_(])/g, '$1*');
+  out = out.replace(/([A-Za-z_])(?=\d|\()/g, '$1*');
+  out = out.replace(/\b(sin|cos|tan|cot|sec|csc|sqrt)\*\(/g, '$1(');
+  return out;
+}
+
+function normalizeEtcExpr(expr) {
+  if (!expr) return '';
+  let e = expr;
+  e = e.replace(/[−–—]/g, '-').replace(/[·⋅]/g, '*').replace(/π/g, 'pi');
+  e = e.replace(/√\s*([A-Za-z0-9_]+)/g, 'sqrt($1)');
+  e = e.replace(/([A-Za-z0-9_)]+)²/g, '($1)^2');
+  e = e.replace(/([A-Za-z0-9_)]+)³/g, '($1)^3');
+  e = e.replace(/([A-Za-z0-9_)]+)⁴/g, '($1)^4');
+  e = e.replace(/([A-Za-z0-9_)]+)⁵/g, '($1)^5');
+  e = e.replace(/([A-Za-z0-9_)]+)⁶/g, '($1)^6');
+  e = e.replace(/([A-Za-z0-9_)]+)⁷/g, '($1)^7');
+  e = e.replace(/([A-Za-z0-9_)]+)⁸/g, '($1)^8');
+  e = e.replace(/([A-Za-z0-9_)]+)⁹/g, '($1)^9');
+  e = e.replace(/\b(sin|cos|tan|cot|sec|csc)\s+([A-Za-z0-9_.()+\-/*^]+)/g, '$1($2)');
+  return addImplicitMultiply(e);
+}
+
+function compileWeightFromBary(center) {
+  if (WEIGHT_FN_CACHE.has(center.center_id)) return WEIGHT_FN_CACHE.get(center.center_id);
+  const raw = (center.barycentrics || [])[0] || '';
+  if (!raw || /…|→|=|variant|approx/i.test(raw)) {
+    WEIGHT_FN_CACHE.set(center.center_id, null);
+    return null;
+  }
+  const parts = raw.split(':').map(p => p.trim()).filter(Boolean);
+  if (parts.length !== 3) {
+    WEIGHT_FN_CACHE.set(center.center_id, null);
+    return null;
+  }
+  try {
+    const compiled = parts.map(p => math.parse(normalizeEtcExpr(p)).compile());
+    const fn = (p) => {
+      const clamp = (x) => Math.max(-1, Math.min(1, x));
+      const A = Math.acos(clamp((p.b2 + p.c2 - p.a2) / (2 * p.b * p.c)));
+      const B = Math.acos(clamp((p.a2 + p.c2 - p.b2) / (2 * p.a * p.c)));
+      const C = Math.acos(clamp((p.a2 + p.b2 - p.c2) / (2 * p.a * p.b)));
+      const scope = {
+        ...p,
+        s: p.sp,
+        A, B, C,
+        pi: Math.PI,
+        cot: (x) => 1 / Math.tan(x),
+        sec: (x) => 1 / Math.cos(x),
+        csc: (x) => 1 / Math.sin(x),
+      };
+      const vals = compiled.map(c => c.evaluate(scope));
+      if (vals.some(v => !isFinite(v))) return [NaN, NaN];
+      return b2c(vals[0], vals[1], vals[2], p.cosT, p.sinT);
+    };
+    WEIGHT_FN_CACHE.set(center.center_id, fn);
+    return fn;
+  } catch (err) {
+    WEIGHT_FN_CACHE.set(center.center_id, null);
+    return null;
+  }
+}
+
+
 function tFromTheta(theta) {
   let th = ((theta % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
   if (th > Math.PI) th = 2*Math.PI - th;
@@ -511,9 +579,16 @@ function evalFormula(id, t) {
   }
 }
 
+function findCenter(id) { return ALL_CENTERS.find(c => c.center_id === id) || null; }
+
 function buildLocus(id) {
+  const center = findCenter(id);
+  const weightFn = center ? compileWeightFromBary(center) : null;
+  if (weightFn) return buildLocusWfn(weightFn);
+
   // Check if formula uses triParams (p-based)
   const fn = LOCUS_FORMULAS[id];
+  if (!fn) return [[], []];
   const useP = fn.length !== 1 || (() => {
     try { const r=fn(0.5); return !Array.isArray(r); } catch(e){ return true; }
   })();
@@ -590,12 +665,18 @@ function makeThalesBoard(domId, state, centerId, compact) {
   b.create('segment',[[-1,0],[1,0]],{strokeColor:'#58a6ff',strokeWidth:1.5,opacity:.6});
 
   // Locus + moving dot if formula known
-  if (hasFormula(centerId)) {
+  const center = findCenter(centerId);
+  const hasComputed = !!(center && compileWeightFromBary(center));
+  if (hasFormula(centerId) || hasComputed) {
     const [xs,ys] = buildLocus(centerId);
     b.create('curve',[xs,ys],{strokeColor:'#f0b429',strokeWidth:compact?2:2.5,highlight:false,name:''});
     b.create('point',[
-      ()=>{ const t=tFromTheta(state.angle); const [x]=evalFormula(centerId,t); return isFinite(x)?x:NaN; },
-      ()=>{ const t=tFromTheta(state.angle); const [,y]=evalFormula(centerId,t);
+      ()=>{ const t=tFromTheta(state.angle); const p=triParams(t);
+            const fn = center ? compileWeightFromBary(center) : null;
+            const [x]=fn ? fn(p) : evalFormula(centerId,t); return isFinite(x)?x:NaN; },
+      ()=>{ const t=tFromTheta(state.angle); const p=triParams(t);
+            const fn = center ? compileWeightFromBary(center) : null;
+            const [,y]=fn ? fn(p) : evalFormula(centerId,t);
             if(!isFinite(y))return NaN; return isLowerHalf(state.angle)?-y:y; }
     ],{name:centerId,fixed:true,fillColor:'#f0b429',strokeColor:'#fff',strokeWidth:1.5,size:compact?4:6,
        label:{fontSize:compact?9:11,color:'#f0b429',offset:[7,6]}});
@@ -641,7 +722,7 @@ function render() {
   tbody.innerHTML = '';
   slice.forEach(c => {
     const bary = (c.barycentrics||[])[0] || '—';
-    const hasLocus = hasFormula(c.center_id);
+    const hasLocus = hasFormula(c.center_id) || !!compileWeightFromBary(c);
     const tr = document.createElement('tr');
     tr.dataset.id = c.center_id;
     tr.innerHTML = `
