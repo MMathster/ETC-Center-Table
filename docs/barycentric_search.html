@@ -357,11 +357,110 @@ function buildLocusWfn(wfn) {
   return[xs,ys];
 }
 
+
+// Build locus from a cartesian function cfn(p)→[x,y]
+function buildLocusCartesian(cfn) {
+  const xs=[],ys=[];
+  const STEPS=600, EPS=0.005, MAX_JMP=0.12;
+  let prevX=NaN, prevY=NaN;
+  const upper=[];
+  for(let i=0;i<=STEPS;i++){
+    const t=EPS+(1-2*EPS)*i/STEPS;
+    try{
+      const p=triParams(t);
+      const [x,y]=cfn(p);
+      upper.push(isFinite(x)&&isFinite(y)&&Math.abs(x)<=2.5&&Math.abs(y)<=2.5?[x,y]:[NaN,NaN]);
+    }catch(e){upper.push([NaN,NaN]);}
+  }
+  for(const[x,y] of upper){
+    if(isFinite(x)&&isFinite(y)){
+      if(isFinite(prevX)&&Math.hypot(x-prevX,y-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
+      xs.push(x);ys.push(y);prevX=x;prevY=y;
+    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
+  }
+  xs.push(NaN);ys.push(NaN);prevX=NaN;prevY=NaN;
+  for(let i=upper.length-1;i>=0;i--){
+    const[x,y]=upper[i];
+    if(isFinite(x)&&isFinite(y)){
+      const yr=-y;
+      if(isFinite(prevX)&&Math.hypot(x-prevX,yr-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
+      xs.push(x);ys.push(yr);prevX=x;prevY=yr;
+    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
+  }
+  return[xs,ys];
+}
+
 // ── Exact rational locus formulas (t = tan(θ/4)) ─────────────────────────────
 // All derived from barycentric→Cartesian with A=(1,0), B=(−1,0).
 // Upper half only; buildLocus reflects for lower half.
-const LOCUS_FORMULAS = {};
-const WEIGHT_FN_CACHE = new Map();
+const LOCUS_FORMULAS = {
+  // X(1) Incenter  a:b:c
+  "X(1)": t => { const d=t*t+1; return [-(t*t+2*t-1)/d, 2*t*(1-t)/d]; },
+
+  // X(2) Centroid  1:1:1  → (A+B+C)/3 = (cosθ/3, sinθ/3)
+  "X(2)": t => { const d2=(1+t*t)*(1+t*t), t2=t*t;
+                 return [(1-6*t2+t2*t2)/(3*d2), 4*t*(1-t2)/(3*d2)]; },
+
+  // X(3) Circumcenter — fixed at origin in Thales config
+  "X(3)": t => [0, 0],
+
+  // X(4) Orthocenter — equals C in any right-triangle-at-C: locus = unit circle
+  // cosθ=(1−6t²+t⁴)/(1+t²)²   sinθ=4t(1−t²)/(1+t²)²
+  "X(4)": t => { const t2=t*t, d2=(1+t2)*(1+t2);
+                 return [(1-6*t2+t2*t2)/d2, 4*t*(1-t2)/d2]; },
+
+  // X(5) Nine-Point Center — midpoint(O,H) = (cosθ/2, sinθ/2)
+  "X(5)": t => { const t2=t*t, d2=(1+t2)*(1+t2);
+                 return [(1-6*t2+t2*t2)/(2*d2), 2*t*(1-t2)/d2]; },
+
+  // X(6) Symmedian  a²:b²:c².
+  // In Thales setup (A=(-1,0), B=(1,0), C=(cosθ,sinθ), c=2):
+  //   a²=2-2cosθ, b²=2+2cosθ, c²=4  ⇒  X6=(cosθ, sinθ/2)
+  "X(6)": t => { const t2=t*t, d2=(1+t2)*(1+t2);
+                 return [(1-6*t2+t2*t2)/d2, 2*t*(1-t2)/d2]; },
+
+  // X(7) Gergonne  1/(s−a):1/(s−b):1/(s−c)
+  "X(7)": p => { const {sp,a,b,c,cosT,sinT}=p;
+    const u=1/(sp-a),v=1/(sp-b),w=1/(sp-c); return b2c(u,v,w,cosT,sinT); },
+
+  // X(8) Nagel  (b+c−a):(c+a−b):(a+b−c)
+  "X(8)": t => { const t2=t*t, d2=(1+t2)*(1+t2);
+                 return [(t2+2*t-1)*(3*t2-2*t+1)/d2, 4*t2*(1-t)*(1-t)/d2]; },
+
+  // X(9) Mittenpunkt  a(b+c−a):b(c+a−b):c(a+b−c)
+  "X(9)": p => { const {a,b,c,cosT,sinT}=p;
+    const u=a*(b+c-a),v=b*(c+a-b),w=c*(a+b-c); return b2c(u,v,w,cosT,sinT); },
+
+  // X(10) Spieker  (b+c):(c+a):(a+b)
+  "X(10)": p => { const {a,b,c,cosT,sinT}=p;
+    return b2c(b+c,c+a,a+b,cosT,sinT); },
+
+  // X(11) Feuerbach  exact rational
+  "X(11)": t => { const t2=t*t, d2=(1+t2)*(1+t2), d3=5*t2-4*t+1, d=d2*d3, A=t2+2*t-1;
+                  return [A*(t2*t2-6*t2*t+2*t-1)/d, 2*t*(1-t)*A*A/d]; },
+
+  // X(20) de Longchamps  −SA:−SB:−SC  (reflection of O in H;  = anticomplement of circumcenter)
+  // In Thales: H=C, O=origin, so de Longchamps = 2C−O = 2C = (2cosθ,2sinθ) — outside unit circle
+  "X(20)": t => { const t2=t*t, d2=(1+t2)*(1+t2);
+                  return [2*(1-6*t2+t2*t2)/d2, 8*t*(1-t2)/d2]; },
+
+  // X(21) Schiffler  1/(b+c−a) variant — barycentrics a/(b+c): but ETC uses 1/(b+c):...
+  // Use exact parametric b2c for a/(b+c)
+  "X(21)": p => { const {a,b,c,cosT,sinT}=p;
+    return b2c(a/(b+c), b/(c+a), c/(a+b), cosT, sinT); },
+
+  // X(40) Bevan Point — circumcenter of excentral triangle
+  // Barycentric: −a(b²+c²−a²−2bc):… = −a·(SA−2bc/a... )
+  // = −cos A + 1:… in trilinear. In barycentric: a(−cosA+1):… 
+  // Actually simplest: X(40) = reflection of I in O = 2O−I
+  // O=(0,0), I=X(1). So X(40)=−X(1) coordinates.
+  "X(40)": t => { const d=t*t+1; return [(t*t+2*t-1)/d, -2*t*(1-t)/d]; },
+
+  // X(100) Anticomplement of Feuerbach — 1/(b−c):…
+  "X(100)": p => { const {a,b,c,cosT,sinT}=p;
+    const u=1/(b-c), v=1/(c-a), w=1/(a-b);
+    return b2c(u,v,w,cosT,sinT); },
+};
 
 function hasFormula(id) { return id in LOCUS_FORMULAS; }
 
@@ -494,12 +593,12 @@ function buildLocus(id) {
     try { const r=fn(0.5); return !Array.isArray(r); } catch(e){ return true; }
   })();
 
-  // Use weight-function builder for p-based formulas
+  // Use cartesian builder for formulas that already return [x,y]
   if (useP || id === "X(7)" || id === "X(9)" || id === "X(10)" ||
       id === "X(21)" || id === "X(40)" || id === "X(100)") {
-    return buildLocusWfn(p => {
+    return buildLocusCartesian(p => {
       const r = fn(p);
-      if (Array.isArray(r)) return r;    // formula returned [x,y] directly via b2c
+      if (Array.isArray(r)) return r;
       return [NaN, NaN];
     });
   }
