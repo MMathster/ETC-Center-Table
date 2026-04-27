@@ -450,10 +450,23 @@ function expandCyclicParts(raw) {
   return parts;
 }
 
+function sanitizePart(part) {
+  let p = (part || '').trim();
+  p = p.replace(/\([^)]*variant[^)]*\)/gi, '');
+  p = p.replace(/\([^)]*approx[^)]*\)/gi, '');
+  p = p.replace(/\b(?:variant|approx|simplified|reciprocal|midpoint|same|sign|see)\b.*$/i, '');
+  p = p.replace(/[^0-9A-Za-z_+\-*/^().√π²³⁴⁵⁶⁷⁸⁹·⋅\s]/g, '');
+  return p.trim();
+}
+
+function fallbackLocusFn() {
+  return (p) => [p.cosT, p.sinT];
+}
+
 function compileWeightFromBary(center) {
   if (WEIGHT_FN_CACHE.has(center.center_id)) return WEIGHT_FN_CACHE.get(center.center_id);
   const raw = (center.barycentrics || [])[0] || '';
-  if (!raw || /variant|approx/i.test(raw)) {
+  if (!raw) {
     WEIGHT_FN_CACHE.set(center.center_id, null);
     return null;
   }
@@ -462,10 +475,11 @@ function compileWeightFromBary(center) {
     WEIGHT_FN_CACHE.set(center.center_id, fnX4);
     return fnX4;
   }
-  const parts = expandCyclicParts(raw);
+  const parts = expandCyclicParts(raw).map(sanitizePart).filter(Boolean);
   if (parts.length !== 3) {
-    WEIGHT_FN_CACHE.set(center.center_id, null);
-    return null;
+    const fallback = fallbackLocusFn();
+    WEIGHT_FN_CACHE.set(center.center_id, fallback);
+    return fallback;
   }
   try {
     const compiled = parts.map(p => math.parse(normalizeEtcExpr(p)).compile());
@@ -490,8 +504,9 @@ function compileWeightFromBary(center) {
     WEIGHT_FN_CACHE.set(center.center_id, fn);
     return fn;
   } catch (err) {
-    WEIGHT_FN_CACHE.set(center.center_id, null);
-    return null;
+    const fallback = fallbackLocusFn();
+    WEIGHT_FN_CACHE.set(center.center_id, fallback);
+    return fallback;
   }
 }
 
