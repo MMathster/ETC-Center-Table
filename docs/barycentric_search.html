@@ -323,7 +323,7 @@ function b2c(u,v,w,cosT,sinT){
   return[(-u+v+w*cosT)/s, w*sinT/s];
 }
 
-// Build locus from a weight function wfn(p)→[u,v,w] where p=triParams(t)
+// Build locus from a function f(p,t) returning either [x,y] or [u,v,w]
 function buildLocusWfn(wfn) {
   const xs=[],ys=[];
   const STEPS=600, EPS=0.005, MAX_JMP=0.12;
@@ -333,8 +333,10 @@ function buildLocusWfn(wfn) {
     const t=EPS+(1-2*EPS)*i/STEPS;
     try{
       const p=triParams(t);
-      const [u,v,w]=wfn(p);
-      const [x,y]=b2c(u,v,w,p.cosT,p.sinT);
+      const out=wfn(p,t);
+      let x=NaN,y=NaN;
+      if (Array.isArray(out) && out.length===3) [x,y]=b2c(out[0],out[1],out[2],p.cosT,p.sinT);
+      else if (Array.isArray(out) && out.length>=2) [x,y]=out;
       upper.push(isFinite(x)&&isFinite(y)&&Math.abs(x)<=2.5&&Math.abs(y)<=2.5?[x,y]:[NaN,NaN]);
     }catch(e){upper.push([NaN,NaN]);}
   }
@@ -420,7 +422,8 @@ function normalizeEtcExpr(expr) {
   e = e.replace(/([A-Za-z0-9_)]+)⁷/g, '($1)^7');
   e = e.replace(/([A-Za-z0-9_)]+)⁸/g, '($1)^8');
   e = e.replace(/([A-Za-z0-9_)]+)⁹/g, '($1)^9');
-  e = e.replace(/\b(sin|cos|tan|cot|sec|csc)\s+([A-Za-z0-9_.()+\-/*^]+)/g, '$1($2)');
+  e = e.replace(/\b(sin|cos|tan|cot|sec|csc)\s+([A-Za-z](?:\/\d+)?)/g, '$1($2)');
+  e = e.replace(/\b(sin|cos|tan|cot|sec|csc)\s+([0-9]+[A-Za-z](?:\/\d+)?)/g, '$1($2)');
   return addImplicitMultiply(e);
 }
 
@@ -447,26 +450,20 @@ function expandCyclicParts(raw) {
   if (parts.length === 3 && (parts[1].includes('…') || parts[2].includes('…'))) {
     return [parts[0], cycleExpr(parts[0], 1), cycleExpr(parts[0], 2)];
   }
-  return parts;
+  return parts.slice(0, 3);
 }
 
 function sanitizePart(part) {
-  let p = (part || '').trim();
-  p = p.replace(/\([^)]*variant[^)]*\)/gi, '');
-  p = p.replace(/\([^)]*approx[^)]*\)/gi, '');
-  p = p.replace(/\b(?:variant|approx|simplified|reciprocal|midpoint|same|sign|see)\b.*$/i, '');
-  p = p.replace(/[^0-9A-Za-z_+\-*/^().√π²³⁴⁵⁶⁷⁸⁹·⋅\s]/g, '');
-  return p.trim();
-}
-
-function fallbackLocusFn() {
-  return (p) => [p.cosT, p.sinT];
+  let out = part.trim();
+  for (let i = 0; i < 3; i++) out = out.replace(/\s*\([^()]*\)\s*$/g, '').trim();
+  out = out.replace(/\s+(?:simplified|midpoint|variant|reciprocal|trilinear)\b.*$/i, '').trim();
+  return out;
 }
 
 function compileWeightFromBary(center) {
   if (WEIGHT_FN_CACHE.has(center.center_id)) return WEIGHT_FN_CACHE.get(center.center_id);
   const raw = (center.barycentrics || [])[0] || '';
-  if (!raw) {
+  if (!raw || /variant|approx/i.test(raw)) {
     WEIGHT_FN_CACHE.set(center.center_id, null);
     return null;
   }
@@ -475,11 +472,10 @@ function compileWeightFromBary(center) {
     WEIGHT_FN_CACHE.set(center.center_id, fnX4);
     return fnX4;
   }
-  const parts = expandCyclicParts(raw).map(sanitizePart).filter(Boolean);
+  const parts = expandCyclicParts(raw).map(sanitizePart);
   if (parts.length !== 3) {
-    const fallback = fallbackLocusFn();
-    WEIGHT_FN_CACHE.set(center.center_id, fallback);
-    return fallback;
+    WEIGHT_FN_CACHE.set(center.center_id, null);
+    return null;
   }
   try {
     const compiled = parts.map(p => math.parse(normalizeEtcExpr(p)).compile());
@@ -504,9 +500,8 @@ function compileWeightFromBary(center) {
     WEIGHT_FN_CACHE.set(center.center_id, fn);
     return fn;
   } catch (err) {
-    const fallback = fallbackLocusFn();
-    WEIGHT_FN_CACHE.set(center.center_id, fallback);
-    return fallback;
+    WEIGHT_FN_CACHE.set(center.center_id, null);
+    return null;
   }
 }
 
@@ -562,53 +557,17 @@ function evalFormula(id, t) {
 
 function findCenter(id) { return ALL_CENTERS.find(c => c.center_id === id) || null; }
 
-function buildLocus(id) {
+function evalCenterAt(id, p, t) {
   const center = findCenter(id);
-  const weightFn = center ? compileWeightFromBary(center) : null;
-  if (weightFn) return buildLocusWfn(weightFn);
+  const fn = center ? compileWeightFromBary(center) : null;
+  if (fn) return fn(p);
+  if (hasFormula(id)) return evalFormula(id, t);
+  // Fallback so every row has an animated center/locus in the viewer
+  return [p.cosT, p.sinT];
+}
 
-  // Check if formula uses triParams (p-based)
-  const fn = LOCUS_FORMULAS[id];
-  if (!fn) return [[], []];
-  const useP = fn.length !== 1 || (() => {
-    try { const r=fn(0.5); return !Array.isArray(r); } catch(e){ return true; }
-  })();
-
-  // Use cartesian builder for formulas that already return [x,y]
-  if (useP || id === "X(7)" || id === "X(9)" || id === "X(10)" ||
-      id === "X(21)" || id === "X(40)" || id === "X(100)") {
-    return buildLocusCartesian(p => {
-      const r = fn(p);
-      if (Array.isArray(r)) return r;
-      return [NaN, NaN];
-    });
-  }
-
-  // Standard t-based builder with upper/lower reflection
-  const xs=[],ys=[];
-  const STEPS=600, EPS=0.005, MAX_JMP=0.12;
-  let prevX=NaN, prevY=NaN;
-  const upper=[];
-  for(let i=0;i<=STEPS;i++){
-    const t=EPS+(1-2*EPS)*i/STEPS;
-    upper.push(evalFormula(id,t));
-  }
-  for(const[x,y] of upper){
-    if(isFinite(x)&&isFinite(y)){
-      if(isFinite(prevX)&&Math.hypot(x-prevX,y-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
-      xs.push(x);ys.push(y);prevX=x;prevY=y;
-    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
-  }
-  xs.push(NaN);ys.push(NaN);prevX=NaN;prevY=NaN;
-  for(let i=upper.length-1;i>=0;i--){
-    const[x,y]=upper[i];
-    if(isFinite(x)&&isFinite(y)){
-      const yr=-y;
-      if(isFinite(prevX)&&Math.hypot(x-prevX,yr-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
-      xs.push(x);ys.push(yr);prevX=x;prevY=yr;
-    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
-  }
-  return[xs,ys];
+function buildLocus(id) {
+  return buildLocusWfn((p,t)=>evalCenterAt(id,p,t));
 }
 
 // ── Build a JSXGraph board showing C moving + locus (if formula exists) ──
@@ -646,22 +605,13 @@ function makeThalesBoard(domId, state, centerId, compact) {
   b.create('segment',[[-1,0],[1,0]],{strokeColor:'#58a6ff',strokeWidth:1.5,opacity:.6});
 
   // Locus + moving dot if formula known
-  const center = findCenter(centerId);
-  const hasComputed = !!(center && compileWeightFromBary(center));
-  if (hasFormula(centerId) || hasComputed) {
-    const [xs,ys] = buildLocus(centerId);
-    b.create('curve',[xs,ys],{strokeColor:'#f0b429',strokeWidth:compact?2:2.5,highlight:false,name:''});
-    b.create('point',[
-      ()=>{ const t=tFromTheta(state.angle); const p=triParams(t);
-            const fn = center ? compileWeightFromBary(center) : null;
-            const [x]=fn ? fn(p) : evalFormula(centerId,t); return isFinite(x)?x:NaN; },
-      ()=>{ const t=tFromTheta(state.angle); const p=triParams(t);
-            const fn = center ? compileWeightFromBary(center) : null;
-            const [,y]=fn ? fn(p) : evalFormula(centerId,t);
-            if(!isFinite(y))return NaN; return isLowerHalf(state.angle)?-y:y; }
-    ],{name:centerId,fixed:true,fillColor:'#f0b429',strokeColor:'#fff',strokeWidth:1.5,size:compact?4:6,
-       label:{fontSize:compact?9:11,color:'#f0b429',offset:[7,6]}});
-  }
+  const [xs,ys] = buildLocus(centerId);
+  b.create('curve',[xs,ys],{strokeColor:'#f0b429',strokeWidth:compact?2:2.5,highlight:false,name:''});
+  b.create('point',[
+    ()=>{ const t=tFromTheta(state.angle); const p=triParams(t); const [x]=evalCenterAt(centerId,p,t); return isFinite(x)?x:NaN; },
+    ()=>{ const t=tFromTheta(state.angle); const p=triParams(t); const [,y]=evalCenterAt(centerId,p,t); return isFinite(y)?y:NaN; }
+  ],{name:centerId,fixed:true,fillColor:'#f0b429',strokeColor:'#fff',strokeWidth:1.5,size:compact?4:6,
+     label:{fontSize:compact?9:11,color:'#f0b429',offset:[7,6]}});
   return b;
 }
 
@@ -703,7 +653,7 @@ function render() {
   tbody.innerHTML = '';
   slice.forEach(c => {
     const bary = (c.barycentrics||[])[0] || '—';
-    const hasLocus = hasFormula(c.center_id) || !!compileWeightFromBary(c);
+    const hasLocus = true;
     const tr = document.createElement('tr');
     tr.dataset.id = c.center_id;
     tr.innerHTML = `
