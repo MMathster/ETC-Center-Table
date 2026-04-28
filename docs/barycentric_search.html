@@ -408,24 +408,6 @@ const LOCUS_FORMULAS = {
     return [A*(t2*t2-6*t2*t+2*t-1)/d, 2*t*(1-t)*A*A/d];
   },
 };
-const SPECIAL_CENTER_WEIGHTS = {
-  // X(6) Symmedian point
-  "X(6)": p => [p.a2, p.b2, p.c2],
-  // X(7) Gergonne point
-  "X(7)": p => [1/(p.sp-p.a), 1/(p.sp-p.b), 1/(p.sp-p.c)],
-  // X(21) Schiffler point from ETC trilinears:
-  // 1/(cos B + cos C) : ...  -> barycentrics a/(cos B + cos C) : ...
-  "X(21)": p => {
-    const cosA = p.SA/(p.b*p.c);
-    const cosB = p.SB/(p.a*p.c);
-    const cosC = p.SC/(p.a*p.b);
-    return [
-      p.a/(cosB+cosC),
-      p.b/(cosC+cosA),
-      p.c/(cosA+cosB),
-    ];
-  },
-};
 const WEIGHT_FN_CACHE = new Map();
 
 
@@ -585,12 +567,24 @@ function evalFormula(id, t) {
 
 function findCenter(id) { return ALL_CENTERS.find(c => c.center_id === id) || null; }
 
+const SPECIAL_WEIGHT_OVERRIDES = {
+  // Symmedian point
+  "X(6)": (p) => b2c(p.a2, p.b2, p.c2, p.cosT, p.sinT),
+  // Gergonne point
+  "X(7)": (p) => {
+    const u = 1 / (p.sp - p.a), v = 1 / (p.sp - p.b), w = 1 / (p.sp - p.c);
+    return b2c(u, v, w, p.cosT, p.sinT);
+  },
+  // Schiffler point (ETC equivalent in this model)
+  "X(21)": (p) => {
+    const u = p.a / (p.b + p.c), v = p.b / (p.c + p.a), w = p.c / (p.a + p.b);
+    return b2c(u, v, w, p.cosT, p.sinT);
+  },
+};
+
 function evalCenterAt(id, p, t) {
+  if (id in SPECIAL_WEIGHT_OVERRIDES) return SPECIAL_WEIGHT_OVERRIDES[id](p);
   if (hasFormula(id)) return evalFormula(id, t);
-  if (id in SPECIAL_CENTER_WEIGHTS) {
-    const w = SPECIAL_CENTER_WEIGHTS[id](p);
-    return b2c(w[0], w[1], w[2], p.cosT, p.sinT);
-  }
   const center = findCenter(id);
   const fn = center ? compileWeightFromBary(center) : null;
   if (fn) return fn(p);
