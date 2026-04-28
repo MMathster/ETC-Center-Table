@@ -730,6 +730,28 @@ let popupBoard = null;
 let popupCenterId = null;
 let popupTimer = null;
 
+function startBoardAnimation(board, state, speed, onFrame) {
+  let animId = null;
+  let lastTs = null;
+  function step(ts) {
+    if (!board) return;
+    if (!lastTs) lastTs = ts;
+    const dt = Math.min((ts - lastTs) / 1000, 0.1);
+    lastTs = ts;
+    state.angle = (state.angle + speed * dt) % (2 * Math.PI);
+    try {
+      board.update();
+      if (typeof onFrame === 'function') onFrame();
+      animId = requestAnimationFrame(step);
+    } catch (err) {
+      if (animId) cancelAnimationFrame(animId);
+      animId = null;
+    }
+  }
+  animId = requestAnimationFrame(step);
+  return () => { if (animId) cancelAnimationFrame(animId); };
+}
+
 function showPopup(e, center) {
   clearTimeout(popupTimer);
   const popup = document.getElementById('hoverPopup');
@@ -745,10 +767,13 @@ function showPopup(e, center) {
     const st = {angle: Math.PI/3};
     popupBoard = makeThalesBoard('popupBoard', st, center.center_id, true);
     // Gentle auto-animate
-    let pAnim = null, pLast = null;
-    function pStep(ts){ if(!pLast) pLast=ts; const dt=Math.min((ts-pLast)/1000,.1); pLast=ts; st.angle=(st.angle+0.6*dt)%(2*Math.PI); popupBoard.update(); pAnim=requestAnimationFrame(pStep); }
-    popupTimer = setTimeout(()=>{ pAnim=requestAnimationFrame(pStep); popup._popupAnim=pAnim; }, 80);
+    let stopAnim = null;
+    popupTimer = setTimeout(()=>{
+      stopAnim = startBoardAnimation(popupBoard, st, 0.6);
+      popup._popupAnimStop = stopAnim;
+    }, 80);
     if (popup._popupAnim) { cancelAnimationFrame(popup._popupAnim); popup._popupAnim=null; }
+    if (popup._popupAnimStop) { popup._popupAnimStop(); popup._popupAnimStop = null; }
   }
 
   movePopup(e);
@@ -773,16 +798,17 @@ function hidePopup() {
   popup.classList.remove('visible');
   clearTimeout(popupTimer);
   if (popup._popupAnim){ cancelAnimationFrame(popup._popupAnim); popup._popupAnim=null; }
+  if (popup._popupAnimStop){ popup._popupAnimStop(); popup._popupAnimStop=null; }
 }
 
 // ── Detail panel (click) ─────────────────────────────────────────
-let detailAnimId2 = null;
+let detailAnimStop = null;
 let detailState2 = {angle: Math.PI/3};
 
 function openDetail(center) {
   hidePopup();
   // Stop any previous animation
-  if (detailAnimId2){ cancelAnimationFrame(detailAnimId2); detailAnimId2=null; }
+  if (detailAnimStop){ detailAnimStop(); detailAnimStop=null; }
   // Destroy old board
   if (detailBoard){ try{ JXG.JSXGraph.freeBoard(detailBoard); }catch(e){} detailBoard=null; }
   document.getElementById('detailBoard').innerHTML='';
@@ -799,19 +825,11 @@ function openDetail(center) {
   detailBoard = makeThalesBoard('detailBoard', detailState2, center.center_id, false);
 
   // Auto-animate the detail board
-  let lastTs = null;
-  function step(ts){
-    if(!lastTs) lastTs=ts;
-    const dt=Math.min((ts-lastTs)/1000,.1); lastTs=ts;
-    detailState2.angle=(detailState2.angle+0.5*dt)%(2*Math.PI);
-    detailBoard.update();
-    detailAnimId2=requestAnimationFrame(step);
-  }
-  detailAnimId2=requestAnimationFrame(step);
+  detailAnimStop = startBoardAnimation(detailBoard, detailState2, 0.5);
 }
 
 function closeDetail(){
-  if(detailAnimId2){cancelAnimationFrame(detailAnimId2);detailAnimId2=null;}
+  if(detailAnimStop){detailAnimStop();detailAnimStop=null;}
   document.getElementById('detailPanel').classList.remove('open');
 }
 
