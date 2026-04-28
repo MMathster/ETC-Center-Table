@@ -300,16 +300,16 @@ const ALL_CENTERS = [{"center_id":"X(3)","name":"Circumcenter","source_page":"ET
 
 // ── Known rational locus formulas (subset with exact parametrics) ─
 // ── Parametric helpers — t = tan(θ/4), t∈(EPS,1-EPS) for upper half ──────────
-// A=(1,0), B=(-1,0), C=(cosθ,sinθ).  c=|AB|=2 always.
+// A=(-1,0), B=(1,0), C=(cosθ,sinθ).  c=|AB|=2 always.
 // cosθ = (1−6t²+t⁴)/(1+t²)²   sinθ = 4t(1−t²)/(1+t²)²
-// a=|BC|=2(1−t²)/(1+t²)  b=|CA|=4t/(1+t²)  [t∈(0,1)]
+// a=|BC|=4t/(1+t²)  b=|CA|=2(1−t²)/(1+t²)  [t∈(0,1)]
 // Barycentric→Cartesian for A=(-1,0), B=(1,0), C=(cosθ,sinθ):
 // x=(-u+v+w·cosθ)/(u+v+w), y=w·sinθ/(u+v+w)
 
 function triParams(t) {
   const t2=t*t, t4=t2*t2, d2=(1+t2)*(1+t2);
   const cosT=(1-6*t2+t4)/d2, sinT=4*t*(1-t2)/d2;
-  const a=2*(1-t2)/(1+t2), b=4*t/(1+t2), c=2;
+  const a=4*t/(1+t2), b=2*(1-t2)/(1+t2), c=2;
   const a2=a*a, b2=b*b, c2=c*c;
   const sp=(a+b+c)/2;
   const SA=(b2+c2-a2)/2, SB=(a2+c2-b2)/2; // SC=0 always (right angle at C)
@@ -397,118 +397,36 @@ function buildLocusCartesian(cfn) {
 // All derived from barycentric→Cartesian with A=(1,0), B=(−1,0).
 // Upper half only; buildLocus reflects for lower half.
 const LOCUS_FORMULAS = {
-  // Verified for Thales configuration A=(-1,0), B=(1,0), C on unit circumcircle
-  "X(5)": t => { const t2=t*t, d2=(1+t2)*(1+t2); return [(1-6*t2+t2*t2)/(2*d2), 2*t*(1-t2)/d2]; },
-  "X(11)": t => { const t2=t*t, d2=(1+t2)*(1+t2), d3=5*t2-4*t+1, d=d2*d3, A=t2+2*t-1;
-                  return [A*(t2*t2-6*t2*t+2*t-1)/d, 2*t*(1-t)*A*A/d]; },
+  // X(5): midpoint of circumcenter O and orthocenter H in Thales setup
+  "X(5)": t => {
+    const t2=t*t, d2=(1+t2)*(1+t2);
+    return [(1-6*t2+t2*t2)/(2*d2), 2*t*(1-t2)/d2];
+  },
+  // X(11): Feuerbach point (verified rational form in this coordinate model)
+  "X(11)": t => {
+    const t2=t*t, d2=(1+t2)*(1+t2), d3=5*t2-4*t+1, d=d2*d3, A=t2+2*t-1;
+    return [A*(t2*t2-6*t2*t+2*t-1)/d, 2*t*(1-t)*A*A/d];
+  },
+};
+const SPECIAL_CENTER_WEIGHTS = {
+  // X(6) Symmedian point
+  "X(6)": p => [p.a2, p.b2, p.c2],
+  // X(7) Gergonne point
+  "X(7)": p => [1/(p.sp-p.a), 1/(p.sp-p.b), 1/(p.sp-p.c)],
+  // X(21) Schiffler point from ETC trilinears:
+  // 1/(cos B + cos C) : ...  -> barycentrics a/(cos B + cos C) : ...
+  "X(21)": p => {
+    const cosA = p.SA/(p.b*p.c);
+    const cosB = p.SB/(p.a*p.c);
+    const cosC = p.SC/(p.a*p.b);
+    return [
+      p.a/(cosB+cosC),
+      p.b/(cosC+cosA),
+      p.c/(cosA+cosB),
+    ];
+  },
 };
 const WEIGHT_FN_CACHE = new Map();
-
-function hasFormula(id) { return id in LOCUS_FORMULAS; }
-
-function addImplicitMultiply(expr) {
-  let out = expr.replace(/\s+/g, '');
-  out = out.replace(/(\d|\))(?=[A-Za-z_(])/g, '$1*');
-  out = out.replace(/([A-Za-z_])(?=\d|\()/g, '$1*');
-  out = out.replace(/\b(sin|cos|tan|cot|sec|csc|sqrt)\*\(/g, '$1(');
-  return out;
-}
-
-function normalizeEtcExpr(expr) {
-  if (!expr) return '';
-  let e = expr;
-  e = e.replace(/[−–—]/g, '-').replace(/[·⋅]/g, '*').replace(/π/g, 'pi');
-  e = e.replace(/√\s*([A-Za-z0-9_]+)/g, 'sqrt($1)');
-  e = e.replace(/([A-Za-z0-9_)]+)²/g, '($1)^2');
-  e = e.replace(/([A-Za-z0-9_)]+)³/g, '($1)^3');
-  e = e.replace(/([A-Za-z0-9_)]+)⁴/g, '($1)^4');
-  e = e.replace(/([A-Za-z0-9_)]+)⁵/g, '($1)^5');
-  e = e.replace(/([A-Za-z0-9_)]+)⁶/g, '($1)^6');
-  e = e.replace(/([A-Za-z0-9_)]+)⁷/g, '($1)^7');
-  e = e.replace(/([A-Za-z0-9_)]+)⁸/g, '($1)^8');
-  e = e.replace(/([A-Za-z0-9_)]+)⁹/g, '($1)^9');
-  e = e.replace(/\b(sin|cos|tan|cot|sec|csc)\s+([A-Za-z](?:\/\d+)?)/g, '$1($2)');
-  e = e.replace(/\b(sin|cos|tan|cot|sec|csc)\s+([0-9]+[A-Za-z](?:\/\d+)?)/g, '$1($2)');
-  return addImplicitMultiply(e);
-}
-
-function cycleExpr(expr, shift) {
-  if (!shift) return expr;
-  const map = shift === 1
-    ? { SA: '__SA__', SB: '__SB__', SC: '__SC__', A: '__A__', B: '__B__', C: '__C__', a: '__a__', b: '__b__', c: '__c__' }
-    : { SA: '__SB__', SB: '__SC__', SC: '__SA__', A: '__B__', B: '__C__', C: '__A__', a: '__b__', b: '__c__', c: '__a__' };
-  let out = expr;
-  Object.entries(map).forEach(([k,v]) => { out = out.replace(new RegExp(`\\b${k}\\b`, 'g'), v); });
-  const back = shift === 1
-    ? { '__SA__':'SB', '__SB__':'SC', '__SC__':'SA', '__A__':'B', '__B__':'C', '__C__':'A', '__a__':'b', '__b__':'c', '__c__':'a' }
-    : { '__SB__':'SA', '__SC__':'SB', '__SA__':'SC', '__B__':'A', '__C__':'B', '__A__':'C', '__b__':'a', '__c__':'b', '__a__':'c' };
-  Object.entries(back).forEach(([k,v]) => { out = out.replace(new RegExp(k, 'g'), v); });
-  return out;
-}
-
-function expandCyclicParts(raw) {
-  const cleaned = raw.split(/(?:→|≈|=)/, 1)[0].trim();
-  const parts = cleaned.split(':').map(p => p.trim()).filter(Boolean);
-  if (parts.length === 2 && parts[1].startsWith('…')) {
-    return [parts[0], cycleExpr(parts[0], 1), cycleExpr(parts[0], 2)];
-  }
-  if (parts.length === 3 && (parts[1].includes('…') || parts[2].includes('…'))) {
-    return [parts[0], cycleExpr(parts[0], 1), cycleExpr(parts[0], 2)];
-  }
-  return parts.slice(0, 3);
-}
-
-function sanitizePart(part) {
-  let out = part.trim();
-  for (let i = 0; i < 3; i++) out = out.replace(/\s*\([^()]*\)\s*$/g, '').trim();
-  out = out.replace(/\s+(?:simplified|midpoint|variant|reciprocal|trilinear)\b.*$/i, '').trim();
-  return out;
-}
-
-function compileWeightFromBary(center) {
-  if (WEIGHT_FN_CACHE.has(center.center_id)) return WEIGHT_FN_CACHE.get(center.center_id);
-  const raw = (center.barycentrics || [])[0] || '';
-  if (!raw || /variant|approx/i.test(raw)) {
-    WEIGHT_FN_CACHE.set(center.center_id, null);
-    return null;
-  }
-  if (center.center_id === 'X(4)') {
-    const fnX4 = (p) => [p.cosT, p.sinT];
-    WEIGHT_FN_CACHE.set(center.center_id, fnX4);
-    return fnX4;
-  }
-  const parts = expandCyclicParts(raw).map(sanitizePart);
-  if (parts.length !== 3) {
-    WEIGHT_FN_CACHE.set(center.center_id, null);
-    return null;
-  }
-  try {
-    const compiled = parts.map(p => math.parse(normalizeEtcExpr(p)).compile());
-    const fn = (p) => {
-      const clamp = (x) => Math.max(-1, Math.min(1, x));
-      const A = Math.acos(clamp((p.b2 + p.c2 - p.a2) / (2 * p.b * p.c)));
-      const B = Math.acos(clamp((p.a2 + p.c2 - p.b2) / (2 * p.a * p.c)));
-      const C = Math.acos(clamp((p.a2 + p.b2 - p.c2) / (2 * p.a * p.b)));
-      const scope = {
-        ...p,
-        s: p.sp,
-        A, B, C,
-        pi: Math.PI,
-        cot: (x) => 1 / Math.tan(x),
-        sec: (x) => 1 / Math.cos(x),
-        csc: (x) => 1 / Math.sin(x),
-      };
-      const vals = compiled.map(c => c.evaluate(scope));
-      if (vals.some(v => !isFinite(v))) return [NaN, NaN];
-      return b2c(vals[0], vals[1], vals[2], p.cosT, p.sinT);
-    };
-    WEIGHT_FN_CACHE.set(center.center_id, fn);
-    return fn;
-  } catch (err) {
-    WEIGHT_FN_CACHE.set(center.center_id, null);
-    return null;
-  }
-}
 
 
 function addImplicitMultiply(expr) {
@@ -669,6 +587,10 @@ function findCenter(id) { return ALL_CENTERS.find(c => c.center_id === id) || nu
 
 function evalCenterAt(id, p, t) {
   if (hasFormula(id)) return evalFormula(id, t);
+  if (id in SPECIAL_CENTER_WEIGHTS) {
+    const w = SPECIAL_CENTER_WEIGHTS[id](p);
+    return b2c(w[0], w[1], w[2], p.cosT, p.sinT);
+  }
   const center = findCenter(id);
   const fn = center ? compileWeightFromBary(center) : null;
   if (fn) return fn(p);
@@ -720,7 +642,8 @@ function makeThalesBoard(domId, state, centerId, compact) {
   b.create('point',[
     ()=>{ const t=tFromTheta(state.angle); const p=triParams(t); const [x]=evalCenterAt(centerId,p,t); return isFinite(x)?x:NaN; },
     ()=>{ const t=tFromTheta(state.angle); const p=triParams(t); const [,y]=evalCenterAt(centerId,p,t);
-          if(!isFinite(y)) return NaN; return isLowerHalf(state.angle) ? -y : y; }
+          if(!isFinite(y)) return NaN;
+          return isLowerHalf(state.angle) ? -y : y; }
   ],{name:centerId,fixed:true,fillColor:'#f0b429',strokeColor:'#fff',strokeWidth:1.5,size:compact?4:6,
      label:{fontSize:compact?9:11,color:'#f0b429',offset:[7,6]}});
   return b;
