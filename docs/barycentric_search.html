@@ -302,7 +302,7 @@ const ALL_CENTERS = [{"center_id":"X(3)","name":"Circumcenter","source_page":"ET
 // ── Parametric helpers — t = tan(θ/4), t∈(EPS,1-EPS) for upper half ──────────
 // A=(-1,0), B=(1,0), C=(cosθ,sinθ).  c=|AB|=2 always.
 // cosθ = (1−6t²+t⁴)/(1+t²)²   sinθ = 4t(1−t²)/(1+t²)²
-// a=|BC|=4t/(1+t²)  b=|CA|=2(1−t²)/(1+t²)  [t∈(0,1)]
+// a=|BC|=2(1−t²)/(1+t²)  b=|CA|=4t/(1+t²)  [t∈(0,1)]
 // Barycentric→Cartesian for A=(-1,0), B=(1,0), C=(cosθ,sinθ):
 // x=(-u+v+w·cosθ)/(u+v+w), y=w·sinθ/(u+v+w)
 
@@ -396,18 +396,7 @@ function buildLocusCartesian(cfn) {
 // ── Exact rational locus formulas (t = tan(θ/4)) ─────────────────────────────
 // All derived from barycentric→Cartesian with A=(1,0), B=(−1,0).
 // Upper half only; buildLocus reflects for lower half.
-const LOCUS_FORMULAS = {
-  // X(5): midpoint of circumcenter O and orthocenter H in Thales setup
-  "X(5)": t => {
-    const t2=t*t, d2=(1+t2)*(1+t2);
-    return [(1-6*t2+t2*t2)/(2*d2), 2*t*(1-t2)/d2];
-  },
-  // X(11): Feuerbach point (verified rational form in this coordinate model)
-  "X(11)": t => {
-    const t2=t*t, d2=(1+t2)*(1+t2), d3=5*t2-4*t+1, d=d2*d3, A=t2+2*t-1;
-    return [A*(t2*t2-6*t2*t+2*t-1)/d, 2*t*(1-t)*A*A/d];
-  },
-};
+const LOCUS_FORMULAS = {};
 const WEIGHT_FN_CACHE = new Map();
 
 
@@ -567,20 +556,27 @@ function evalFormula(id, t) {
 
 function findCenter(id) { return ALL_CENTERS.find(c => c.center_id === id) || null; }
 
-const SPECIAL_WEIGHT_OVERRIDES = {
-  // Symmedian point
-  "X(6)": (p) => b2c(p.a2, p.b2, p.c2, p.cosT, p.sinT),
-  // Gergonne point
-  "X(7)": (p) => {
-    const u = 1 / (p.sp - p.a), v = 1 / (p.sp - p.b), w = 1 / (p.sp - p.c);
-    return b2c(u, v, w, p.cosT, p.sinT);
-  },
-  // Schiffler point (ETC equivalent in this model)
-  "X(21)": (p) => {
-    const u = p.a / (p.b + p.c), v = p.b / (p.c + p.a), w = p.c / (p.a + p.b);
-    return b2c(u, v, w, p.cosT, p.sinT);
-  },
-};
+function buildLocus(id) {
+  const center = findCenter(id);
+  const weightFn = center ? compileWeightFromBary(center) : null;
+  if (weightFn) return buildLocusWfn(weightFn);
+
+  // Check if formula uses triParams (p-based)
+  const fn = LOCUS_FORMULAS[id];
+  if (!fn) return buildLocusWfn(p => [p.cosT, p.sinT]);
+  const useP = fn.length !== 1 || (() => {
+    try { const r=fn(0.5); return !Array.isArray(r); } catch(e){ return true; }
+  })();
+
+  // Use weight-function builder for p-based formulas
+  if (useP || id === "X(7)" || id === "X(9)" || id === "X(10)" ||
+      id === "X(21)" || id === "X(40)" || id === "X(100)") {
+    return buildLocusWfn(p => {
+      const r = fn(p);
+      if (Array.isArray(r)) return r;    // formula returned [x,y] directly via b2c
+      return [NaN, NaN];
+    });
+  }
 
 function evalCenterAt(id, p, t) {
   if (id in SPECIAL_WEIGHT_OVERRIDES) return SPECIAL_WEIGHT_OVERRIDES[id](p);
@@ -631,13 +627,18 @@ function makeThalesBoard(domId, state, centerId, compact) {
   b.create('segment',[[-1,0],[1,0]],{strokeColor:'#58a6ff',strokeWidth:1.5,opacity:.6});
 
   // Locus + moving dot if formula known
+  const center = findCenter(centerId);
   const [xs,ys] = buildLocus(centerId);
   b.create('curve',[xs,ys],{strokeColor:'#f0b429',strokeWidth:compact?2:2.5,highlight:false,name:''});
   b.create('point',[
-    ()=>{ const t=tFromTheta(state.angle); const p=triParams(t); const [x]=evalCenterAt(centerId,p,t); return isFinite(x)?x:NaN; },
-    ()=>{ const t=tFromTheta(state.angle); const p=triParams(t); const [,y]=evalCenterAt(centerId,p,t);
-          if(!isFinite(y)) return NaN;
-          return isLowerHalf(state.angle) ? -y : y; }
+    ()=>{ const t=tFromTheta(state.angle); const p=triParams(t);
+          const fn = center ? compileWeightFromBary(center) : null;
+          const [x]=fn ? fn(p) : (hasFormula(centerId) ? evalFormula(centerId,t) : [p.cosT,p.sinT]);
+          return isFinite(x)?x:NaN; },
+    ()=>{ const t=tFromTheta(state.angle); const p=triParams(t);
+          const fn = center ? compileWeightFromBary(center) : null;
+          const [,y]=fn ? fn(p) : (hasFormula(centerId) ? evalFormula(centerId,t) : [p.cosT,p.sinT]);
+          if(!isFinite(y))return NaN; return isLowerHalf(state.angle)?-y:y; }
   ],{name:centerId,fixed:true,fillColor:'#f0b429',strokeColor:'#fff',strokeWidth:1.5,size:compact?4:6,
      label:{fontSize:compact?9:11,color:'#f0b429',offset:[7,6]}});
   return b;
