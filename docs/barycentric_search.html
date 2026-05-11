@@ -295,88 +295,269 @@ tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
 </div>
 
 <script>
-// ── Centers data (embedded from barycentric_index.json) ──────────
-const ALL_CENTERS = [{"center_id":"X(3)","name":"Circumcenter","source_page":"ETC.html","barycentrics":["sin 2A : sin 2B : sin 2C"],"search_text":"X(3) | Circumcenter | sin 2A : sin 2B : sin 2C"},{"center_id":"X(4)","name":"Orthocenter (= C here)","source_page":"ETC.html","barycentrics":["SA : SB : SC"],"search_text":"X(4) | Orthocenter (= C here) | SA : SB : SC"},{"center_id":"X(5)","name":"Nine-Point Center","source_page":"ETC.html","barycentrics":["cos(B-C):cos(C-A):cos(A-B)"],"search_text":"X(5) | Nine-Point Center | cos(B-C):cos(C-A):cos(A-B)"},{"center_id":"X(6)","name":"Symmedian Point","source_page":"ETC.html","barycentrics":["a² : b² : c²"],"search_text":"X(6) | Symmedian Point | a² : b² : c²"},{"center_id":"X(7)","name":"Gergonne Point","source_page":"ETC.html","barycentrics":["1/(s−a) : 1/(s−b) : 1/(s−c)"],"search_text":"X(7) | Gergonne Point | 1/(s−a) : 1/(s−b) : 1/(s−c)"},{"center_id":"X(8)","name":"Nagel Point","source_page":"ETC.html","barycentrics":["b+c−a : c+a−b : a+b−c"],"search_text":"X(8) | Nagel Point | b+c−a : c+a−b : a+b−c"},{"center_id":"X(9)","name":"Mittenpunkt","source_page":"ETC.html","barycentrics":["a(b+c−a):b(c+a−b):c(a+b−c)"],"search_text":"X(9) | Mittenpunkt | a(b+c−a):b(c+a−b):c(a+b−c)"},{"center_id":"X(10)","name":"Spieker Center","source_page":"ETC.html","barycentrics":["b+c : c+a : a+b"],"search_text":"X(10) | Spieker Center | b+c : c+a : a+b"},{"center_id":"X(11)","name":"Feuerbach Point","source_page":"ETC.html","barycentrics":["(b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)"],"search_text":"X(11) | Feuerbach Point | (b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)"},{"center_id":"X(12)","name":"Extouchpoint-midpoint","source_page":"ETC.html","barycentrics":["a/(b+c+a)²:…"],"search_text":"X(12) | Extouchpoint-midpoint | a/(b+c+a)²:…"},{"center_id":"X(13)","name":"Fermat Point 1 (isog conj X14)","source_page":"ETC.html","barycentrics":["1/(SA+√3·S):…"],"search_text":"X(13) | Fermat Point 1 (isog conj X14) | 1/(SA+√3·S):…"},{"center_id":"X(14)","name":"Fermat Point 2","source_page":"ETC.html","barycentrics":["1/(SA-√3·S):…"],"search_text":"X(14) | Fermat Point 2 | 1/(SA-√3·S):…"},{"center_id":"X(15)","name":"Isogonic Point 1","source_page":"ETC.html","barycentrics":["sin(A+π/3):sin(B+π/3):sin(C+π/3)"],"search_text":"X(15) | Isogonic Point 1 | sin(A+π/3):sin(B+π/3):sin(C+π/3)"},{"center_id":"X(16)","name":"Isogonic Point 2","source_page":"ETC.html","barycentrics":["sin(A-π/3):sin(B-π/3):sin(C-π/3)"],"search_text":"X(16) | Isogonic Point 2 | sin(A-π/3):sin(B-π/3):sin(C-π/3)"},{"center_id":"X(17)","name":"Napoleon Pt 1","source_page":"ETC.html","barycentrics":["1/(SA+√3·S):… (=X13 variant)"],"search_text":"X(17) | Napoleon Pt 1 | 1/(SA+√3·S):… (=X13 variant)"},{"center_id":"X(18)","name":"Napoleon Pt 2","source_page":"ETC.html","barycentrics":["SA-√3·S:…"],"search_text":"X(18) | Napoleon Pt 2 | SA-√3·S:…"},{"center_id":"X(19)","name":"Clawson Point (isog conj X63)","source_page":"ETC.html","barycentrics":["tan A:tan B:tan C"],"search_text":"X(19) | Clawson Point (isog conj X63) | tan A:tan B:tan C"},{"center_id":"X(20)","name":"de Longchamps Point","source_page":"ETC.html","barycentrics":["-SA·(SB-SC)²+…  ≈ SA+SB+3SC variant"],"search_text":"X(20) | de Longchamps Point | -SA·(SB-SC)²+…  ≈ SA+SB+3SC variant"},{"center_id":"X(21)","name":"Schiffler Point","source_page":"ETC.html","barycentrics":["1/(b+c):…"],"search_text":"X(21) | Schiffler Point | 1/(b+c):…"},{"center_id":"X(22)","name":"Exeter Point","source_page":"ETC.html","barycentrics":["a²(b⁴+c⁴-a⁴):…"],"search_text":"X(22) | Exeter Point | a²(b⁴+c⁴-a⁴):…"},{"center_id":"X(23)","name":"Far-Out Point","source_page":"ETC.html","barycentrics":["a²(a⁴-b²c²):…"],"search_text":"X(23) | Far-Out Point | a²(a⁴-b²c²):…"},{"center_id":"X(25)","name":"Homothetic Center (orthic and tangential)","source_page":"ETC.html","barycentrics":["a²/SA:…"],"search_text":"X(25) | Homothetic Center (orthic and tangential) | a²/SA:…"},{"center_id":"X(31)","name":"2nd Power Point","source_page":"ETC.html","barycentrics":["a³:b³:c³ (trilinear a²:…)"],"search_text":"X(31) | 2nd Power Point | a³:b³:c³ (trilinear a²:…)"},{"center_id":"X(32)","name":"3rd Power Point","source_page":"ETC.html","barycentrics":["a⁴:b⁴:c⁴"],"search_text":"X(32) | 3rd Power Point | a⁴:b⁴:c⁴"},{"center_id":"X(35)","name":"Intersection AP₁ with BC … isog 1st isog of X36","source_page":"ETC.html","barycentrics":["a²(b²+c²-a²-bc):…"],"search_text":"X(35) | Intersection AP₁ with BC … isog 1st isog of X36 | a²(b²+c²-a²-bc):…"},{"center_id":"X(36)","name":"Inverse of Incenter in circumcircle","source_page":"ETC.html","barycentrics":["a(a²-b²-bc-c²):…  simplified"],"search_text":"X(36) | Inverse of Incenter in circumcircle | a(a²-b²-bc-c²):…  simplified"},{"center_id":"X(37)","name":"Crosspoint of X1,X2 (harmonic mean)","source_page":"ETC.html","barycentrics":["ab+ac : bc+ba : ca+cb"],"search_text":"X(37) | Crosspoint of X1,X2 (harmonic mean) | ab+ac : bc+ba : ca+cb"},{"center_id":"X(39)","name":"Brocard Midpoint (X3 of medial)","source_page":"ETC.html","barycentrics":["a²(b²+c²):…"],"search_text":"X(39) | Brocard Midpoint (X3 of medial) | a²(b²+c²):…"},{"center_id":"X(40)","name":"Bevan Point (circumcenter of excentral)","source_page":"ETC.html","barycentrics":["−a(b²+c²−a²−2bc):…"],"search_text":"X(40) | Bevan Point (circumcenter of excentral) | −a(b²+c²−a²−2bc):…"},{"center_id":"X(41)","name":"Crosspoint of X1 and X6","source_page":"ETC.html","barycentrics":["a²(b+c-a):…"],"search_text":"X(41) | Crosspoint of X1 and X6 | a²(b+c-a):…"},{"center_id":"X(42)","name":"Crosssum of X1 and X2","source_page":"ETC.html","barycentrics":["a(b+c):…"],"search_text":"X(42) | Crosssum of X1 and X2 | a(b+c):…"},{"center_id":"X(43)","name":"X(1) of medial triangle","source_page":"ETC.html","barycentrics":["bc(b+c-a):…"],"search_text":"X(43) | X(1) of medial triangle | bc(b+c-a):…"},{"center_id":"X(44)","name":"X(1)-beth conjugate of X(44)","source_page":"ETC.html","barycentrics":["a(b+c-2a):…"],"search_text":"X(44) | X(1)-beth conjugate of X(44) | a(b+c-2a):…"},{"center_id":"X(45)","name":"Complement of X(44)","source_page":"ETC.html","barycentrics":["a(2b+2c-a):…"],"search_text":"X(45) | Complement of X(44) | a(2b+2c-a):…"},{"center_id":"X(46)","name":"X(4) of excentral triangle","source_page":"ETC.html","barycentrics":["a(cos B cos C - cos A):…"],"search_text":"X(46) | X(4) of excentral triangle | a(cos B cos C - cos A):…"},{"center_id":"X(55)","name":"Insimilicenter of circumcircle and incircle","source_page":"ETC.html","barycentrics":["a(b+c-a):…"],"search_text":"X(55) | Insimilicenter of circumcircle and incircle | a(b+c-a):…"},{"center_id":"X(56)","name":"Exsimilicenter (isog conj X55)","source_page":"ETC.html","barycentrics":["a/(b+c-a):…"],"search_text":"X(56) | Exsimilicenter (isog conj X55) | a/(b+c-a):…"},{"center_id":"X(57)","name":"Isogonal conj of X9","source_page":"ETC.html","barycentrics":["1/(b+c-a):…"],"search_text":"X(57) | Isogonal conj of X9 | 1/(b+c-a):…"},{"center_id":"X(58)","name":"Isogonal conj of X10","source_page":"ETC.html","barycentrics":["a²/(b+c):…"],"search_text":"X(58) | Isogonal conj of X10 | a²/(b+c):…"},{"center_id":"X(59)","name":"Isogonal conj of X11","source_page":"ETC.html","barycentrics":["a/((s-b)(s-c)):…"],"search_text":"X(59) | Isogonal conj of X11 | a/((s-b)(s-c)):…"},{"center_id":"X(63)","name":"Isogonal conj of X19","source_page":"ETC.html","barycentrics":["a/tan A:…  = a cos A:…"],"search_text":"X(63) | Isogonal conj of X19 | a/tan A:…  = a cos A:…"},{"center_id":"X(65)","name":"Isogonal conj of X21","source_page":"ETC.html","barycentrics":["a/(tan B+tan C):…"],"search_text":"X(65) | Isogonal conj of X21 | a/(tan B+tan C):…"},{"center_id":"X(69)","name":"Isotomic conj of X25  (symmedian point of anticomp)","source_page":"ETC.html","barycentrics":["b²c²(b²+c²-a²):…"],"search_text":"X(69) | Isotomic conj of X25  (symmedian point of anticomp) | b²c²(b²+c²-a²):…"},{"center_id":"X(75)","name":"Isotomic conj of X31","source_page":"ETC.html","barycentrics":["bc:ca:ab"],"search_text":"X(75) | Isotomic conj of X31 | bc:ca:ab"},{"center_id":"X(76)","name":"Isotomic conj of X32","source_page":"ETC.html","barycentrics":["b²c²:c²a²:a²b²"],"search_text":"X(76) | Isotomic conj of X32 | b²c²:c²a²:a²b²"},{"center_id":"X(79)","name":"Isogonal conj of X35","source_page":"ETC.html","barycentrics":["1/(2SA+bc):…"],"search_text":"X(79) | Isogonal conj of X35 | 1/(2SA+bc):…"},{"center_id":"X(80)","name":"Reflection of X1 in X11 variant","source_page":"ETC.html","barycentrics":["(b+c-a)/(b-a+c):…  simplified"],"search_text":"X(80) | Reflection of X1 in X11 variant | (b+c-a)/(b-a+c):…  simplified"},{"center_id":"X(81)","name":"Isogonal conj of X42","source_page":"ETC.html","barycentrics":["b+c:c+a:a+b → reciprocal of…  a/(b+c):…"],"search_text":"X(81) | Isogonal conj of X42 | b+c:c+a:a+b → reciprocal of…  a/(b+c):…"},{"center_id":"X(82)","name":"Isogonal conj of X38","source_page":"ETC.html","barycentrics":["a/(b²+c²):…"],"search_text":"X(82) | Isogonal conj of X38 | a/(b²+c²):…"},{"center_id":"X(83)","name":"Isogonal conj of X39","source_page":"ETC.html","barycentrics":["1/(b²+c²):…"],"search_text":"X(83) | Isogonal conj of X39 | 1/(b²+c²):…"},{"center_id":"X(85)","name":"Isotomic conj of X41","source_page":"ETC.html","barycentrics":["bc/(b+c-a):…"],"search_text":"X(85) | Isotomic conj of X41 | bc/(b+c-a):…"},{"center_id":"X(86)","name":"Isotomic conj of X42","source_page":"ETC.html","barycentrics":["bc(b+c):…"],"search_text":"X(86) | Isotomic conj of X42 | bc(b+c):…"},{"center_id":"X(88)","name":"Isogonal conj of X44","source_page":"ETC.html","barycentrics":["a/(2a-b-c):…"],"search_text":"X(88) | Isogonal conj of X44 | a/(2a-b-c):…"},{"center_id":"X(89)","name":"Isogonal conj of X45","source_page":"ETC.html","barycentrics":["a/(2b+2c-a):…"],"search_text":"X(89) | Isogonal conj of X45 | a/(2b+2c-a):…"},{"center_id":"X(98)","name":"Tarry Point (isog conj of Steiner)","source_page":"ETC.html","barycentrics":["SA(SB-SC)²:…"],"search_text":"X(98) | Tarry Point (isog conj of Steiner) | SA(SB-SC)²:…"},{"center_id":"X(99)","name":"Steiner Point","source_page":"ETC.html","barycentrics":["1/(b²-c²):…"],"search_text":"X(99) | Steiner Point | 1/(b²-c²):…"},{"center_id":"X(100)","name":"Anticomplement of Feuerbach","source_page":"ETC.html","barycentrics":["1/(b-c):…"],"search_text":"X(100) | Anticomplement of Feuerbach | 1/(b-c):…"},{"center_id":"X(101)","name":"Isog conj of X514 (trilinear: a/(b-c))","source_page":"ETC.html","barycentrics":["a²/(b-c):…"],"search_text":"X(101) | Isog conj of X514 (trilinear: a/(b-c)) | a²/(b-c):…"},{"center_id":"X(105)","name":"Isog conj of X518","source_page":"ETC.html","barycentrics":["1/(a(b+c)-b²-c²):…"],"search_text":"X(105) | Isog conj of X518 | 1/(a(b+c)-b²-c²):…"},{"center_id":"X(110)","name":"Focus of Kiepert parabola","source_page":"ETC.html","barycentrics":["a²/(b²-c²):…"],"search_text":"X(110) | Focus of Kiepert parabola | a²/(b²-c²):…"},{"center_id":"X(111)","name":"Parry Point","source_page":"ETC.html","barycentrics":["a²/(2a²-b²-c²):…"],"search_text":"X(111) | Parry Point | a²/(2a²-b²-c²):…"},{"center_id":"X(114)","name":"Center of Kiepert hyperbola","source_page":"ETC.html","barycentrics":["SA(SB-SC)²+…  midpoint X113 X4"],"search_text":"X(114) | Center of Kiepert hyperbola | SA(SB-SC)²+…  midpoint X113 X4"},{"center_id":"X(115)","name":"Center of Kiepert circumconic","source_page":"ETC.html","barycentrics":["(b²-c²)²:…"],"search_text":"X(115) | Center of Kiepert circumconic | (b²-c²)²:…"},{"center_id":"X(116)","name":"Tripole of Euler line","source_page":"ETC.html","barycentrics":["(SB-SC)²:…"],"search_text":"X(116) | Tripole of Euler line | (SB-SC)²:…"},{"center_id":"X(119)","name":"Complement of X(11)","source_page":"ETC.html","barycentrics":["(b+c-a)(b²+c²-a²):…"],"search_text":"X(119) | Complement of X(11) | (b+c-a)(b²+c²-a²):…"},{"center_id":"X(120)","name":"Complement of X(105)","source_page":"ETC.html","barycentrics":["b²+c²-a(b+c):…"],"search_text":"X(120) | Complement of X(105) | b²+c²-a(b+c):…"},{"center_id":"X(121)","name":"Complement of X(106)","source_page":"ETC.html","barycentrics":["bc(b+c-a-bc/a):…  → a(b+c-2a)²:…"],"search_text":"X(121) | Complement of X(106) | bc(b+c-a-bc/a):…  → a(b+c-2a)²:…"},{"center_id":"X(125)","name":"Center of Jerabek hyperbola","source_page":"ETC.html","barycentrics":["a²(b²-c²)²·SA:…"],"search_text":"X(125) | Center of Jerabek hyperbola | a²(b²-c²)²·SA:…"},{"center_id":"X(126)","name":"Midpoint of X3 and X111","source_page":"ETC.html","barycentrics":["a²(2a²-b²-c²):…"],"search_text":"X(126) | Midpoint of X3 and X111 | a²(2a²-b²-c²):…"},{"center_id":"X(127)","name":"Midpoint X3 and X112","source_page":"ETC.html","barycentrics":["a²·SA(SB-SC)²:…"],"search_text":"X(127) | Midpoint X3 and X112 | a²·SA(SB-SC)²:…"},{"center_id":"X(140)","name":"Complement of X5","source_page":"ETC.html","barycentrics":["a²(b²+c²)+bc(b²+c²-a²):…"],"search_text":"X(140) | Complement of X5 | a²(b²+c²)+bc(b²+c²-a²):…"},{"center_id":"X(141)","name":"Complement of X6","source_page":"ETC.html","barycentrics":["b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)"],"search_text":"X(141) | Complement of X6 | b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)"},{"center_id":"X(142)","name":"Complement of X7","source_page":"ETC.html","barycentrics":["(b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…"],"search_text":"X(142) | Complement of X7 | (b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…"},{"center_id":"X(144)","name":"Anticomplement of X7","source_page":"ETC.html","barycentrics":["(b-c)²+a(b+c-2a):…"],"search_text":"X(144) | Anticomplement of X7 | (b-c)²+a(b+c-2a):…"},{"center_id":"X(145)","name":"Anticomplement of X8","source_page":"ETC.html","barycentrics":["(b+c-3a):…"],"search_text":"X(145) | Anticomplement of X8 | (b+c-3a):…"},{"center_id":"X(162)","name":"Isog conj of X525 (trilinear:a/(b²-c²))","source_page":"ETC.html","barycentrics":["a³/(b²-c²):…"],"search_text":"X(162) | Isog conj of X525 (trilinear:a/(b²-c²)) | a³/(b²-c²):…"},{"center_id":"X(174)","name":"Isog conj of X175 (midcircle)","source_page":"ETC.html","barycentrics":["sin(A/2):sin(B/2):sin(C/2)"],"search_text":"X(174) | Isog conj of X175 (midcircle) | sin(A/2):sin(B/2):sin(C/2)"},{"center_id":"X(175)","name":"Isog conj of X174","source_page":"ETC.html","barycentrics":["1/sin(A/2):…"],"search_text":"X(175) | Isog conj of X174 | 1/sin(A/2):…"},{"center_id":"X(176)","name":"Isotomic conj X174","source_page":"ETC.html","barycentrics":["bc/sin(A/2):…"],"search_text":"X(176) | Isotomic conj X174 | bc/sin(A/2):…"},{"center_id":"X(178)","name":"Midcircle of incircle and A-excircle (approx)","source_page":"ETC.html","barycentrics":["cos(A/2):cos(B/2):cos(C/2)"],"search_text":"X(178) | Midcircle of incircle and A-excircle (approx) | cos(A/2):cos(B/2):cos(C/2)"},{"center_id":"X(181)","name":"Isog conj of X314","source_page":"ETC.html","barycentrics":["a²/((b+c)(s-a)):…"],"search_text":"X(181) | Isog conj of X314 | a²/((b+c)(s-a)):…"},{"center_id":"X(182)","name":"Midpoint of X3 and X6","source_page":"ETC.html","barycentrics":["a²(b²+c²-a²):…"],"search_text":"X(182) | Midpoint of X3 and X6 | a²(b²+c²-a²):…"},{"center_id":"X(184)","name":"Crosssum of X3 and X6","source_page":"ETC.html","barycentrics":["a⁴(b²+c²-a²):…"],"search_text":"X(184) | Crosssum of X3 and X6 | a⁴(b²+c²-a²):…"},{"center_id":"X(186)","name":"Inverse of X4 in circumcircle","source_page":"ETC.html","barycentrics":["a²(a⁴-b⁴-c⁴+b²c²):…"],"search_text":"X(186) | Inverse of X4 in circumcircle | a²(a⁴-b⁴-c⁴+b²c²):…"},{"center_id":"X(187)","name":"Schoute Center","source_page":"ETC.html","barycentrics":["a²(2a²-b²-c²):…"],"search_text":"X(187) | Schoute Center | a²(2a²-b²-c²):…"},{"center_id":"X(190)","name":"Isotomic conj of X44","source_page":"ETC.html","barycentrics":["bc(b+c-2a):…"],"search_text":"X(190) | Isotomic conj of X44 | bc(b+c-2a):…"},{"center_id":"X(192)","name":"Crosspoint of X1 and X75","source_page":"ETC.html","barycentrics":["bc(c+a-b):…  variant"],"search_text":"X(192) | Crosspoint of X1 and X75 | bc(c+a-b):…  variant"},{"center_id":"X(193)","name":"Isotomic conj of X69","source_page":"ETC.html","barycentrics":["a²(b²+c²)-b²c²:…  = a²SA:…"],"search_text":"X(193) | Isotomic conj of X69 | a²(b²+c²)-b²c²:…  = a²SA:…"},{"center_id":"X(200)","name":"Isog conj X269 (Mittenpunkt variant)","source_page":"ETC.html","barycentrics":["a(b+c-a)²:…"],"search_text":"X(200) | Isog conj X269 (Mittenpunkt variant) | a(b+c-a)²:…"},{"center_id":"X(210)","name":"Isog conj X1170","source_page":"ETC.html","barycentrics":["a(b+c-a)²:…  (same as X200 up to sign — see ETC)"],"search_text":"X(210) | Isog conj X1170 | a(b+c-a)²:…  (same as X200 up to sign — see ETC)"},{"center_id":"X(213)","name":"Crosspoint X1,X42","source_page":"ETC.html","barycentrics":["a²(b+c):…"],"search_text":"X(213) | Crosspoint X1,X42 | a²(b+c):…"},{"center_id":"X(214)","name":"Harmonic conjugate of X1 wrt X11 X12","source_page":"ETC.html","barycentrics":["a²(b+c-a)²:…"],"search_text":"X(214) | Harmonic conjugate of X1 wrt X11 X12 | a²(b+c-a)²:…"},{"center_id":"X(216)","name":"Kosnita's theorem point","source_page":"ETC.html","barycentrics":["SA(SB·SC):…  → SA·SB:…"],"search_text":"X(216) | Kosnita's theorem point | SA(SB·SC):…  → SA·SB:…"},{"center_id":"X(218)","name":"Isog conj X1445","source_page":"ETC.html","barycentrics":["a²(b+c-a)(a(b+c)-bc):…"],"search_text":"X(218) | Isog conj X1445 | a²(b+c-a)(a(b+c)-bc):…"},{"center_id":"X(220)","name":"Isog conj X279","source_page":"ETC.html","barycentrics":["a²(b+c-a)²/(bc):…"],"search_text":"X(220) | Isog conj X279 | a²(b+c-a)²/(bc):…"},{"center_id":"X(222)","name":"Isog conj X281 (3rd Conway pt)","source_page":"ETC.html","barycentrics":["a·cos²(A/2)/(b+c-a):…"],"search_text":"X(222) | Isog conj X281 (3rd Conway pt) | a·cos²(A/2)/(b+c-a):…"},{"center_id":"X(223)","name":"Isog conj X282","source_page":"ETC.html","barycentrics":["a(b+c-a)/(b²+c²-a²):…"],"search_text":"X(223) | Isog conj X282 | a(b+c-a)/(b²+c²-a²):…"},{"center_id":"X(226)","name":"Isog conj X284","source_page":"ETC.html","barycentrics":["bc/(b+c-a):…"],"search_text":"X(226) | Isog conj X284 | bc/(b+c-a):…"},{"center_id":"X(230)","name":"Crossdiff X2,X6 (Euler-line tripole)","source_page":"ETC.html","barycentrics":["SA·SB:SB·SC:SC·SA → simplified"],"search_text":"X(230) | Crossdiff X2,X6 (Euler-line tripole) | SA·SB:SB·SC:SC·SA → simplified"},{"center_id":"X(232)","name":"Crossdiff X3,X6","source_page":"ETC.html","barycentrics":["a²·SA(SB-SC)²:…"],"search_text":"X(232) | Crossdiff X3,X6 | a²·SA(SB-SC)²:…"},{"center_id":"X(233)","name":"Nine-point circle inverse of X5","source_page":"ETC.html","barycentrics":["a⁴(b²-c²)²:…"],"search_text":"X(233) | Nine-point circle inverse of X5 | a⁴(b²-c²)²:…"},{"center_id":"X(236)","name":"Midpoint X175 X176","source_page":"ETC.html","barycentrics":["cos(A/2)+cos(B/2)+cos(C/2):…  variant"],"search_text":"X(236) | Midpoint X175 X176 | cos(A/2)+cos(B/2)+cos(C/2):…  variant"}];
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+//  ALL_CENTERS — Clean ASCII barycentric strings; all dirty unicode removed.
+//  Data changes per audit notes:
+//   · All superscripts (², ³, ⁴…) replaced with ^n
+//   · All unicode minus (−) replaced with -
+//   · All unicode dot (·) replaced with *
+//   · bc/ca/ab product tokens replaced with b*c/c*a/a*b
+//   · Annotation colons (trilinear a²:…) stripped from X(31)
+//   · X(12),(17),(20),(81),(114),(142),(236) corrected formulas
+//   · Explicit three-weight strings for all centers (no … shorthand ambiguity)
+//   · Bug 10 fix: X(7) uses (s-a) form, not lowercase sa shorthand
+// ════════════════════════════════════════════════════════════════════════════
+const ALL_CENTERS = [
+  {center_id:"X(3)", name:"Circumcenter", barycentrics:["sin(2*A):sin(2*B):sin(2*C)"], search_text:"X(3) | Circumcenter | sin(2*A):sin(2*B):sin(2*C)"},
+  {center_id:"X(4)", name:"Orthocenter (= C in Thales)", barycentrics:["SA:SB:SC"], search_text:"X(4) | Orthocenter | SA:SB:SC"},
+  {center_id:"X(5)", name:"Nine-Point Center", barycentrics:["cos(B-C):cos(C-A):cos(A-B)"], search_text:"X(5) | Nine-Point Center | cos(B-C):cos(C-A):cos(A-B)"},
+  {center_id:"X(6)", name:"Symmedian Point", barycentrics:["a^2:b^2:c^2"], search_text:"X(6) | Symmedian Point | a^2:b^2:c^2"},
+  // Bug 10 fix: use (s-a) form — lowercase sa is NOT cycled by cycleExpr
+  {center_id:"X(7)", name:"Gergonne Point", barycentrics:["1/(s-a):1/(s-b):1/(s-c)"], search_text:"X(7) | Gergonne Point | 1/(s-a)"},
+  {center_id:"X(8)", name:"Nagel Point", barycentrics:["b+c-a:c+a-b:a+b-c"], search_text:"X(8) | Nagel Point | b+c-a"},
+  {center_id:"X(9)", name:"Mittenpunkt", barycentrics:["a*(b+c-a):b*(c+a-b):c*(a+b-c)"], search_text:"X(9) | Mittenpunkt | a*(b+c-a)"},
+  {center_id:"X(10)", name:"Spieker Center", barycentrics:["b+c:c+a:a+b"], search_text:"X(10) | Spieker Center | b+c"},
+  {center_id:"X(11)", name:"Feuerbach Point", barycentrics:["(b-c)^2*(b+c-a):(c-a)^2*(c+a-b):(a-b)^2*(a+b-c)"], search_text:"X(11) | Feuerbach Point"},
+  // X(12): corrected formula — a^2*(s-b)*(s-c) cyclic
+  {center_id:"X(12)", name:"Extouchpoint", barycentrics:["a^2*(s-b)*(s-c):b^2*(s-c)*(s-a):c^2*(s-a)*(s-b)"], search_text:"X(12) | Extouchpoint | a^2*(s-b)*(s-c)"},
+  {center_id:"X(13)", name:"Fermat Point 1", barycentrics:["1/(SA+sqrt(3)*S):1/(SB+sqrt(3)*S):1/(SC+sqrt(3)*S)"], search_text:"X(13) | Fermat Point 1 | 1/(SA+sqrt(3)*S)"},
+  {center_id:"X(14)", name:"Fermat Point 2", barycentrics:["1/(SA-sqrt(3)*S):1/(SB-sqrt(3)*S):1/(SC-sqrt(3)*S)"], search_text:"X(14) | Fermat Point 2 | 1/(SA-sqrt(3)*S)"},
+  {center_id:"X(15)", name:"Isogonic Point 1", barycentrics:["sin(A+pi/3):sin(B+pi/3):sin(C+pi/3)"], search_text:"X(15) | Isogonic Point 1 | sin(A+pi/3)"},
+  {center_id:"X(16)", name:"Isogonic Point 2", barycentrics:["sin(A-pi/3):sin(B-pi/3):sin(C-pi/3)"], search_text:"X(16) | Isogonic Point 2 | sin(A-pi/3)"},
+  // X(17): corrected — Napoleon Pt 1 ≠ X(13); distinct cyclic form
+  {center_id:"X(17)", name:"Napoleon Point 1", barycentrics:["sin(B+pi/3):sin(C+pi/3):sin(A+pi/3)"], search_text:"X(17) | Napoleon Point 1 | sin(B+pi/3)"},
+  {center_id:"X(18)", name:"Napoleon Point 2", barycentrics:["SA-sqrt(3)*S:SB-sqrt(3)*S:SC-sqrt(3)*S"], search_text:"X(18) | Napoleon Point 2 | SA-sqrt(3)*S"},
+  // X(19): tan(C)=∞ in Thales; locus is partial — shown with gap
+  {center_id:"X(19)", name:"Clawson Point (⚠ degenerate: tan C = ∞)", barycentrics:["tan(A):tan(B):tan(C)"], search_text:"X(19) | Clawson Point | tan(A):tan(B):tan(C)"},
+  // X(20): corrected formula — de Longchamps simplified
+  {center_id:"X(20)", name:"de Longchamps Point", barycentrics:["SA+SB-SC:SB+SC-SA:SC+SA-SB"], search_text:"X(20) | de Longchamps Point | SA+SB-SC"},
+  {center_id:"X(21)", name:"Schiffler Point", barycentrics:["1/(b+c):1/(c+a):1/(a+b)"], search_text:"X(21) | Schiffler Point | 1/(b+c)"},
+  {center_id:"X(22)", name:"Exeter Point", barycentrics:["a^2*(b^4+c^4-a^4):b^2*(c^4+a^4-b^4):c^2*(a^4+b^4-c^4)"], search_text:"X(22) | Exeter Point"},
+  // X(23): Far-Out Point — locus exits viewport; partial locus expected
+  {center_id:"X(23)", name:"Far-Out Point (partial locus)", barycentrics:["a^2*(a^4-b^2*c^2):b^2*(b^4-c^2*a^2):c^2*(c^4-a^2*b^2)"], search_text:"X(23) | Far-Out Point"},
+  {center_id:"X(25)", name:"Homothetic Center (orthic/tangential)", barycentrics:["a^2/SA:b^2/SB:c^2/SC"], search_text:"X(25) | Homothetic Center | a^2/SA"},
+  // X(31): Bug 9 fix — removed annotation (trilinear a^2:…) that contained colon
+  {center_id:"X(31)", name:"2nd Power Point", barycentrics:["a^3:b^3:c^3"], search_text:"X(31) | 2nd Power Point | a^3"},
+  {center_id:"X(32)", name:"3rd Power Point", barycentrics:["a^4:b^4:c^4"], search_text:"X(32) | 3rd Power Point | a^4"},
+  {center_id:"X(35)", name:"Intersection AP1 with BC", barycentrics:["a^2*(b^2+c^2-a^2-b*c):b^2*(c^2+a^2-b^2-c*a):c^2*(a^2+b^2-c^2-a*b)"], search_text:"X(35) | AP1 with BC"},
+  {center_id:"X(36)", name:"Inverse of Incenter in circumcircle", barycentrics:["a*(a^2-b^2-b*c-c^2):b*(b^2-c^2-c*a-a^2):c*(c^2-a^2-a*b-b^2)"], search_text:"X(36) | Inverse Incenter circ"},
+  // Bug 6 fix: bc→b*c, ab→a*b, ca→c*a
+  {center_id:"X(37)", name:"Crosspoint of X1, X2", barycentrics:["a*b+a*c:b*c+b*a:c*a+c*b"], search_text:"X(37) | Crosspoint X1 X2 | a*b+a*c"},
+  {center_id:"X(39)", name:"Brocard Midpoint", barycentrics:["a^2*(b^2+c^2):b^2*(c^2+a^2):c^2*(a^2+b^2)"], search_text:"X(39) | Brocard Midpoint"},
+  {center_id:"X(40)", name:"Bevan Point", barycentrics:["-a*(b^2+c^2-a^2-2*b*c):-b*(c^2+a^2-b^2-2*c*a):-c*(a^2+b^2-c^2-2*a*b)"], search_text:"X(40) | Bevan Point"},
+  {center_id:"X(41)", name:"Crosspoint of X1 and X6", barycentrics:["a^2*(b+c-a):b^2*(c+a-b):c^2*(a+b-c)"], search_text:"X(41) | Crosspoint X1 X6"},
+  {center_id:"X(42)", name:"Crosssum of X1 and X2", barycentrics:["a*(b+c):b*(c+a):c*(a+b)"], search_text:"X(42) | Crosssum X1 X2"},
+  {center_id:"X(43)", name:"X(1) of medial triangle", barycentrics:["b*c*(b+c-a):c*a*(c+a-b):a*b*(a+b-c)"], search_text:"X(43) | X1 of medial"},
+  {center_id:"X(44)", name:"X(1)-beth conjugate", barycentrics:["a*(b+c-2*a):b*(c+a-2*b):c*(a+b-2*c)"], search_text:"X(44) | beth conjugate"},
+  {center_id:"X(45)", name:"Complement of X(44)", barycentrics:["a*(2*b+2*c-a):b*(2*c+2*a-b):c*(2*a+2*b-c)"], search_text:"X(45) | Complement X44"},
+  {center_id:"X(46)", name:"X(4) of excentral triangle", barycentrics:["a*(cos(B)*cos(C)-cos(A)):b*(cos(C)*cos(A)-cos(B)):c*(cos(A)*cos(B)-cos(C))"], search_text:"X(46) | X4 excentral"},
+  {center_id:"X(55)", name:"Insimilicenter (circumcircle & incircle)", barycentrics:["a*(b+c-a):b*(c+a-b):c*(a+b-c)"], search_text:"X(55) | Insimilicenter"},
+  {center_id:"X(56)", name:"Exsimilicenter", barycentrics:["a/(b+c-a):b/(c+a-b):c/(a+b-c)"], search_text:"X(56) | Exsimilicenter"},
+  {center_id:"X(57)", name:"Isogonal conj of X(9)", barycentrics:["1/(b+c-a):1/(c+a-b):1/(a+b-c)"], search_text:"X(57) | Isogonal conj X9"},
+  {center_id:"X(58)", name:"Isogonal conj of X(10)", barycentrics:["a^2/(b+c):b^2/(c+a):c^2/(a+b)"], search_text:"X(58) | Isogonal conj X10"},
+  {center_id:"X(59)", name:"Isogonal conj of X(11)", barycentrics:["a/((s-b)*(s-c)):b/((s-c)*(s-a)):c/((s-a)*(s-b))"], search_text:"X(59) | Isogonal conj X11"},
+  // X(63): simpler equivalent; avoids tan A issues
+  {center_id:"X(63)", name:"Isogonal conj of X(19)", barycentrics:["a*cos(A):b*cos(B):c*cos(C)"], search_text:"X(63) | Isogonal conj X19 | a*cos(A)"},
+  // X(65): tan(C)=∞ in Thales — degenerate, shown with gap
+  {center_id:"X(65)", name:"Isogonal conj of X(21) (⚠ degenerate: tan C = ∞)", barycentrics:["a/(tan(B)+tan(C)):b/(tan(C)+tan(A)):c/(tan(A)+tan(B))"], search_text:"X(65) | Isogonal conj X21"},
+  {center_id:"X(69)", name:"Isotomic conj of X(25)", barycentrics:["b^2*c^2*(b^2+c^2-a^2):c^2*a^2*(c^2+a^2-b^2):a^2*b^2*(a^2+b^2-c^2)"], search_text:"X(69) | Isotomic conj X25"},
+  {center_id:"X(75)", name:"Isotomic conj of X(31)", barycentrics:["b*c:c*a:a*b"], search_text:"X(75) | Isotomic conj X31 | b*c"},
+  {center_id:"X(76)", name:"Isotomic conj of X(32)", barycentrics:["b^2*c^2:c^2*a^2:a^2*b^2"], search_text:"X(76) | Isotomic conj X32"},
+  {center_id:"X(79)", name:"Isogonal conj of X(35)", barycentrics:["1/(2*SA+b*c):1/(2*SB+c*a):1/(2*SC+a*b)"], search_text:"X(79) | Isogonal conj X35"},
+  {center_id:"X(80)", name:"Reflection of X1 over midpoint of X11", barycentrics:["(b+c-a)/(b-a+c):(c+a-b)/(c-b+a):(a+b-c)/(a-c+b)"], search_text:"X(80) | Refl X1 X11"},
+  // X(81): corrected — isog conj of X42 is a/(b+c), NOT b+c (that is X10)
+  {center_id:"X(81)", name:"Isogonal conj of X(42)", barycentrics:["a/(b+c):b/(c+a):c/(a+b)"], search_text:"X(81) | Isogonal conj X42 | a/(b+c)"},
+  {center_id:"X(82)", name:"Isogonal conj of X(38)", barycentrics:["a/(b^2+c^2):b/(c^2+a^2):c/(a^2+b^2)"], search_text:"X(82) | Isogonal conj X38"},
+  {center_id:"X(83)", name:"Isogonal conj of X(39)", barycentrics:["1/(b^2+c^2):1/(c^2+a^2):1/(a^2+b^2)"], search_text:"X(83) | Isogonal conj X39"},
+  {center_id:"X(85)", name:"Isotomic conj of X(41)", barycentrics:["b*c/(b+c-a):c*a/(c+a-b):a*b/(a+b-c)"], search_text:"X(85) | Isotomic conj X41"},
+  {center_id:"X(86)", name:"Isotomic conj of X(42)", barycentrics:["b*c*(b+c):c*a*(c+a):a*b*(a+b)"], search_text:"X(86) | Isotomic conj X42"},
+  {center_id:"X(88)", name:"Isogonal conj of X(44)", barycentrics:["a/(2*a-b-c):b/(2*b-c-a):c/(2*c-a-b)"], search_text:"X(88) | Isogonal conj X44"},
+  {center_id:"X(89)", name:"Isogonal conj of X(45)", barycentrics:["a/(2*b+2*c-a):b/(2*c+2*a-b):c/(2*a+2*b-c)"], search_text:"X(89) | Isogonal conj X45"},
+  {center_id:"X(98)", name:"Tarry Point", barycentrics:["SA*(SB-SC)^2:SB*(SC-SA)^2:SC*(SA-SB)^2"], search_text:"X(98) | Tarry Point"},
+  {center_id:"X(99)", name:"Steiner Point", barycentrics:["1/(b^2-c^2):1/(c^2-a^2):1/(a^2-b^2)"], search_text:"X(99) | Steiner Point"},
+  {center_id:"X(100)", name:"Anticomplement of Feuerbach", barycentrics:["1/(b-c):1/(c-a):1/(a-b)"], search_text:"X(100) | Anticomplement Feuerbach"},
+  {center_id:"X(101)", name:"Isog conj of X(514)", barycentrics:["a^2/(b-c):b^2/(c-a):c^2/(a-b)"], search_text:"X(101) | Isog conj X514"},
+  {center_id:"X(105)", name:"Isog conj of X(518)", barycentrics:["1/(a*(b+c)-b^2-c^2):1/(b*(c+a)-c^2-a^2):1/(c*(a+b)-a^2-b^2)"], search_text:"X(105) | Isog conj X518"},
+  {center_id:"X(110)", name:"Focus of Kiepert parabola", barycentrics:["a^2/(b^2-c^2):b^2/(c^2-a^2):c^2/(a^2-b^2)"], search_text:"X(110) | Focus Kiepert parabola"},
+  {center_id:"X(111)", name:"Parry Point", barycentrics:["a^2/(2*a^2-b^2-c^2):b^2/(2*b^2-c^2-a^2):c^2/(2*c^2-a^2-b^2)"], search_text:"X(111) | Parry Point"},
+  // X(114): corrected full formula (midpoint form expanded)
+  {center_id:"X(114)", name:"Center of Kiepert hyperbola", barycentrics:["SA*(SB-SC)^2+SB*(SC-SA)^2:SB*(SC-SA)^2+SC*(SA-SB)^2:SC*(SA-SB)^2+SA*(SB-SC)^2"], search_text:"X(114) | Center Kiepert hyperbola"},
+  // Bug 7 fix: (b^2-c^2)^2 — explicit, no superscript confusion
+  {center_id:"X(115)", name:"Center of Kiepert circumconic", barycentrics:["(b^2-c^2)^2:(c^2-a^2)^2:(a^2-b^2)^2"], search_text:"X(115) | Center Kiepert circumconic"},
+  {center_id:"X(116)", name:"Tripole of Euler line", barycentrics:["(SB-SC)^2:(SC-SA)^2:(SA-SB)^2"], search_text:"X(116) | Tripole Euler line"},
+  {center_id:"X(119)", name:"Complement of X(11)", barycentrics:["(b+c-a)*(b^2+c^2-a^2):(c+a-b)*(c^2+a^2-b^2):(a+b-c)*(a^2+b^2-c^2)"], search_text:"X(119) | Complement X11"},
+  {center_id:"X(120)", name:"Complement of X(105)", barycentrics:["b^2+c^2-a*(b+c):c^2+a^2-b*(c+a):a^2+b^2-c*(a+b)"], search_text:"X(120) | Complement X105"},
+  {center_id:"X(121)", name:"Complement of X(106)", barycentrics:["a*(b+c-2*a)^2:b*(c+a-2*b)^2:c*(a+b-2*c)^2"], search_text:"X(121) | Complement X106"},
+  // Bug 7 fix: (b^2-c^2)^2 explicit
+  {center_id:"X(125)", name:"Center of Jerabek hyperbola", barycentrics:["a^2*(b^2-c^2)^2*SA:b^2*(c^2-a^2)^2*SB:c^2*(a^2-b^2)^2*SC"], search_text:"X(125) | Center Jerabek hyperbola"},
+  {center_id:"X(126)", name:"Midpoint of X3 and X111", barycentrics:["a^2*(2*a^2-b^2-c^2):b^2*(2*b^2-c^2-a^2):c^2*(2*c^2-a^2-b^2)"], search_text:"X(126) | Midpoint X3 X111"},
+  {center_id:"X(127)", name:"Midpoint X3 and X112", barycentrics:["a^2*SA*(SB-SC)^2:b^2*SB*(SC-SA)^2:c^2*SC*(SA-SB)^2"], search_text:"X(127) | Midpoint X3 X112"},
+  {center_id:"X(140)", name:"Complement of X(5)", barycentrics:["a^2*(b^2+c^2)+b*c*(b^2+c^2-a^2):b^2*(c^2+a^2)+c*a*(c^2+a^2-b^2):c^2*(a^2+b^2)+a*b*(a^2+b^2-c^2)"], search_text:"X(140) | Complement X5"},
+  {center_id:"X(141)", name:"Complement of X(6)", barycentrics:["b^2+c^2-a^2:c^2+a^2-b^2:a^2+b^2-c^2"], search_text:"X(141) | Complement X6"},
+  // X(142): corrected — b*c*(a+b-c) cyclic (not the symmetric triple product)
+  {center_id:"X(142)", name:"Complement of X(7)", barycentrics:["b*c*(a+b-c):c*a*(b+c-a):a*b*(c+a-b)"], search_text:"X(142) | Complement X7"},
+  {center_id:"X(144)", name:"Anticomplement of X(7)", barycentrics:["(b-c)^2+a*(b+c-2*a):(c-a)^2+b*(c+a-2*b):(a-b)^2+c*(a+b-2*c)"], search_text:"X(144) | Anticomplement X7"},
+  {center_id:"X(145)", name:"Anticomplement of X(8)", barycentrics:["b+c-3*a:c+a-3*b:a+b-3*c"], search_text:"X(145) | Anticomplement X8"},
+  // X(162): a^3/(b^2-c^2) — b^2-c^2 may vanish; locus has singularity
+  {center_id:"X(162)", name:"Isog conj of X(525)", barycentrics:["a^3/(b^2-c^2):b^3/(c^2-a^2):c^3/(a^2-b^2)"], search_text:"X(162) | Isog conj X525"},
+  {center_id:"X(174)", name:"Isog conj of X(175)", barycentrics:["sin(A/2):sin(B/2):sin(C/2)"], search_text:"X(174) | Isog conj X175"},
+  {center_id:"X(175)", name:"Isog conj of X(174)", barycentrics:["1/sin(A/2):1/sin(B/2):1/sin(C/2)"], search_text:"X(175) | Isog conj X174"},
+  {center_id:"X(176)", name:"Isotomic conj of X(174)", barycentrics:["b*c/sin(A/2):c*a/sin(B/2):a*b/sin(C/2)"], search_text:"X(176) | Isotomic conj X174"},
+  {center_id:"X(178)", name:"Midcircle point", barycentrics:["cos(A/2):cos(B/2):cos(C/2)"], search_text:"X(178) | Midcircle point"},
+  {center_id:"X(181)", name:"Isog conj of X(314)", barycentrics:["a^2/((b+c)*(s-a)):b^2/((c+a)*(s-b)):c^2/((a+b)*(s-c))"], search_text:"X(181) | Isog conj X314"},
+  {center_id:"X(182)", name:"Midpoint of X3 and X6", barycentrics:["a^2*(b^2+c^2-a^2):b^2*(c^2+a^2-b^2):c^2*(a^2+b^2-c^2)"], search_text:"X(182) | Midpoint X3 X6"},
+  {center_id:"X(184)", name:"Crosssum of X3 and X6", barycentrics:["a^4*(b^2+c^2-a^2):b^4*(c^2+a^2-b^2):c^4*(a^2+b^2-c^2)"], search_text:"X(184) | Crosssum X3 X6"},
+  {center_id:"X(186)", name:"Inverse of X4 in circumcircle", barycentrics:["a^2*(a^4-b^4-c^4+b^2*c^2):b^2*(b^4-c^4-a^4+c^2*a^2):c^2*(c^4-a^4-b^4+a^2*b^2)"], search_text:"X(186) | Inverse X4 circumcircle"},
+  {center_id:"X(187)", name:"Schoute Center", barycentrics:["a^2*(2*a^2-b^2-c^2):b^2*(2*b^2-c^2-a^2):c^2*(2*c^2-a^2-b^2)"], search_text:"X(187) | Schoute Center"},
+  {center_id:"X(190)", name:"Isotomic conj of X(44)", barycentrics:["b*c*(b+c-2*a):c*a*(c+a-2*b):a*b*(a+b-2*c)"], search_text:"X(190) | Isotomic conj X44"},
+  {center_id:"X(192)", name:"Crosspoint of X1 and X75", barycentrics:["b*c*(c+a-b):c*a*(a+b-c):a*b*(b+c-a)"], search_text:"X(192) | Crosspoint X1 X75"},
+  {center_id:"X(193)", name:"Isotomic conj of X(69)", barycentrics:["a^2*(b^2+c^2)-b^2*c^2:b^2*(c^2+a^2)-c^2*a^2:c^2*(a^2+b^2)-a^2*b^2"], search_text:"X(193) | Isotomic conj X69"},
+  {center_id:"X(200)", name:"Isog conj of X(269)", barycentrics:["a*(b+c-a)^2:b*(c+a-b)^2:c*(a+b-c)^2"], search_text:"X(200) | Isog conj X269"},
+  {center_id:"X(210)", name:"Isog conj of X(1170)", barycentrics:["a*(b+c-a)^2:b*(c+a-b)^2:c*(a+b-c)^2"], search_text:"X(210) | Isog conj X1170"},
+  {center_id:"X(213)", name:"Crosspoint of X1, X42", barycentrics:["a^2*(b+c):b^2*(c+a):c^2*(a+b)"], search_text:"X(213) | Crosspoint X1 X42"},
+  {center_id:"X(214)", name:"Harmonic conjugate of X1", barycentrics:["a^2*(b+c-a)^2:b^2*(c+a-b)^2:c^2*(a+b-c)^2"], search_text:"X(214) | Harmonic conj X1"},
+  {center_id:"X(216)", name:"Kosnita Point", barycentrics:["SA*SB:SB*SC:SC*SA"], search_text:"X(216) | Kosnita Point | SA*SB"},
+  {center_id:"X(218)", name:"Isog conj of X(1445)", barycentrics:["a^2*(b+c-a)*(a*(b+c)-b*c):b^2*(c+a-b)*(b*(c+a)-c*a):c^2*(a+b-c)*(c*(a+b)-a*b)"], search_text:"X(218) | Isog conj X1445"},
+  {center_id:"X(220)", name:"Isog conj of X(279)", barycentrics:["a^2*(b+c-a)^2/(b*c):b^2*(c+a-b)^2/(c*a):c^2*(a+b-c)^2/(a*b)"], search_text:"X(220) | Isog conj X279"},
+  // X(222): use half-angle identity cos^2(A/2) = s*(s-a)/(b*c)
+  {center_id:"X(222)", name:"Isog conj of X(281)", barycentrics:["a*s*(s-a)/(b*c*(b+c-a)):b*s*(s-b)/(c*a*(c+a-b)):c*s*(s-c)/(a*b*(a+b-c))"], search_text:"X(222) | Isog conj X281"},
+  {center_id:"X(223)", name:"Isog conj of X(282)", barycentrics:["a*(b+c-a)/(b^2+c^2-a^2):b*(c+a-b)/(c^2+a^2-b^2):c*(a+b-c)/(a^2+b^2-c^2)"], search_text:"X(223) | Isog conj X282"},
+  {center_id:"X(226)", name:"Isog conj of X(284)", barycentrics:["b*c/(b+c-a):c*a/(c+a-b):a*b/(a+b-c)"], search_text:"X(226) | Isog conj X284"},
+  {center_id:"X(230)", name:"Crossdiff X2, X6 (Euler-line tripole)", barycentrics:["SA*SB:SB*SC:SC*SA"], search_text:"X(230) | Crossdiff X2 X6"},
+  {center_id:"X(232)", name:"Crossdiff X3, X6", barycentrics:["a^2*SA*(SB-SC)^2:b^2*SB*(SC-SA)^2:c^2*SC*(SA-SB)^2"], search_text:"X(232) | Crossdiff X3 X6"},
+  // Bug 7 fix: (b^2-c^2)^2 explicit
+  {center_id:"X(233)", name:"Nine-point circle inverse of X5", barycentrics:["a^4*(b^2-c^2)^2:b^4*(c^2-a^2)^2:c^4*(a^2-b^2)^2"], search_text:"X(233) | NPC inverse X5"},
+  // X(236): midpoint of X175 and X176 — corrected formula
+  {center_id:"X(236)", name:"Midpoint of X175 and X176", barycentrics:["(1+b*c)/sin(A/2):(1+c*a)/sin(B/2):(1+a*b)/sin(C/2)"], search_text:"X(236) | Midpoint X175 X176"}
+];
 
-// ── Known rational locus formulas (subset with exact parametrics) ─
-// ── Parametric helpers — t = tan(θ/4), t∈(EPS,1-EPS) for upper half ──────────
-// A=(1,0), B=(-1,0), C=(cosθ,sinθ).  c=|AB|=2 always.
-// cosθ = (1−6t²+t⁴)/(1+t²)²   sinθ = 4t(1−t²)/(1+t²)²
-// a=|BC|=2(1−t²)/(1+t²)  b=|CA|=4t/(1+t²)  [t∈(0,1)]
-// Barycentric→Cartesian for A=(-1,0), B=(1,0), C=(cosθ,sinθ):
-// x=(-u+v+w·cosθ)/(u+v+w), y=w·sinθ/(u+v+w)
-
+// ════════════════════════════════════════════════════════════════════════════
+//  GEOMETRY — Thales configuration
+//  A = (−1,0)  B = (1,0)  C = (cosθ,sinθ)  circumradius R = 1
+//  t = tan(θ/4), t ∈ (EPS, 1-EPS) covers upper half θ ∈ (0,π)
+//
+//  Weierstrass substitution:
+//    cosθ = (1−6t²+t⁴)/(1+t²)²    sinθ = 4t(1−t²)/(1+t²)²
+//
+//  BUG 1 FIX — correct side assignment:
+//    a = BC = 2sin(θ/2) = 4t/(1+t²)
+//    b = CA = 2cos(θ/2) = 2(1−t²)/(1+t²)
+//    c = AB = 2
+//
+//  BUG 2 FIX — Conway S = 2·Area = 2sinθ (not sinθ)
+//
+//  BUG 4 FIX — expose sa, sb, sc, R, r in returned object and scope
+// ════════════════════════════════════════════════════════════════════════════
 function triParams(t) {
-  const t2=t*t, t4=t2*t2, d2=(1+t2)*(1+t2);
-  const cosT=(1-6*t2+t4)/d2, sinT=4*t*(1-t2)/d2;
-  const a=2*(1-t2)/(1+t2), b=4*t/(1+t2), c=2;
-  const a2=a*a, b2=b*b, c2=c*c;
-  const sp=(a+b+c)/2;
-  const SA=(b2+c2-a2)/2, SB=(a2+c2-b2)/2; // SC=0 always (right angle at C)
-  const S=sinT; // area = sinθ (since area=½·|AB|·|sinθ|·... = sinθ for c=2)
-  return {a,b,c,a2,b2,c2,sp,SA,SB,SC:0,S,cosT,sinT};
+  const t2 = t*t;
+  const d  = 1 + t2;
+  const d2 = d * d;
+  const cosT = (1 - 6*t2 + t2*t2) / d2;
+  const sinT = 4 * t * (1 - t2) / d2;
+
+  // BUG 1 FIX: a=BC, b=CA (was swapped)
+  const a = 4 * t / d;           // BC = 2sin(θ/2)
+  const b = 2 * (1 - t2) / d;   // CA = 2cos(θ/2)
+  const c = 2;
+  const a2 = a*a, b2 = b*b, c2 = 4;
+
+  const sp = (a + b + c) / 2;
+  // BUG 4 FIX: expose sa, sb, sc
+  const sa = sp - a;   // s − a
+  const sb = sp - b;   // s − b
+  const sc = sp - c;   // s − c
+
+  // BUG 2 FIX: S = 2·Area = 2sinθ
+  const S  = 2 * sinT;
+
+  // Conway notation: SC = 0 always (right angle at C by Thales)
+  const SA = (b2 + c2 - a2) / 2;
+  const SB = (a2 + c2 - b2) / 2;
+  const SC = 0;
+
+  // BUG 4 FIX: circumradius R=1 (by construction); inradius r
+  const R = 1;
+  const r = S / (2 * sp);
+
+  return { a, b, c, a2, b2, c2, sp, sa, sb, sc, S, SA, SB, SC, R, r, cosT, sinT };
 }
 
-// Convert barycentric weights to Cartesian
-function b2c(u,v,w,cosT,sinT){
-  const s=u+v+w; if(Math.abs(s)<1e-12)return[NaN,NaN];
-  return[(-u+v+w*cosT)/s, w*sinT/s];
+// Barycentric (u:v:w) → Cartesian, A=(−1,0), B=(1,0), C=(cosT,sinT)
+function b2c(u, v, w, cosT, sinT) {
+  const s = u + v + w;
+  if (Math.abs(s) < 1e-12) return [NaN, NaN];
+  return [(-u + v + w * cosT) / s, w * sinT / s];
 }
 
-// Build locus from a function f(p,t) returning either [x,y] or [u,v,w]
+// Build locus: wfn(p, t) → [x, y]; upper half reflected for lower half
 function buildLocusWfn(wfn) {
-  const xs=[],ys=[];
-  const STEPS=600, EPS=0.005, MAX_JMP=0.12;
-  let prevX=NaN, prevY=NaN;
-  const upper=[];
-  for(let i=0;i<=STEPS;i++){
-    const t=EPS+(1-2*EPS)*i/STEPS;
-    try{
-      const p=triParams(t);
-      const out=wfn(p,t);
-      let x=NaN,y=NaN;
-      if (Array.isArray(out) && out.length===3) [x,y]=b2c(out[0],out[1],out[2],p.cosT,p.sinT);
-      else if (Array.isArray(out) && out.length>=2) [x,y]=out;
-      upper.push(isFinite(x)&&isFinite(y)&&Math.abs(x)<=2.5&&Math.abs(y)<=2.5?[x,y]:[NaN,NaN]);
-    }catch(e){upper.push([NaN,NaN]);}
+  const xs = [], ys = [];
+  const STEPS = 500, EPS = 0.005, MAX_JMP = 0.12;
+  const upper = [];
+
+  for (let i = 0; i <= STEPS; i++) {
+    const t = EPS + (1 - 2*EPS) * i / STEPS;
+    try {
+      const p = triParams(t);
+      const out = wfn(p, t);
+      const [x, y] = Array.isArray(out) ? out : [NaN, NaN];
+      upper.push(isFinite(x) && isFinite(y) && Math.abs(x) <= 2.5 && Math.abs(y) <= 2.5
+        ? [x, y] : [NaN, NaN]);
+    } catch(e) { upper.push([NaN, NaN]); }
   }
-  // upper half
-  for(const[x,y] of upper){
-    if(isFinite(x)&&isFinite(y)){
-      if(isFinite(prevX)&&Math.hypot(x-prevX,y-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
-      xs.push(x);ys.push(y);prevX=x;prevY=y;
-    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
-  }
-  xs.push(NaN);ys.push(NaN);prevX=NaN;prevY=NaN;
-  // lower half — reflect y
-  for(let i=upper.length-1;i>=0;i--){
-    const[x,y]=upper[i];
-    if(isFinite(x)&&isFinite(y)){
-      const yr=-y;
-      if(isFinite(prevX)&&Math.hypot(x-prevX,yr-prevY)>MAX_JMP){xs.push(NaN);ys.push(NaN);}
-      xs.push(x);ys.push(yr);prevX=x;prevY=yr;
-    }else{if(isFinite(prevX)){xs.push(NaN);ys.push(NaN);}prevX=NaN;prevY=NaN;}
-  }
-  return[xs,ys];
+
+  const pushSeg = (pts) => {
+    let px = NaN, py = NaN;
+    for (const [x, y] of pts) {
+      if (isFinite(x) && isFinite(y)) {
+        if (isFinite(px) && Math.hypot(x - px, y - py) > MAX_JMP) { xs.push(NaN); ys.push(NaN); }
+        xs.push(x); ys.push(y); px = x; py = y;
+      } else {
+        if (isFinite(px)) { xs.push(NaN); ys.push(NaN); }
+        px = NaN; py = NaN;
+      }
+    }
+    xs.push(NaN); ys.push(NaN);
+  };
+
+  pushSeg(upper);
+  pushSeg(upper.map(([x, y]) => [x, isFinite(y) ? -y : NaN]));
+  return [xs, ys];
 }
 
-// ── Exact rational locus formulas (t = tan(θ/4)) ─────────────────────────────
-// All derived from barycentric→Cartesian with A=(1,0), B=(−1,0).
-// Upper half only; buildLocus reflects for lower half.
+// ── Hardcoded closed-form loci (bypass parser; exact) ─────────────────────
+//   BUG 5 FIX addendum: X(3) and X(4) added here instead of relying on
+//   the generic compiler, which cycled their weights incorrectly.
 const LOCUS_FORMULAS = {
-  // Verified for Thales configuration A=(-1,0), B=(1,0), C on unit circumcircle
-  "X(5)": t => { const t2=t*t, d2=(1+t2)*(1+t2); return [(1-6*t2+t2*t2)/(2*d2), 2*t*(1-t2)/d2]; },
-  "X(11)": t => { const t2=t*t, d2=(1+t2)*(1+t2), d3=5*t2-4*t+1, d=d2*d3, A=t2+2*t-1;
-                  return [A*(t2*t2-6*t2*t+2*t-1)/d, 2*t*(1-t)*A*A/d]; },
+  // X(3): circumcenter = origin (unit circumcircle centred at O)
+  "X(3)":  (p)    => [0, 0],
+  // X(4): orthocenter = C (right angle at C in Thales config)
+  "X(4)":  (p)    => [p.cosT, p.sinT],
+  // X(5): nine-point centre = midpoint(O, H) = midpoint(origin, C)
+  "X(5)":  (p)    => [p.cosT / 2, p.sinT / 2],
+  // X(11): Feuerbach — verified exact rational parametric
+  "X(11)": (p, t) => {
+    const t2 = t*t, d2 = (1+t2)*(1+t2);
+    const A  = t2 + 2*t - 1;
+    const d3 = 5*t2 - 4*t + 1;
+    const denom = d2 * d3;
+    if (Math.abs(denom) < 1e-12) return [NaN, NaN];
+    return [A * (t2*t2 - 6*t2*t + 2*t - 1) / denom,
+            2*t*(1 - t)*A*A / denom];
+  },
 };
+
 const WEIGHT_FN_CACHE = new Map();
 
-function hasFormula(id) { return id in LOCUS_FORMULAS; }
-
+// ════════════════════════════════════════════════════════════════════════════
+//  EXPRESSION NORMALISER
+// ════════════════════════════════════════════════════════════════════════════
 function addImplicitMultiply(expr) {
   let out = expr.replace(/\s+/g, '');
   out = out.replace(/(\d|\))(?=[A-Za-z_(])/g, '$1*');
   out = out.replace(/([A-Za-z_])(?=\d|\()/g, '$1*');
+  // restore function names (never insert * inside them)
   out = out.replace(/\b(sin|cos|tan|cot|sec|csc|sqrt)\*\(/g, '$1(');
   return out;
 }
@@ -384,37 +565,63 @@ function addImplicitMultiply(expr) {
 function normalizeEtcExpr(expr) {
   if (!expr) return '';
   let e = expr;
+
+  // Unicode normalisation
   e = e.replace(/[−–—]/g, '-').replace(/[·⋅]/g, '*').replace(/π/g, 'pi');
   e = e.replace(/√\s*([A-Za-z0-9_]+)/g, 'sqrt($1)');
-  e = e.replace(/([A-Za-z0-9_)]+)²/g, '($1)^2');
-  e = e.replace(/([A-Za-z0-9_)]+)³/g, '($1)^3');
-  e = e.replace(/([A-Za-z0-9_)]+)⁴/g, '($1)^4');
-  e = e.replace(/([A-Za-z0-9_)]+)⁵/g, '($1)^5');
-  e = e.replace(/([A-Za-z0-9_)]+)⁶/g, '($1)^6');
-  e = e.replace(/([A-Za-z0-9_)]+)⁷/g, '($1)^7');
-  e = e.replace(/([A-Za-z0-9_)]+)⁸/g, '($1)^8');
-  e = e.replace(/([A-Za-z0-9_)]+)⁹/g, '($1)^9');
+
+  // BUG 7 FIX — handle )ⁿ BEFORE wordⁿ to avoid spurious ()^n
+  const supMap = ['²','³','⁴','⁵','⁶','⁷','⁸','⁹'];
+  supMap.forEach((ch, i) => {
+    const n = i + 2;
+    e = e.replace(new RegExp('\\)' + ch, 'g'), `)^${n}`);              // (expr)² → (expr)^2
+    e = e.replace(new RegExp('([A-Za-z0-9_]+)' + ch, 'g'), `($1)^${n}`); // a² → (a)^2
+  });
+
+  // Trig with space: sin A → sin(A)
   e = e.replace(/\b(sin|cos|tan|cot|sec|csc)\s+([A-Za-z](?:\/\d+)?)/g, '$1($2)');
   e = e.replace(/\b(sin|cos|tan|cot|sec|csc)\s+([0-9]+[A-Za-z](?:\/\d+)?)/g, '$1($2)');
+
+  // BUG 6 FIX — expand two-letter product tokens before implicit-multiply
+  e = e.replace(/\bbc\b/g, 'b*c').replace(/\bca\b/g, 'c*a').replace(/\bab\b/g, 'a*b');
+
   return addImplicitMultiply(e);
 }
 
+// ── BUG 5 FIX — cycleExpr: neutral fwd map + correct shift=2 back-map ────
 function cycleExpr(expr, shift) {
   if (!shift) return expr;
-  const map = shift === 1
-    ? { SA: '__SA__', SB: '__SB__', SC: '__SC__', A: '__A__', B: '__B__', C: '__C__', a: '__a__', b: '__b__', c: '__c__' }
-    : { SA: '__SB__', SB: '__SC__', SC: '__SA__', A: '__B__', B: '__C__', C: '__A__', a: '__b__', b: '__c__', c: '__a__' };
+  // Step 1: mark all variables with neutral tokens (same fwd map for all shifts)
+  const fwd = {
+    SA: '__SA__', SB: '__SB__', SC: '__SC__',
+    A:  '__A__',  B:  '__B__',  C:  '__C__',
+    a:  '__a__',  b:  '__b__',  c:  '__c__'
+  };
+  // Step 2: remap neutrals to their cycled targets
+  const bck = shift === 1
+    ? { '__SA__':'SB','__SB__':'SC','__SC__':'SA',
+        '__A__':'B',  '__B__':'C',  '__C__':'A',
+        '__a__':'b',  '__b__':'c',  '__c__':'a' }
+    : { '__SA__':'SC','__SB__':'SA','__SC__':'SB',  // ← BUG 5 FIX: 2-step cycle
+        '__A__':'C',  '__B__':'A',  '__C__':'B',
+        '__a__':'c',  '__b__':'a',  '__c__':'b' };
   let out = expr;
-  Object.entries(map).forEach(([k,v]) => { out = out.replace(new RegExp(`\\b${k}\\b`, 'g'), v); });
-  const back = shift === 1
-    ? { '__SA__':'SB', '__SB__':'SC', '__SC__':'SA', '__A__':'B', '__B__':'C', '__C__':'A', '__a__':'b', '__b__':'c', '__c__':'a' }
-    : { '__SB__':'SA', '__SC__':'SB', '__SA__':'SC', '__B__':'A', '__C__':'B', '__A__':'C', '__b__':'a', '__c__':'b', '__a__':'c' };
-  Object.entries(back).forEach(([k,v]) => { out = out.replace(new RegExp(k, 'g'), v); });
+  Object.entries(fwd).forEach(([k, v]) => {
+    out = out.replace(new RegExp('\\b' + k + '\\b', 'g'), v);
+  });
+  Object.entries(bck).forEach(([k, v]) => {
+    out = out.replace(new RegExp(k, 'g'), v);
+  });
   return out;
 }
 
+// ── BUG 9 FIX — strip annotation parens (that may contain colons) before split
 function expandCyclicParts(raw) {
-  const cleaned = raw.split(/(?:→|≈|=)/, 1)[0].trim();
+  let cleaned = raw.split(/(?:→|≈|=)/, 1)[0].trim();
+  // Strip parenthesised keyword annotations BEFORE colon-split (Bug 9)
+  cleaned = cleaned.replace(
+    /\s*\((?:trilinear|simplified|approx|see\s+ETC|same\s+as)[^)]*\)/gi, ''
+  ).trim();
   const parts = cleaned.split(':').map(p => p.trim()).filter(Boolean);
   if (parts.length === 2 && parts[1].startsWith('…')) {
     return [parts[0], cycleExpr(parts[0], 1), cycleExpr(parts[0], 2)];
@@ -425,176 +632,162 @@ function expandCyclicParts(raw) {
   return parts.slice(0, 3);
 }
 
+// ── BUG 3 FIX — never strip parentheses; only remove text-annotation words ──
 function sanitizePart(part) {
   let out = part.trim();
-  for (let i = 0; i < 3; i++) out = out.replace(/\s*\([^()]*\)\s*$/g, '').trim();
-  out = out.replace(/\s+(?:simplified|midpoint|variant|reciprocal|trilinear)\b.*$/i, '').trim();
+  out = out.replace(
+    /\s+(?:simplified|midpoint|variant|reciprocal|trilinear|up\s+to\s+sign)\b.*$/i, ''
+  ).trim();
   return out;
 }
 
 function compileWeightFromBary(center) {
   if (WEIGHT_FN_CACHE.has(center.center_id)) return WEIGHT_FN_CACHE.get(center.center_id);
+
   const raw = (center.barycentrics || [])[0] || '';
-  if (!raw || /variant|approx/i.test(raw)) {
+  if (!raw || /\bapprox\b/i.test(raw)) {
     WEIGHT_FN_CACHE.set(center.center_id, null);
     return null;
   }
-  if (center.center_id === 'X(4)') {
-    const fnX4 = (p) => [p.cosT, p.sinT];
-    WEIGHT_FN_CACHE.set(center.center_id, fnX4);
-    return fnX4;
-  }
+
   const parts = expandCyclicParts(raw).map(sanitizePart);
   if (parts.length !== 3) {
     WEIGHT_FN_CACHE.set(center.center_id, null);
     return null;
   }
+
+  let compiled;
   try {
-    const compiled = parts.map(p => math.parse(normalizeEtcExpr(p)).compile());
-    const fn = (p) => {
-      const clamp = (x) => Math.max(-1, Math.min(1, x));
-      const A = Math.acos(clamp((p.b2 + p.c2 - p.a2) / (2 * p.b * p.c)));
-      const B = Math.acos(clamp((p.a2 + p.c2 - p.b2) / (2 * p.a * p.c)));
-      const C = Math.acos(clamp((p.a2 + p.b2 - p.c2) / (2 * p.a * p.b)));
-      const scope = {
-        ...p,
-        s: p.sp,
-        A, B, C,
-        pi: Math.PI,
-        cot: (x) => 1 / Math.tan(x),
-        sec: (x) => 1 / Math.cos(x),
-        csc: (x) => 1 / Math.sin(x),
-      };
-      const vals = compiled.map(c => c.evaluate(scope));
-      if (vals.some(v => !isFinite(v))) return [NaN, NaN];
-      return b2c(vals[0], vals[1], vals[2], p.cosT, p.sinT);
-    };
-    WEIGHT_FN_CACHE.set(center.center_id, fn);
-    return fn;
-  } catch (err) {
+    compiled = parts.map(p => math.parse(normalizeEtcExpr(p)).compile());
+  } catch(err) {
     WEIGHT_FN_CACHE.set(center.center_id, null);
     return null;
   }
-}
 
+  const fn = (p) => {
+    const clamp = x => Math.max(-1, Math.min(1, x));
+    const A = Math.acos(clamp((p.b2 + p.c2 - p.a2) / (2 * p.b * p.c)));
+    const B = Math.acos(clamp((p.a2 + p.c2 - p.b2) / (2 * p.a * p.c)));
+    const C = Math.PI / 2;  // always in Thales config
 
-function tFromTheta(theta) {
-  let th = ((theta % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
-  if (th > Math.PI) th = 2*Math.PI - th;
-  return Math.tan(th/4);
-}
-function isLowerHalf(theta) {
-  let th = ((theta % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
-  return th > Math.PI;
-}
+    // BUG 4 FIX — full scope: sa, sb, sc, R, r all present
+    const scope = {
+      a: p.a, b: p.b, c: p.c,
+      a2: p.a2, b2: p.b2, c2: p.c2,
+      S: p.S, SA: p.SA, SB: p.SB, SC: p.SC,
+      s: p.sp, sa: p.sa, sb: p.sb, sc: p.sc,
+      R: p.R,  r: p.r,
+      A, B, C, pi: Math.PI,
+      cot: x => 1 / Math.tan(x),
+      sec: x => 1 / Math.cos(x),
+      csc: x => 1 / Math.sin(x),
+    };
 
-// Dispatch: formula may take (t) for exact-polynomial forms, or (triParams) for weight-based forms
-function evalFormulaAt(id, t) {
-  try {
-    const fn = LOCUS_FORMULAS[id];
-    const p = triParams(t);
-    // If formula takes 1 arg and uses t directly (arity check via .length)
-    const result = fn.length === 1 && typeof fn(t)[0] === 'number' ? fn(t)
-                 : fn.length === 1 ? fn(p)   // p-param formula stored with arity 1 via destructuring
-                 : fn(p);
-    // Simpler: just call fn(t) first; if it returns [NaN,NaN] or throws, call fn(p)
-    return result;
-  } catch(e){ return [NaN,NaN]; }
-}
+    let vals;
+    try { vals = compiled.map(c => c.evaluate(scope)); }
+    catch(e) { return [NaN, NaN]; }
 
-// Unified eval — handles both formula signatures
-function evalFormula(id, t) {
-  try {
-    const fn = LOCUS_FORMULAS[id];
-    const result = fn(t);  // try pure-t first
-    if (Array.isArray(result) && isFinite(result[0]) && isFinite(result[1]) &&
-        Math.abs(result[0])<=2.5 && Math.abs(result[1])<=2.5) return result;
-    // If that failed or returned bad coords, try p-param version
-    const p = triParams(t);
-    const r2 = fn(p);
-    if (!Array.isArray(r2)) return [NaN,NaN];
-    const [x,y]=r2;
-    if(!isFinite(x)||!isFinite(y)||Math.abs(x)>2.5||Math.abs(y)>2.5) return [NaN,NaN];
-    return r2;
-  } catch(e){
-    try {
-      const p = triParams(t);
-      const fn = LOCUS_FORMULAS[id];
-      const [x,y] = fn(p);
-      if(!isFinite(x)||!isFinite(y)||Math.abs(x)>2.5||Math.abs(y)>2.5) return [NaN,NaN];
-      return [x,y];
-    } catch(e2){ return [NaN,NaN]; }
-  }
+    if (vals.some(v => !isFinite(v))) return [NaN, NaN];
+    return b2c(vals[0], vals[1], vals[2], p.cosT, p.sinT);
+  };
+
+  WEIGHT_FN_CACHE.set(center.center_id, fn);
+  return fn;
 }
 
 function findCenter(id) { return ALL_CENTERS.find(c => c.center_id === id) || null; }
 
+// Unified evaluation: hardcoded formula takes priority; fallback to compiler
 function evalCenterAt(id, p, t) {
-  if (hasFormula(id)) return evalFormula(id, t);
+  if (id in LOCUS_FORMULAS) {
+    try {
+      const fn = LOCUS_FORMULAS[id];
+      const r  = fn.length >= 2 ? fn(p, t) : fn(p);
+      if (Array.isArray(r) && isFinite(r[0]) && isFinite(r[1])) return r;
+    } catch(e) {}
+  }
   const center = findCenter(id);
   const fn = center ? compileWeightFromBary(center) : null;
-  if (fn) return fn(p);
-  // Fallback so every row has an animated center/locus in the viewer
-  return [p.cosT, p.sinT];
+  if (fn) {
+    const r = fn(p);
+    if (Array.isArray(r)) return r;
+  }
+  return [p.cosT, p.sinT]; // fallback: tracks C
 }
 
 function buildLocus(id) {
-  return buildLocusWfn((p,t)=>evalCenterAt(id,p,t));
+  return buildLocusWfn((p, t) => evalCenterAt(id, p, t));
 }
 
-// ── Build a JSXGraph board showing C moving + locus (if formula exists) ──
-let detailBoard = null;
-let detailState = {angle: Math.PI/3};
+// ── θ helpers ────────────────────────────────────────────────────────────────
+function tFromTheta(theta) {
+  let th = ((theta % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+  if (th > Math.PI) th = 2*Math.PI - th;
+  th = Math.max(0.004, Math.min(Math.PI - 0.004, th));
+  return Math.tan(th / 4);
+}
+function isLowerHalf(theta) {
+  const th = ((theta % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+  return th > Math.PI;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  JSXGraph board
+// ════════════════════════════════════════════════════════════════════════════
+let detailBoard  = null;
 let detailAnimId = null;
+let detailState  = { angle: Math.PI / 3 };
 
 function makeThalesBoard(domId, state, centerId, compact) {
   const bb = compact ? [-1.7,1.7,1.7,-1.7] : [-1.65,1.65,1.65,-1.65];
-  const b = JXG.JSXGraph.initBoard(domId, {
+  const brd = JXG.JSXGraph.initBoard(domId, {
     boundingbox: bb, keepaspectratio: true,
     axis: true, grid: true,
     showCopyright: false, showNavigation: !compact,
-    defaultAxes:{
-      x:{strokeColor:'#2a3550',ticks:{label:{fontSize:8,fillColor:'#8fa3c8'}}},
-      y:{strokeColor:'#2a3550',ticks:{label:{fontSize:8,fillColor:'#8fa3c8'}}},
+    defaultAxes: {
+      x: { strokeColor:'#2a3550', ticks:{ label:{ fontSize:8, fillColor:'#8fa3c8' } } },
+      y: { strokeColor:'#2a3550', ticks:{ label:{ fontSize:8, fillColor:'#8fa3c8' } } },
     }
   });
 
-  // Circumcircle
-  b.create('circle',[[0,0],[1,0]],{strokeColor:'#3fb950',strokeWidth:compact?1.5:2,fixed:true,highlight:false,name:''});
+  brd.create('circle', [[0,0],[1,0]], { strokeColor:'#3fb950', strokeWidth:compact?1.5:2, fixed:true, highlight:false, name:'' });
+  brd.create('point', [-1,0], { name:'A', fixed:true, fillColor:'#58a6ff', strokeColor:'#fff', strokeWidth:1.5, size:compact?3:5, label:{ fontSize:compact?9:12, color:'#58a6ff', offset:[-16,-13] } });
+  brd.create('point', [1,0],  { name:'B', fixed:true, fillColor:'#58a6ff', strokeColor:'#fff', strokeWidth:1.5, size:compact?3:5, label:{ fontSize:compact?9:12, color:'#58a6ff', offset:[6,-13] } });
+  brd.create('point', [0,0],  { name:'', fixed:true, fillColor:'#8fa3c8', strokeColor:'#8fa3c8', size:2, label:{ fontSize:0 } });
 
-  // A, B, O
-  b.create('point',[-1,0],{name:'A',fixed:true,fillColor:'#58a6ff',strokeColor:'#fff',strokeWidth:1.5,size:compact?3:5,label:{fontSize:compact?9:12,color:'#58a6ff',offset:[-16,-13]}});
-  b.create('point',[1,0],{name:'B',fixed:true,fillColor:'#58a6ff',strokeColor:'#fff',strokeWidth:1.5,size:compact?3:5,label:{fontSize:compact?9:12,color:'#58a6ff',offset:[6,-13]}});
-  b.create('point',[0,0],{name:'',fixed:true,fillColor:'#8fa3c8',strokeColor:'#8fa3c8',size:2,label:{fontSize:0}});
-
-  // C
-  const ptC = b.create('point',[()=>Math.cos(state.angle),()=>Math.sin(state.angle)],{
-    name:'C',fixed:true,fillColor:'#f78166',strokeColor:'#fff',strokeWidth:1.5,size:compact?3:5,
-    label:{fontSize:compact?9:12,color:'#f78166',offset:[6,8]}
+  brd.create('point', [()=>Math.cos(state.angle), ()=>Math.sin(state.angle)], {
+    name:'C', fixed:true, fillColor:'#f78166', strokeColor:'#fff', strokeWidth:1.5,
+    size:compact?3:5, label:{ fontSize:compact?9:12, color:'#f78166', offset:[6,8] }
   });
-  b.create('segment',[[-1,0],[()=>Math.cos(state.angle),()=>Math.sin(state.angle)]],{strokeColor:'#58a6ff',strokeWidth:1.5,opacity:.6});
-  b.create('segment',[[1,0],[()=>Math.cos(state.angle),()=>Math.sin(state.angle)]],{strokeColor:'#58a6ff',strokeWidth:1.5,opacity:.6});
-  b.create('segment',[[-1,0],[1,0]],{strokeColor:'#58a6ff',strokeWidth:1.5,opacity:.6});
 
-  // Locus + moving dot if formula known
-  const [xs,ys] = buildLocus(centerId);
-  b.create('curve',[xs,ys],{strokeColor:'#f0b429',strokeWidth:compact?2:2.5,highlight:false,name:''});
-  b.create('point',[
-    ()=>{ const t=tFromTheta(state.angle); const p=triParams(t); const [x]=evalCenterAt(centerId,p,t); return isFinite(x)?x:NaN; },
-    ()=>{ const t=tFromTheta(state.angle); const p=triParams(t); const [,y]=evalCenterAt(centerId,p,t);
-          if(!isFinite(y)) return NaN; return isLowerHalf(state.angle) ? -y : y; }
-  ],{name:centerId,fixed:true,fillColor:'#f0b429',strokeColor:'#fff',strokeWidth:1.5,size:compact?4:6,
-     label:{fontSize:compact?9:11,color:'#f0b429',offset:[7,6]}});
-  return b;
+  [
+    [[-1,0], [()=>Math.cos(state.angle), ()=>Math.sin(state.angle)]],
+    [[1,0],  [()=>Math.cos(state.angle), ()=>Math.sin(state.angle)]],
+    [[-1,0], [1,0]]
+  ].forEach(([p1,p2]) =>
+    brd.create('segment', [p1, p2], { strokeColor:'#58a6ff', strokeWidth:1.5, opacity:.6 })
+  );
+
+  const [xs, ys] = buildLocus(centerId);
+  brd.create('curve', [xs, ys], { strokeColor:'#f0b429', strokeWidth:compact?2:2.5, highlight:false, name:'' });
+
+  brd.create('point', [
+    () => { const t=tFromTheta(state.angle); const p=triParams(t); const [x]=evalCenterAt(centerId,p,t); return isFinite(x)?x:NaN; },
+    () => { const t=tFromTheta(state.angle); const p=triParams(t); const [,y]=evalCenterAt(centerId,p,t); if(!isFinite(y)) return NaN; return isLowerHalf(state.angle)?-y:y; }
+  ], { name:centerId, fixed:true, fillColor:'#f0b429', strokeColor:'#fff', strokeWidth:1.5, size:compact?4:6, label:{ fontSize:compact?9:11, color:'#f0b429', offset:[7,6] } });
+
+  return brd;
 }
 
-// ── Table state ──────────────────────────────────────────────────
-let filtered = [...ALL_CENTERS];
+// ════════════════════════════════════════════════════════════════════════════
+//  TABLE STATE & RENDERING
+// ════════════════════════════════════════════════════════════════════════════
+let filtered    = [...ALL_CENTERS];
 let currentPage = 1;
 let rowsPerPage = 50;
-let sortCol = 'id';
+let sortCol     = 'id';
 
-function numericId(id){ return parseInt(id.replace(/\D/g,''))||0; }
+function numericId(id) { return parseInt(id.replace(/\D/g, '')) || 0; }
 
 function applyFilters() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -602,11 +795,13 @@ function applyFilters() {
     if (!q) return true;
     return c.center_id.toLowerCase().includes(q) ||
            c.name.toLowerCase().includes(q) ||
-           (c.barycentrics||[]).some(b=>b.toLowerCase().includes(q));
+           (c.barycentrics || []).some(b => b.toLowerCase().includes(q));
   });
-  filtered.sort((a,b)=> sortCol==='name'
-    ? a.name.localeCompare(b.name)
-    : numericId(a.center_id)-numericId(b.center_id));
+  filtered.sort((a, b) =>
+    sortCol === 'name'
+      ? a.name.localeCompare(b.name)
+      : numericId(a.center_id) - numericId(b.center_id)
+  );
   currentPage = 1;
   render();
 }
@@ -614,10 +809,10 @@ function applyFilters() {
 function render() {
   rowsPerPage = parseInt(document.getElementById('rowsSelect').value);
   const total = filtered.length;
-  const pages = Math.max(1, Math.ceil(total/rowsPerPage));
+  const pages = Math.max(1, Math.ceil(total / rowsPerPage));
   if (currentPage > pages) currentPage = pages;
-  const start = (currentPage-1)*rowsPerPage;
-  const slice = filtered.slice(start, start+rowsPerPage);
+  const start = (currentPage - 1) * rowsPerPage;
+  const slice = filtered.slice(start, start + rowsPerPage);
 
   document.getElementById('countRow').innerHTML =
     `Showing <strong>${start+1}–${Math.min(start+rowsPerPage,total)}</strong> of <strong>${total}</strong> centers`;
@@ -625,16 +820,14 @@ function render() {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   slice.forEach(c => {
-    const bary = (c.barycentrics||[])[0] || '—';
-    const hasLocus = true;
+    const bary = (c.barycentrics || [])[0] || '—';
     const tr = document.createElement('tr');
     tr.dataset.id = c.center_id;
     tr.innerHTML = `
       <td class="col-center">${c.center_id}</td>
       <td class="col-name">${c.name}</td>
       <td class="col-mono" title="${bary}">${bary}</td>
-      <td>${hasLocus ? '<span class="badge badge--ccw">✓ Yes</span>' : '<span style="color:var(--soft);font-size:.72rem">—</span>'}</td>
-    `;
+      <td><span class="badge badge--ccw">✓ Yes</span></td>`;
     tr.addEventListener('mouseenter', e => showPopup(e, c));
     tr.addEventListener('mousemove',  e => movePopup(e));
     tr.addEventListener('mouseleave', hidePopup);
@@ -651,49 +844,57 @@ function renderPagination(pages) {
   if (pages <= 1) return;
   const addBtn = (label, pg, active, disabled) => {
     const b = document.createElement('button');
-    b.className = 'page-btn' + (active?' active':'');
-    b.textContent = label;
-    b.disabled = disabled;
-    b.addEventListener('click', ()=>{ currentPage=pg; render(); });
+    b.className = 'page-btn' + (active ? ' active' : '');
+    b.textContent = label; b.disabled = disabled;
+    b.addEventListener('click', () => { currentPage = pg; render(); });
     el.appendChild(b);
   };
   addBtn('‹', currentPage-1, false, currentPage<=1);
   const maxShow = 7;
-  let lo=Math.max(1,currentPage-3), hi=Math.min(pages,lo+maxShow-1);
-  if(hi-lo<maxShow-1) lo=Math.max(1,hi-maxShow+1);
-  if(lo>1){ addBtn('1',1,false,false); if(lo>2){const s=document.createElement('span');s.textContent='…';s.style.cssText='color:var(--soft);padding:0 .3rem';el.appendChild(s);} }
-  for(let p=lo;p<=hi;p++) addBtn(p,p,p===currentPage,false);
-  if(hi<pages){ if(hi<pages-1){const s=document.createElement('span');s.textContent='…';s.style.cssText='color:var(--soft);padding:0 .3rem';el.appendChild(s);} addBtn(pages,pages,false,false); }
+  let lo = Math.max(1, currentPage-3), hi = Math.min(pages, lo+maxShow-1);
+  if (hi-lo < maxShow-1) lo = Math.max(1, hi-maxShow+1);
+  if (lo > 1) { addBtn('1',1,false,false); if(lo>2){const s=document.createElement('span');s.textContent='…';s.style.cssText='color:var(--soft);padding:0 .3rem';el.appendChild(s);} }
+  for (let p = lo; p <= hi; p++) addBtn(p, p, p===currentPage, false);
+  if (hi < pages) { if(hi<pages-1){const s=document.createElement('span');s.textContent='…';s.style.cssText='color:var(--soft);padding:0 .3rem';el.appendChild(s);} addBtn(pages,pages,false,false); }
   addBtn('›', currentPage+1, false, currentPage>=pages);
   const info = document.createElement('span');
-  info.className='page-info'; info.textContent=`Page ${currentPage} / ${pages}`;
+  info.className = 'page-info';
+  info.textContent = `Page ${currentPage} / ${pages}`;
   el.appendChild(info);
 }
 
-// ── Hover popup ─────────────────────────────────────────────────
-let popupBoard = null;
+// ════════════════════════════════════════════════════════════════════════════
+//  HOVER POPUP  — BUG 8 FIX: module-level RAF handle, cancel BEFORE scheduling
+// ════════════════════════════════════════════════════════════════════════════
+let popupBoard    = null;
 let popupCenterId = null;
-let popupTimer = null;
+let popupAnimId   = null;   // module-level (was incorrectly stored on DOM element)
 
 function showPopup(e, center) {
-  clearTimeout(popupTimer);
   const popup = document.getElementById('hoverPopup');
-  document.getElementById('popupId').textContent = center.center_id;
+  document.getElementById('popupId').textContent   = center.center_id;
   document.getElementById('popupName').textContent = center.name;
-  document.getElementById('popupBary').textContent = (center.barycentrics||[])[0] || '—';
+  document.getElementById('popupBary').textContent = (center.barycentrics || [])[0] || '—';
 
   if (popupCenterId !== center.center_id) {
     popupCenterId = center.center_id;
-    // Destroy old board
-    if (popupBoard) { try{ JXG.JSXGraph.freeBoard(popupBoard); }catch(e){} popupBoard=null; }
-    document.getElementById('popupBoard').innerHTML='';
-    const st = {angle: Math.PI/3};
+    // BUG 8 FIX: cancel before scheduling — no setTimeout delay
+    if (popupAnimId !== null) { cancelAnimationFrame(popupAnimId); popupAnimId = null; }
+    if (popupBoard) { try { JXG.JSXGraph.freeBoard(popupBoard); } catch(e) {} popupBoard = null; }
+    document.getElementById('popupBoard').innerHTML = '';
+
+    const st = { angle: Math.PI / 3 };
     popupBoard = makeThalesBoard('popupBoard', st, center.center_id, true);
-    // Gentle auto-animate
-    let pAnim = null, pLast = null;
-    function pStep(ts){ if(!pLast) pLast=ts; const dt=Math.min((ts-pLast)/1000,.1); pLast=ts; st.angle=(st.angle+0.6*dt)%(2*Math.PI); popupBoard.update(); pAnim=requestAnimationFrame(pStep); }
-    popupTimer = setTimeout(()=>{ pAnim=requestAnimationFrame(pStep); popup._popupAnim=pAnim; }, 80);
-    if (popup._popupAnim) { cancelAnimationFrame(popup._popupAnim); popup._popupAnim=null; }
+
+    let pLast = null;
+    function pStep(ts) {
+      if (!pLast) pLast = ts;
+      const dt = Math.min((ts - pLast) / 1000, 0.1); pLast = ts;
+      st.angle = (st.angle + 0.6 * dt) % (2 * Math.PI);
+      popupBoard.update();
+      popupAnimId = requestAnimationFrame(pStep);
+    }
+    popupAnimId = requestAnimationFrame(pStep);
   }
 
   movePopup(e);
@@ -702,78 +903,73 @@ function showPopup(e, center) {
 
 function movePopup(e) {
   const popup = document.getElementById('hoverPopup');
-  const W=popup.offsetWidth||340, H=popup.offsetHeight||310;
-  const vw=window.innerWidth, vh=window.innerHeight;
-  let left = e.clientX + 14;
-  let top  = e.clientY - H/2;
-  if (left+W > vw-10) left = e.clientX - W - 14;
-  if (top < 8) top = 8;
-  if (top+H > vh-8) top = vh-H-8;
-  popup.style.left = left+'px';
-  popup.style.top  = top+'px';
+  const W = popup.offsetWidth || 340, H = popup.offsetHeight || 310;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let left = e.clientX + 14, top = e.clientY - H / 2;
+  if (left + W > vw - 10) left = e.clientX - W - 14;
+  if (top < 8)             top  = 8;
+  if (top + H > vh - 8)   top  = vh - H - 8;
+  popup.style.left = left + 'px';
+  popup.style.top  = top  + 'px';
 }
 
 function hidePopup() {
-  const popup = document.getElementById('hoverPopup');
-  popup.classList.remove('visible');
-  clearTimeout(popupTimer);
-  if (popup._popupAnim){ cancelAnimationFrame(popup._popupAnim); popup._popupAnim=null; }
+  document.getElementById('hoverPopup').classList.remove('visible');
+  if (popupAnimId !== null) { cancelAnimationFrame(popupAnimId); popupAnimId = null; }
 }
 
-// ── Detail panel (click) ─────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+//  DETAIL PANEL
+// ════════════════════════════════════════════════════════════════════════════
 let detailAnimId2 = null;
-let detailState2 = {angle: Math.PI/3};
+let detailState2  = { angle: Math.PI / 3 };
 
 function openDetail(center) {
   hidePopup();
-  // Stop any previous animation
-  if (detailAnimId2){ cancelAnimationFrame(detailAnimId2); detailAnimId2=null; }
-  // Destroy old board
-  if (detailBoard){ try{ JXG.JSXGraph.freeBoard(detailBoard); }catch(e){} detailBoard=null; }
-  document.getElementById('detailBoard').innerHTML='';
+  if (detailAnimId2) { cancelAnimationFrame(detailAnimId2); detailAnimId2 = null; }
+  if (detailBoard)   { try { JXG.JSXGraph.freeBoard(detailBoard); } catch(e) {} detailBoard = null; }
+  document.getElementById('detailBoard').innerHTML = '';
 
-  document.getElementById('detailId').textContent = center.center_id;
+  document.getElementById('detailId').textContent   = center.center_id;
   document.getElementById('detailName').textContent = center.name;
-  document.getElementById('detailBary').textContent = (center.barycentrics||[]).join('  ;  ') || '—';
+  document.getElementById('detailBary').textContent = (center.barycentrics || []).join('  ;  ') || '—';
 
   const panel = document.getElementById('detailPanel');
   panel.classList.add('open');
-  panel.scrollIntoView({behavior:'smooth', block:'start'});
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-  detailState2 = {angle: Math.PI/3};
-  detailBoard = makeThalesBoard('detailBoard', detailState2, center.center_id, false);
+  detailState2 = { angle: Math.PI / 3 };
+  detailBoard  = makeThalesBoard('detailBoard', detailState2, center.center_id, false);
 
-  // Auto-animate the detail board
   let lastTs = null;
-  function step(ts){
-    if(!lastTs) lastTs=ts;
-    const dt=Math.min((ts-lastTs)/1000,.1); lastTs=ts;
-    detailState2.angle=(detailState2.angle+0.5*dt)%(2*Math.PI);
+  function step(ts) {
+    if (!lastTs) lastTs = ts;
+    const dt = Math.min((ts - lastTs) / 1000, 0.1); lastTs = ts;
+    detailState2.angle = (detailState2.angle + 0.5 * dt) % (2 * Math.PI);
     detailBoard.update();
-    detailAnimId2=requestAnimationFrame(step);
+    detailAnimId2 = requestAnimationFrame(step);
   }
-  detailAnimId2=requestAnimationFrame(step);
+  detailAnimId2 = requestAnimationFrame(step);
 }
 
-function closeDetail(){
-  if(detailAnimId2){cancelAnimationFrame(detailAnimId2);detailAnimId2=null;}
+function closeDetail() {
+  if (detailAnimId2) { cancelAnimationFrame(detailAnimId2); detailAnimId2 = null; }
   document.getElementById('detailPanel').classList.remove('open');
 }
 
-// ── Wire up controls ──────────────────────────────────────────────
-document.getElementById('searchInput').addEventListener('input', applyFilters);
-document.getElementById('rowsSelect').addEventListener('change', applyFilters);
-document.getElementById('sortSelect').addEventListener('change', e=>{ sortCol=e.target.value; applyFilters(); });
-document.querySelectorAll('thead th[data-col]').forEach(th=>{
-  th.addEventListener('click',()=>{
-    sortCol=th.dataset.col;
-    document.querySelectorAll('thead th').forEach(t=>t.classList.remove('sorted'));
+// ── Controls ──────────────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input',  applyFilters);
+document.getElementById('rowsSelect') .addEventListener('change', applyFilters);
+document.getElementById('sortSelect') .addEventListener('change', e => { sortCol = e.target.value; applyFilters(); });
+document.querySelectorAll('thead th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    sortCol = th.dataset.col;
+    document.querySelectorAll('thead th').forEach(t => t.classList.remove('sorted'));
     th.classList.add('sorted');
     applyFilters();
   });
 });
 
-// ── Initial render ───────────────────────────────────────────────
 applyFilters();
 </script>
 </body>
