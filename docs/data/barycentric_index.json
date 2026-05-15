@@ -1,8 +1,7 @@
 {
   "meta": {
-    "generated_from": "docs/intro.html",
     "generated_by": "scripts/build_docs_barycentric_index.py",
-    "notes": "Fallback index used when live ETC pages are unavailable from the browser; live parsing still runs in docs/barycentric_search.html when the source pages are reachable.",
+    "notes": "Fallback index used when live ETC pages are unavailable from the browser; live parsing still runs in docs/barycentric_search.html when source pages are reachable.",
     "page_manifest": [
       "ETC.html",
       "ETCPart2.html",
@@ -44,7 +43,8 @@
     "total_centers": 102,
     "pages_present": [
       "ETC.html"
-    ]
+    ],
+    "source": "https://faculty.evansville.edu/ck6/encyclopedia/"
   },
   "centers": [
     {
@@ -54,7 +54,17 @@
       "barycentrics": [
         "sin 2A : sin 2B : sin 2C"
       ],
-      "search_text": "X(3) | Circumcenter | sin 2A : sin 2B : sin 2C"
+      "search_text": "X(3) | Circumcenter | ETC.html | sin 2A : sin 2B : sin 2C",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "sin 2A : sin 2B : sin 2C"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(4)",
@@ -63,7 +73,17 @@
       "barycentrics": [
         "SA : SB : SC"
       ],
-      "search_text": "X(4) | Orthocenter (= C here) | SA : SB : SC"
+      "search_text": "X(4) | Orthocenter (= C here) | ETC.html | SA : SB : SC",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "SA : SB : SC"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(5)",
@@ -72,7 +92,17 @@
       "barycentrics": [
         "cos(B-C):cos(C-A):cos(A-B)"
       ],
-      "search_text": "X(5) | Nine-Point Center | cos(B-C):cos(C-A):cos(A-B)"
+      "search_text": "X(5) | Nine-Point Center | ETC.html | cos(B-C):cos(C-A):cos(A-B)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "cos(B-C):cos(C-A):cos(A-B)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(6)",
@@ -81,7 +111,17 @@
       "barycentrics": [
         "a² : b² : c²"
       ],
-      "search_text": "X(6) | Symmedian Point | a² : b² : c²"
+      "search_text": "X(6) | Symmedian Point | ETC.html | a² : b² : c²",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a² : b² : c²"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(7)",
@@ -90,7 +130,17 @@
       "barycentrics": [
         "1/(s−a) : 1/(s−b) : 1/(s−c)"
       ],
-      "search_text": "X(7) | Gergonne Point | 1/(s−a) : 1/(s−b) : 1/(s−c)"
+      "search_text": "X(7) | Gergonne Point | ETC.html | 1/(s−a) : 1/(s−b) : 1/(s−c)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(s−a) : 1/(s−b) : 1/(s−c)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(8)",
@@ -99,7 +149,17 @@
       "barycentrics": [
         "b+c−a : c+a−b : a+b−c"
       ],
-      "search_text": "X(8) | Nagel Point | b+c−a : c+a−b : a+b−c"
+      "search_text": "X(8) | Nagel Point | ETC.html | b+c−a : c+a−b : a+b−c",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "b+c−a : c+a−b : a+b−c"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(9)",
@@ -108,7 +168,17 @@
       "barycentrics": [
         "a(b+c−a):b(c+a−b):c(a+b−c)"
       ],
-      "search_text": "X(9) | Mittenpunkt | a(b+c−a):b(c+a−b):c(a+b−c)"
+      "search_text": "X(9) | Mittenpunkt | ETC.html | a(b+c−a):b(c+a−b):c(a+b−c)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a(b+c−a):b(c+a−b):c(a+b−c)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(10)",
@@ -117,7 +187,17 @@
       "barycentrics": [
         "b+c : c+a : a+b"
       ],
-      "search_text": "X(10) | Spieker Center | b+c : c+a : a+b"
+      "search_text": "X(10) | Spieker Center | ETC.html | b+c : c+a : a+b",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "b+c : c+a : a+b"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(11)",
@@ -126,7 +206,17 @@
       "barycentrics": [
         "(b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)"
       ],
-      "search_text": "X(11) | Feuerbach Point | (b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)"
+      "search_text": "X(11) | Feuerbach Point | ETC.html | (b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "(b−c)²(b+c−a) : (c−a)²(c+a−b) : (a−b)²(a+b−c)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(12)",
@@ -135,7 +225,17 @@
       "barycentrics": [
         "a/(b+c+a)²:…"
       ],
-      "search_text": "X(12) | Extouchpoint-midpoint | a/(b+c+a)²:…"
+      "search_text": "X(12) | Extouchpoint-midpoint | ETC.html | a/(b+c+a)²:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a/(b+c+a)²:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(13)",
@@ -144,7 +244,17 @@
       "barycentrics": [
         "1/(SA+√3·S):…"
       ],
-      "search_text": "X(13) | Fermat Point 1 (isog conj X14) | 1/(SA+√3·S):…"
+      "search_text": "X(13) | Fermat Point 1 (isog conj X14) | ETC.html | 1/(SA+√3·S):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(SA+√3·S):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(14)",
@@ -153,7 +263,17 @@
       "barycentrics": [
         "1/(SA-√3·S):…"
       ],
-      "search_text": "X(14) | Fermat Point 2 | 1/(SA-√3·S):…"
+      "search_text": "X(14) | Fermat Point 2 | ETC.html | 1/(SA-√3·S):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(SA-√3·S):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(15)",
@@ -162,7 +282,17 @@
       "barycentrics": [
         "sin(A+π/3):sin(B+π/3):sin(C+π/3)"
       ],
-      "search_text": "X(15) | Isogonic Point 1 | sin(A+π/3):sin(B+π/3):sin(C+π/3)"
+      "search_text": "X(15) | Isogonic Point 1 | ETC.html | sin(A+π/3):sin(B+π/3):sin(C+π/3)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "sin(A+π/3):sin(B+π/3):sin(C+π/3)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(16)",
@@ -171,7 +301,17 @@
       "barycentrics": [
         "sin(A-π/3):sin(B-π/3):sin(C-π/3)"
       ],
-      "search_text": "X(16) | Isogonic Point 2 | sin(A-π/3):sin(B-π/3):sin(C-π/3)"
+      "search_text": "X(16) | Isogonic Point 2 | ETC.html | sin(A-π/3):sin(B-π/3):sin(C-π/3)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "sin(A-π/3):sin(B-π/3):sin(C-π/3)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(17)",
@@ -180,7 +320,17 @@
       "barycentrics": [
         "1/(SA+√3·S):… (=X13 variant)"
       ],
-      "search_text": "X(17) | Napoleon Pt 1 | 1/(SA+√3·S):… (=X13 variant)"
+      "search_text": "X(17) | Napoleon Pt 1 | ETC.html | 1/(SA+√3·S):… (=X13 variant)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(SA+√3·S):… (=X13 variant)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(18)",
@@ -189,7 +339,17 @@
       "barycentrics": [
         "SA-√3·S:…"
       ],
-      "search_text": "X(18) | Napoleon Pt 2 | SA-√3·S:…"
+      "search_text": "X(18) | Napoleon Pt 2 | ETC.html | SA-√3·S:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "SA-√3·S:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(19)",
@@ -198,7 +358,17 @@
       "barycentrics": [
         "tan A:tan B:tan C"
       ],
-      "search_text": "X(19) | Clawson Point (isog conj X63) | tan A:tan B:tan C"
+      "search_text": "X(19) | Clawson Point (isog conj X63) | ETC.html | tan A:tan B:tan C",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "tan A:tan B:tan C"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(20)",
@@ -207,7 +377,17 @@
       "barycentrics": [
         "-SA·(SB-SC)²+…  ≈ SA+SB+3SC variant"
       ],
-      "search_text": "X(20) | de Longchamps Point | -SA·(SB-SC)²+…  ≈ SA+SB+3SC variant"
+      "search_text": "X(20) | de Longchamps Point | ETC.html | -SA·(SB-SC)²+…  ≈ SA+SB+3SC variant",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "-SA·(SB-SC)²+…  ≈ SA+SB+3SC variant"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(21)",
@@ -216,7 +396,17 @@
       "barycentrics": [
         "1/(b+c):…"
       ],
-      "search_text": "X(21) | Schiffler Point | 1/(b+c):…"
+      "search_text": "X(21) | Schiffler Point | ETC.html | 1/(b+c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(b+c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(22)",
@@ -225,7 +415,17 @@
       "barycentrics": [
         "a²(b⁴+c⁴-a⁴):…"
       ],
-      "search_text": "X(22) | Exeter Point | a²(b⁴+c⁴-a⁴):…"
+      "search_text": "X(22) | Exeter Point | ETC.html | a²(b⁴+c⁴-a⁴):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b⁴+c⁴-a⁴):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(23)",
@@ -234,7 +434,17 @@
       "barycentrics": [
         "a²(a⁴-b²c²):…"
       ],
-      "search_text": "X(23) | Far-Out Point | a²(a⁴-b²c²):…"
+      "search_text": "X(23) | Far-Out Point | ETC.html | a²(a⁴-b²c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(a⁴-b²c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(25)",
@@ -243,7 +453,17 @@
       "barycentrics": [
         "a²/SA:…"
       ],
-      "search_text": "X(25) | Homothetic Center (orthic and tangential) | a²/SA:…"
+      "search_text": "X(25) | Homothetic Center (orthic and tangential) | ETC.html | a²/SA:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²/SA:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(31)",
@@ -252,7 +472,17 @@
       "barycentrics": [
         "a³:b³:c³ (trilinear a²:…)"
       ],
-      "search_text": "X(31) | 2nd Power Point | a³:b³:c³ (trilinear a²:…)"
+      "search_text": "X(31) | 2nd Power Point | ETC.html | a³:b³:c³ (trilinear a²:…)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a³:b³:c³ (trilinear a²:…)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(32)",
@@ -261,7 +491,17 @@
       "barycentrics": [
         "a⁴:b⁴:c⁴"
       ],
-      "search_text": "X(32) | 3rd Power Point | a⁴:b⁴:c⁴"
+      "search_text": "X(32) | 3rd Power Point | ETC.html | a⁴:b⁴:c⁴",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a⁴:b⁴:c⁴"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(35)",
@@ -270,7 +510,17 @@
       "barycentrics": [
         "a²(b²+c²-a²-bc):…"
       ],
-      "search_text": "X(35) | Intersection AP₁ with BC … isog 1st isog of X36 | a²(b²+c²-a²-bc):…"
+      "search_text": "X(35) | Intersection AP₁ with BC … isog 1st isog of X36 | ETC.html | a²(b²+c²-a²-bc):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b²+c²-a²-bc):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(36)",
@@ -279,7 +529,17 @@
       "barycentrics": [
         "a(a²-b²-bc-c²):…  simplified"
       ],
-      "search_text": "X(36) | Inverse of Incenter in circumcircle | a(a²-b²-bc-c²):…  simplified"
+      "search_text": "X(36) | Inverse of Incenter in circumcircle | ETC.html | a(a²-b²-bc-c²):…  simplified",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a(a²-b²-bc-c²):…  simplified"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(37)",
@@ -288,7 +548,17 @@
       "barycentrics": [
         "ab+ac : bc+ba : ca+cb"
       ],
-      "search_text": "X(37) | Crosspoint of X1,X2 (harmonic mean) | ab+ac : bc+ba : ca+cb"
+      "search_text": "X(37) | Crosspoint of X1,X2 (harmonic mean) | ETC.html | ab+ac : bc+ba : ca+cb",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "ab+ac : bc+ba : ca+cb"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(39)",
@@ -297,7 +567,17 @@
       "barycentrics": [
         "a²(b²+c²):…"
       ],
-      "search_text": "X(39) | Brocard Midpoint (X3 of medial) | a²(b²+c²):…"
+      "search_text": "X(39) | Brocard Midpoint (X3 of medial) | ETC.html | a²(b²+c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b²+c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(40)",
@@ -306,7 +586,17 @@
       "barycentrics": [
         "−a(b²+c²−a²−2bc):…"
       ],
-      "search_text": "X(40) | Bevan Point (circumcenter of excentral) | −a(b²+c²−a²−2bc):…"
+      "search_text": "X(40) | Bevan Point (circumcenter of excentral) | ETC.html | −a(b²+c²−a²−2bc):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "−a(b²+c²−a²−2bc):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(41)",
@@ -315,7 +605,17 @@
       "barycentrics": [
         "a²(b+c-a):…"
       ],
-      "search_text": "X(41) | Crosspoint of X1 and X6 | a²(b+c-a):…"
+      "search_text": "X(41) | Crosspoint of X1 and X6 | ETC.html | a²(b+c-a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b+c-a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(42)",
@@ -324,7 +624,17 @@
       "barycentrics": [
         "a(b+c):…"
       ],
-      "search_text": "X(42) | Crosssum of X1 and X2 | a(b+c):…"
+      "search_text": "X(42) | Crosssum of X1 and X2 | ETC.html | a(b+c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a(b+c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(43)",
@@ -333,7 +643,17 @@
       "barycentrics": [
         "bc(b+c-a):…"
       ],
-      "search_text": "X(43) | X(1) of medial triangle | bc(b+c-a):…"
+      "search_text": "X(43) | X(1) of medial triangle | ETC.html | bc(b+c-a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "bc(b+c-a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(44)",
@@ -342,7 +662,17 @@
       "barycentrics": [
         "a(b+c-2a):…"
       ],
-      "search_text": "X(44) | X(1)-beth conjugate of X(44) | a(b+c-2a):…"
+      "search_text": "X(44) | X(1)-beth conjugate of X(44) | ETC.html | a(b+c-2a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a(b+c-2a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(45)",
@@ -351,7 +681,17 @@
       "barycentrics": [
         "a(2b+2c-a):…"
       ],
-      "search_text": "X(45) | Complement of X(44) | a(2b+2c-a):…"
+      "search_text": "X(45) | Complement of X(44) | ETC.html | a(2b+2c-a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a(2b+2c-a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(46)",
@@ -360,7 +700,17 @@
       "barycentrics": [
         "a(cos B cos C - cos A):…"
       ],
-      "search_text": "X(46) | X(4) of excentral triangle | a(cos B cos C - cos A):…"
+      "search_text": "X(46) | X(4) of excentral triangle | ETC.html | a(cos B cos C - cos A):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a(cos B cos C - cos A):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(55)",
@@ -369,7 +719,17 @@
       "barycentrics": [
         "a(b+c-a):…"
       ],
-      "search_text": "X(55) | Insimilicenter of circumcircle and incircle | a(b+c-a):…"
+      "search_text": "X(55) | Insimilicenter of circumcircle and incircle | ETC.html | a(b+c-a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a(b+c-a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(56)",
@@ -378,7 +738,17 @@
       "barycentrics": [
         "a/(b+c-a):…"
       ],
-      "search_text": "X(56) | Exsimilicenter (isog conj X55) | a/(b+c-a):…"
+      "search_text": "X(56) | Exsimilicenter (isog conj X55) | ETC.html | a/(b+c-a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a/(b+c-a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(57)",
@@ -387,7 +757,17 @@
       "barycentrics": [
         "1/(b+c-a):…"
       ],
-      "search_text": "X(57) | Isogonal conj of X9 | 1/(b+c-a):…"
+      "search_text": "X(57) | Isogonal conj of X9 | ETC.html | 1/(b+c-a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(b+c-a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(58)",
@@ -396,7 +776,17 @@
       "barycentrics": [
         "a²/(b+c):…"
       ],
-      "search_text": "X(58) | Isogonal conj of X10 | a²/(b+c):…"
+      "search_text": "X(58) | Isogonal conj of X10 | ETC.html | a²/(b+c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²/(b+c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(59)",
@@ -405,7 +795,17 @@
       "barycentrics": [
         "a/((s-b)(s-c)):…"
       ],
-      "search_text": "X(59) | Isogonal conj of X11 | a/((s-b)(s-c)):…"
+      "search_text": "X(59) | Isogonal conj of X11 | ETC.html | a/((s-b)(s-c)):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a/((s-b)(s-c)):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(63)",
@@ -414,7 +814,17 @@
       "barycentrics": [
         "a/tan A:…  = a cos A:…"
       ],
-      "search_text": "X(63) | Isogonal conj of X19 | a/tan A:…  = a cos A:…"
+      "search_text": "X(63) | Isogonal conj of X19 | ETC.html | a/tan A:…  = a cos A:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a/tan A:…  = a cos A:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(65)",
@@ -423,7 +833,17 @@
       "barycentrics": [
         "a/(tan B+tan C):…"
       ],
-      "search_text": "X(65) | Isogonal conj of X21 | a/(tan B+tan C):…"
+      "search_text": "X(65) | Isogonal conj of X21 | ETC.html | a/(tan B+tan C):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a/(tan B+tan C):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(69)",
@@ -432,7 +852,17 @@
       "barycentrics": [
         "b²c²(b²+c²-a²):…"
       ],
-      "search_text": "X(69) | Isotomic conj of X25  (symmedian point of anticomp) | b²c²(b²+c²-a²):…"
+      "search_text": "X(69) | Isotomic conj of X25  (symmedian point of anticomp) | ETC.html | b²c²(b²+c²-a²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "b²c²(b²+c²-a²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(75)",
@@ -441,7 +871,17 @@
       "barycentrics": [
         "bc:ca:ab"
       ],
-      "search_text": "X(75) | Isotomic conj of X31 | bc:ca:ab"
+      "search_text": "X(75) | Isotomic conj of X31 | ETC.html | bc:ca:ab",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "bc:ca:ab"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(76)",
@@ -450,7 +890,17 @@
       "barycentrics": [
         "b²c²:c²a²:a²b²"
       ],
-      "search_text": "X(76) | Isotomic conj of X32 | b²c²:c²a²:a²b²"
+      "search_text": "X(76) | Isotomic conj of X32 | ETC.html | b²c²:c²a²:a²b²",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "b²c²:c²a²:a²b²"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(79)",
@@ -459,7 +909,17 @@
       "barycentrics": [
         "1/(2SA+bc):…"
       ],
-      "search_text": "X(79) | Isogonal conj of X35 | 1/(2SA+bc):…"
+      "search_text": "X(79) | Isogonal conj of X35 | ETC.html | 1/(2SA+bc):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(2SA+bc):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(80)",
@@ -468,7 +928,17 @@
       "barycentrics": [
         "(b+c-a)/(b-a+c):…  simplified"
       ],
-      "search_text": "X(80) | Reflection of X1 in X11 variant | (b+c-a)/(b-a+c):…  simplified"
+      "search_text": "X(80) | Reflection of X1 in X11 variant | ETC.html | (b+c-a)/(b-a+c):…  simplified",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "(b+c-a)/(b-a+c):…  simplified"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(81)",
@@ -477,7 +947,17 @@
       "barycentrics": [
         "b+c:c+a:a+b → reciprocal of…  a/(b+c):…"
       ],
-      "search_text": "X(81) | Isogonal conj of X42 | b+c:c+a:a+b → reciprocal of…  a/(b+c):…"
+      "search_text": "X(81) | Isogonal conj of X42 | ETC.html | b+c:c+a:a+b → reciprocal of…  a/(b+c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "b+c:c+a:a+b → reciprocal of…  a/(b+c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(82)",
@@ -486,7 +966,17 @@
       "barycentrics": [
         "a/(b²+c²):…"
       ],
-      "search_text": "X(82) | Isogonal conj of X38 | a/(b²+c²):…"
+      "search_text": "X(82) | Isogonal conj of X38 | ETC.html | a/(b²+c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a/(b²+c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(83)",
@@ -495,7 +985,17 @@
       "barycentrics": [
         "1/(b²+c²):…"
       ],
-      "search_text": "X(83) | Isogonal conj of X39 | 1/(b²+c²):…"
+      "search_text": "X(83) | Isogonal conj of X39 | ETC.html | 1/(b²+c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(b²+c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(85)",
@@ -504,7 +1004,17 @@
       "barycentrics": [
         "bc/(b+c-a):…"
       ],
-      "search_text": "X(85) | Isotomic conj of X41 | bc/(b+c-a):…"
+      "search_text": "X(85) | Isotomic conj of X41 | ETC.html | bc/(b+c-a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "bc/(b+c-a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(86)",
@@ -513,7 +1023,17 @@
       "barycentrics": [
         "bc(b+c):…"
       ],
-      "search_text": "X(86) | Isotomic conj of X42 | bc(b+c):…"
+      "search_text": "X(86) | Isotomic conj of X42 | ETC.html | bc(b+c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "bc(b+c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(88)",
@@ -522,7 +1042,17 @@
       "barycentrics": [
         "a/(2a-b-c):…"
       ],
-      "search_text": "X(88) | Isogonal conj of X44 | a/(2a-b-c):…"
+      "search_text": "X(88) | Isogonal conj of X44 | ETC.html | a/(2a-b-c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a/(2a-b-c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(89)",
@@ -531,7 +1061,17 @@
       "barycentrics": [
         "a/(2b+2c-a):…"
       ],
-      "search_text": "X(89) | Isogonal conj of X45 | a/(2b+2c-a):…"
+      "search_text": "X(89) | Isogonal conj of X45 | ETC.html | a/(2b+2c-a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a/(2b+2c-a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(98)",
@@ -540,7 +1080,17 @@
       "barycentrics": [
         "SA(SB-SC)²:…"
       ],
-      "search_text": "X(98) | Tarry Point (isog conj of Steiner) | SA(SB-SC)²:…"
+      "search_text": "X(98) | Tarry Point (isog conj of Steiner) | ETC.html | SA(SB-SC)²:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "SA(SB-SC)²:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(99)",
@@ -549,7 +1099,17 @@
       "barycentrics": [
         "1/(b²-c²):…"
       ],
-      "search_text": "X(99) | Steiner Point | 1/(b²-c²):…"
+      "search_text": "X(99) | Steiner Point | ETC.html | 1/(b²-c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(b²-c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(100)",
@@ -558,7 +1118,17 @@
       "barycentrics": [
         "1/(b-c):…"
       ],
-      "search_text": "X(100) | Anticomplement of Feuerbach | 1/(b-c):…"
+      "search_text": "X(100) | Anticomplement of Feuerbach | ETC.html | 1/(b-c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(b-c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(101)",
@@ -567,7 +1137,17 @@
       "barycentrics": [
         "a²/(b-c):…"
       ],
-      "search_text": "X(101) | Isog conj of X514 (trilinear: a/(b-c)) | a²/(b-c):…"
+      "search_text": "X(101) | Isog conj of X514 (trilinear: a/(b-c)) | ETC.html | a²/(b-c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²/(b-c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(105)",
@@ -576,7 +1156,17 @@
       "barycentrics": [
         "1/(a(b+c)-b²-c²):…"
       ],
-      "search_text": "X(105) | Isog conj of X518 | 1/(a(b+c)-b²-c²):…"
+      "search_text": "X(105) | Isog conj of X518 | ETC.html | 1/(a(b+c)-b²-c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/(a(b+c)-b²-c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(110)",
@@ -585,7 +1175,17 @@
       "barycentrics": [
         "a²/(b²-c²):…"
       ],
-      "search_text": "X(110) | Focus of Kiepert parabola | a²/(b²-c²):…"
+      "search_text": "X(110) | Focus of Kiepert parabola | ETC.html | a²/(b²-c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²/(b²-c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(111)",
@@ -594,7 +1194,17 @@
       "barycentrics": [
         "a²/(2a²-b²-c²):…"
       ],
-      "search_text": "X(111) | Parry Point | a²/(2a²-b²-c²):…"
+      "search_text": "X(111) | Parry Point | ETC.html | a²/(2a²-b²-c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²/(2a²-b²-c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(114)",
@@ -603,7 +1213,17 @@
       "barycentrics": [
         "SA(SB-SC)²+…  midpoint X113 X4"
       ],
-      "search_text": "X(114) | Center of Kiepert hyperbola | SA(SB-SC)²+…  midpoint X113 X4"
+      "search_text": "X(114) | Center of Kiepert hyperbola | ETC.html | SA(SB-SC)²+…  midpoint X113 X4",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "SA(SB-SC)²+…  midpoint X113 X4"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(115)",
@@ -612,7 +1232,17 @@
       "barycentrics": [
         "(b²-c²)²:…"
       ],
-      "search_text": "X(115) | Center of Kiepert circumconic | (b²-c²)²:…"
+      "search_text": "X(115) | Center of Kiepert circumconic | ETC.html | (b²-c²)²:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "(b²-c²)²:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(116)",
@@ -621,7 +1251,17 @@
       "barycentrics": [
         "(SB-SC)²:…"
       ],
-      "search_text": "X(116) | Tripole of Euler line | (SB-SC)²:…"
+      "search_text": "X(116) | Tripole of Euler line | ETC.html | (SB-SC)²:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "(SB-SC)²:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(119)",
@@ -630,7 +1270,17 @@
       "barycentrics": [
         "(b+c-a)(b²+c²-a²):…"
       ],
-      "search_text": "X(119) | Complement of X(11) | (b+c-a)(b²+c²-a²):…"
+      "search_text": "X(119) | Complement of X(11) | ETC.html | (b+c-a)(b²+c²-a²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "(b+c-a)(b²+c²-a²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(120)",
@@ -639,7 +1289,17 @@
       "barycentrics": [
         "b²+c²-a(b+c):…"
       ],
-      "search_text": "X(120) | Complement of X(105) | b²+c²-a(b+c):…"
+      "search_text": "X(120) | Complement of X(105) | ETC.html | b²+c²-a(b+c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "b²+c²-a(b+c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(121)",
@@ -648,7 +1308,17 @@
       "barycentrics": [
         "bc(b+c-a-bc/a):…  → a(b+c-2a)²:…"
       ],
-      "search_text": "X(121) | Complement of X(106) | bc(b+c-a-bc/a):…  → a(b+c-2a)²:…"
+      "search_text": "X(121) | Complement of X(106) | ETC.html | bc(b+c-a-bc/a):…  → a(b+c-2a)²:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "bc(b+c-a-bc/a):…  → a(b+c-2a)²:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(125)",
@@ -657,7 +1327,17 @@
       "barycentrics": [
         "a²(b²-c²)²·SA:…"
       ],
-      "search_text": "X(125) | Center of Jerabek hyperbola | a²(b²-c²)²·SA:…"
+      "search_text": "X(125) | Center of Jerabek hyperbola | ETC.html | a²(b²-c²)²·SA:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b²-c²)²·SA:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(126)",
@@ -666,7 +1346,17 @@
       "barycentrics": [
         "a²(2a²-b²-c²):…"
       ],
-      "search_text": "X(126) | Midpoint of X3 and X111 | a²(2a²-b²-c²):…"
+      "search_text": "X(126) | Midpoint of X3 and X111 | ETC.html | a²(2a²-b²-c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(2a²-b²-c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(127)",
@@ -675,7 +1365,17 @@
       "barycentrics": [
         "a²·SA(SB-SC)²:…"
       ],
-      "search_text": "X(127) | Midpoint X3 and X112 | a²·SA(SB-SC)²:…"
+      "search_text": "X(127) | Midpoint X3 and X112 | ETC.html | a²·SA(SB-SC)²:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²·SA(SB-SC)²:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(140)",
@@ -684,7 +1384,17 @@
       "barycentrics": [
         "a²(b²+c²)+bc(b²+c²-a²):…"
       ],
-      "search_text": "X(140) | Complement of X5 | a²(b²+c²)+bc(b²+c²-a²):…"
+      "search_text": "X(140) | Complement of X5 | ETC.html | a²(b²+c²)+bc(b²+c²-a²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b²+c²)+bc(b²+c²-a²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(141)",
@@ -693,7 +1403,17 @@
       "barycentrics": [
         "b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)"
       ],
-      "search_text": "X(141) | Complement of X6 | b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)"
+      "search_text": "X(141) | Complement of X6 | ETC.html | b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "b²c²+c²a²-a²b²:…  = b²+c²-a²:…  (=SA:SB:SC up to sign)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(142)",
@@ -702,7 +1422,17 @@
       "barycentrics": [
         "(b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…"
       ],
-      "search_text": "X(142) | Complement of X7 | (b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…"
+      "search_text": "X(142) | Complement of X7 | ETC.html | (b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "(b+c-a)(c+a-b)(a+b-c):…  → bc(a+b-c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(144)",
@@ -711,7 +1441,17 @@
       "barycentrics": [
         "(b-c)²+a(b+c-2a):…"
       ],
-      "search_text": "X(144) | Anticomplement of X7 | (b-c)²+a(b+c-2a):…"
+      "search_text": "X(144) | Anticomplement of X7 | ETC.html | (b-c)²+a(b+c-2a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "(b-c)²+a(b+c-2a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(145)",
@@ -720,7 +1460,17 @@
       "barycentrics": [
         "(b+c-3a):…"
       ],
-      "search_text": "X(145) | Anticomplement of X8 | (b+c-3a):…"
+      "search_text": "X(145) | Anticomplement of X8 | ETC.html | (b+c-3a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "(b+c-3a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(162)",
@@ -729,7 +1479,17 @@
       "barycentrics": [
         "a³/(b²-c²):…"
       ],
-      "search_text": "X(162) | Isog conj of X525 (trilinear:a/(b²-c²)) | a³/(b²-c²):…"
+      "search_text": "X(162) | Isog conj of X525 (trilinear:a/(b²-c²)) | ETC.html | a³/(b²-c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a³/(b²-c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(174)",
@@ -738,7 +1498,17 @@
       "barycentrics": [
         "sin(A/2):sin(B/2):sin(C/2)"
       ],
-      "search_text": "X(174) | Isog conj of X175 (midcircle) | sin(A/2):sin(B/2):sin(C/2)"
+      "search_text": "X(174) | Isog conj of X175 (midcircle) | ETC.html | sin(A/2):sin(B/2):sin(C/2)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "sin(A/2):sin(B/2):sin(C/2)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(175)",
@@ -747,7 +1517,17 @@
       "barycentrics": [
         "1/sin(A/2):…"
       ],
-      "search_text": "X(175) | Isog conj of X174 | 1/sin(A/2):…"
+      "search_text": "X(175) | Isog conj of X174 | ETC.html | 1/sin(A/2):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "1/sin(A/2):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(176)",
@@ -756,7 +1536,17 @@
       "barycentrics": [
         "bc/sin(A/2):…"
       ],
-      "search_text": "X(176) | Isotomic conj X174 | bc/sin(A/2):…"
+      "search_text": "X(176) | Isotomic conj X174 | ETC.html | bc/sin(A/2):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "bc/sin(A/2):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(178)",
@@ -765,7 +1555,17 @@
       "barycentrics": [
         "cos(A/2):cos(B/2):cos(C/2)"
       ],
-      "search_text": "X(178) | Midcircle of incircle and A-excircle (approx) | cos(A/2):cos(B/2):cos(C/2)"
+      "search_text": "X(178) | Midcircle of incircle and A-excircle (approx) | ETC.html | cos(A/2):cos(B/2):cos(C/2)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "cos(A/2):cos(B/2):cos(C/2)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(181)",
@@ -774,7 +1574,17 @@
       "barycentrics": [
         "a²/((b+c)(s-a)):…"
       ],
-      "search_text": "X(181) | Isog conj of X314 | a²/((b+c)(s-a)):…"
+      "search_text": "X(181) | Isog conj of X314 | ETC.html | a²/((b+c)(s-a)):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²/((b+c)(s-a)):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(182)",
@@ -783,7 +1593,17 @@
       "barycentrics": [
         "a²(b²+c²-a²):…"
       ],
-      "search_text": "X(182) | Midpoint of X3 and X6 | a²(b²+c²-a²):…"
+      "search_text": "X(182) | Midpoint of X3 and X6 | ETC.html | a²(b²+c²-a²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b²+c²-a²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(184)",
@@ -792,7 +1612,17 @@
       "barycentrics": [
         "a⁴(b²+c²-a²):…"
       ],
-      "search_text": "X(184) | Crosssum of X3 and X6 | a⁴(b²+c²-a²):…"
+      "search_text": "X(184) | Crosssum of X3 and X6 | ETC.html | a⁴(b²+c²-a²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a⁴(b²+c²-a²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(186)",
@@ -801,7 +1631,17 @@
       "barycentrics": [
         "a²(a⁴-b⁴-c⁴+b²c²):…"
       ],
-      "search_text": "X(186) | Inverse of X4 in circumcircle | a²(a⁴-b⁴-c⁴+b²c²):…"
+      "search_text": "X(186) | Inverse of X4 in circumcircle | ETC.html | a²(a⁴-b⁴-c⁴+b²c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(a⁴-b⁴-c⁴+b²c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(187)",
@@ -810,7 +1650,17 @@
       "barycentrics": [
         "a²(2a²-b²-c²):…"
       ],
-      "search_text": "X(187) | Schoute Center | a²(2a²-b²-c²):…"
+      "search_text": "X(187) | Schoute Center | ETC.html | a²(2a²-b²-c²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(2a²-b²-c²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(190)",
@@ -819,7 +1669,17 @@
       "barycentrics": [
         "bc(b+c-2a):…"
       ],
-      "search_text": "X(190) | Isotomic conj of X44 | bc(b+c-2a):…"
+      "search_text": "X(190) | Isotomic conj of X44 | ETC.html | bc(b+c-2a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "bc(b+c-2a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(192)",
@@ -828,7 +1688,17 @@
       "barycentrics": [
         "bc(c+a-b):…  variant"
       ],
-      "search_text": "X(192) | Crosspoint of X1 and X75 | bc(c+a-b):…  variant"
+      "search_text": "X(192) | Crosspoint of X1 and X75 | ETC.html | bc(c+a-b):…  variant",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "bc(c+a-b):…  variant"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(193)",
@@ -837,7 +1707,17 @@
       "barycentrics": [
         "a²(b²+c²)-b²c²:…  = a²SA:…"
       ],
-      "search_text": "X(193) | Isotomic conj of X69 | a²(b²+c²)-b²c²:…  = a²SA:…"
+      "search_text": "X(193) | Isotomic conj of X69 | ETC.html | a²(b²+c²)-b²c²:…  = a²SA:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b²+c²)-b²c²:…  = a²SA:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(200)",
@@ -846,7 +1726,17 @@
       "barycentrics": [
         "a(b+c-a)²:…"
       ],
-      "search_text": "X(200) | Isog conj X269 (Mittenpunkt variant) | a(b+c-a)²:…"
+      "search_text": "X(200) | Isog conj X269 (Mittenpunkt variant) | ETC.html | a(b+c-a)²:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a(b+c-a)²:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(210)",
@@ -855,7 +1745,17 @@
       "barycentrics": [
         "a(b+c-a)²:…  (same as X200 up to sign — see ETC)"
       ],
-      "search_text": "X(210) | Isog conj X1170 | a(b+c-a)²:…  (same as X200 up to sign — see ETC)"
+      "search_text": "X(210) | Isog conj X1170 | ETC.html | a(b+c-a)²:…  (same as X200 up to sign — see ETC)",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a(b+c-a)²:…  (same as X200 up to sign — see ETC)"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(213)",
@@ -864,7 +1764,17 @@
       "barycentrics": [
         "a²(b+c):…"
       ],
-      "search_text": "X(213) | Crosspoint X1,X42 | a²(b+c):…"
+      "search_text": "X(213) | Crosspoint X1,X42 | ETC.html | a²(b+c):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b+c):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(214)",
@@ -873,7 +1783,17 @@
       "barycentrics": [
         "a²(b+c-a)²:…"
       ],
-      "search_text": "X(214) | Harmonic conjugate of X1 wrt X11 X12 | a²(b+c-a)²:…"
+      "search_text": "X(214) | Harmonic conjugate of X1 wrt X11 X12 | ETC.html | a²(b+c-a)²:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b+c-a)²:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(216)",
@@ -882,7 +1802,17 @@
       "barycentrics": [
         "SA(SB·SC):…  → SA·SB:…"
       ],
-      "search_text": "X(216) | Kosnita's theorem point | SA(SB·SC):…  → SA·SB:…"
+      "search_text": "X(216) | Kosnita's theorem point | ETC.html | SA(SB·SC):…  → SA·SB:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "SA(SB·SC):…  → SA·SB:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(218)",
@@ -891,7 +1821,17 @@
       "barycentrics": [
         "a²(b+c-a)(a(b+c)-bc):…"
       ],
-      "search_text": "X(218) | Isog conj X1445 | a²(b+c-a)(a(b+c)-bc):…"
+      "search_text": "X(218) | Isog conj X1445 | ETC.html | a²(b+c-a)(a(b+c)-bc):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b+c-a)(a(b+c)-bc):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(220)",
@@ -900,7 +1840,17 @@
       "barycentrics": [
         "a²(b+c-a)²/(bc):…"
       ],
-      "search_text": "X(220) | Isog conj X279 | a²(b+c-a)²/(bc):…"
+      "search_text": "X(220) | Isog conj X279 | ETC.html | a²(b+c-a)²/(bc):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²(b+c-a)²/(bc):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(222)",
@@ -909,7 +1859,17 @@
       "barycentrics": [
         "a·cos²(A/2)/(b+c-a):…"
       ],
-      "search_text": "X(222) | Isog conj X281 (3rd Conway pt) | a·cos²(A/2)/(b+c-a):…"
+      "search_text": "X(222) | Isog conj X281 (3rd Conway pt) | ETC.html | a·cos²(A/2)/(b+c-a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a·cos²(A/2)/(b+c-a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(223)",
@@ -918,7 +1878,17 @@
       "barycentrics": [
         "a(b+c-a)/(b²+c²-a²):…"
       ],
-      "search_text": "X(223) | Isog conj X282 | a(b+c-a)/(b²+c²-a²):…"
+      "search_text": "X(223) | Isog conj X282 | ETC.html | a(b+c-a)/(b²+c²-a²):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a(b+c-a)/(b²+c²-a²):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(226)",
@@ -927,7 +1897,17 @@
       "barycentrics": [
         "bc/(b+c-a):…"
       ],
-      "search_text": "X(226) | Isog conj X284 | bc/(b+c-a):…"
+      "search_text": "X(226) | Isog conj X284 | ETC.html | bc/(b+c-a):…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "bc/(b+c-a):…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(230)",
@@ -936,7 +1916,17 @@
       "barycentrics": [
         "SA·SB:SB·SC:SC·SA → simplified"
       ],
-      "search_text": "X(230) | Crossdiff X2,X6 (Euler-line tripole) | SA·SB:SB·SC:SC·SA → simplified"
+      "search_text": "X(230) | Crossdiff X2,X6 (Euler-line tripole) | ETC.html | SA·SB:SB·SC:SC·SA → simplified",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "SA·SB:SB·SC:SC·SA → simplified"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(232)",
@@ -945,7 +1935,17 @@
       "barycentrics": [
         "a²·SA(SB-SC)²:…"
       ],
-      "search_text": "X(232) | Crossdiff X3,X6 | a²·SA(SB-SC)²:…"
+      "search_text": "X(232) | Crossdiff X3,X6 | ETC.html | a²·SA(SB-SC)²:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a²·SA(SB-SC)²:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(233)",
@@ -954,7 +1954,17 @@
       "barycentrics": [
         "a⁴(b²-c²)²:…"
       ],
-      "search_text": "X(233) | Nine-point circle inverse of X5 | a⁴(b²-c²)²:…"
+      "search_text": "X(233) | Nine-point circle inverse of X5 | ETC.html | a⁴(b²-c²)²:…",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "a⁴(b²-c²)²:…"
+        ],
+        "tripolars": []
+      }
     },
     {
       "center_id": "X(236)",
@@ -963,7 +1973,17 @@
       "barycentrics": [
         "cos(A/2)+cos(B/2)+cos(C/2):…  variant"
       ],
-      "search_text": "X(236) | Midpoint X175 X176 | cos(A/2)+cos(B/2)+cos(C/2):…  variant"
+      "search_text": "X(236) | Midpoint X175 X176 | ETC.html | cos(A/2)+cos(B/2)+cos(C/2):…  variant",
+      "source_url": "https://faculty.evansville.edu/ck6/encyclopedia/ETC.html",
+      "trilinears": [],
+      "tripolars": [],
+      "additional": {
+        "trilinears": [],
+        "barycentrics": [
+          "cos(A/2)+cos(B/2)+cos(C/2):…  variant"
+        ],
+        "tripolars": []
+      }
     }
   ]
 }
