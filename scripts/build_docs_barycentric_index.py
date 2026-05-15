@@ -11,7 +11,8 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'docs' / 'data' / 'barycentric_index.json'
 BASE = 'https://faculty.evansville.edu/ck6/encyclopedia/'
-MAX_PART = 100
+MAX_PART = 150
+MAX_CONSECUTIVE_MISSING_PAGES = 3
 COORD_LABELS = ('Trilinears', 'Barycentrics', 'Tripolars')
 COORD_STOP = re.compile(
     r"\s+(?:where|for\b|which\b|See\s+also|Lines|Note|Also|Polar|Coordinates|equals?|Compare|The\s).*",
@@ -93,24 +94,23 @@ def parse_page(html: str, source_page: str) -> list[dict]:
             return
         block = normalize(' '.join(active['lines']))
         barycentrics = extract_coordinate_runs(block, 'Barycentrics')
-        if barycentrics:
-            trilinears = extract_coordinate_runs(block, 'Trilinears')
-            tripolars = extract_coordinate_runs(block, 'Tripolars')
-            rows.append({
-                'center_id': active['center_id'],
-                'name': active['name'],
-                'source_page': source_page,
-                'source_url': BASE + source_page,
-                'barycentrics': barycentrics,
+        trilinears = extract_coordinate_runs(block, 'Trilinears')
+        tripolars = extract_coordinate_runs(block, 'Tripolars')
+        rows.append({
+            'center_id': active['center_id'],
+            'name': active['name'],
+            'source_page': source_page,
+            'source_url': BASE + source_page,
+            'barycentrics': barycentrics,
+            'trilinears': trilinears,
+            'tripolars': tripolars,
+            'additional': {
                 'trilinears': trilinears,
+                'barycentrics': barycentrics,
                 'tripolars': tripolars,
-                'additional': {
-                    'trilinears': trilinears,
-                    'barycentrics': barycentrics,
-                    'tripolars': tripolars,
-                },
-                'search_text': ' | '.join([active['center_id'], active['name'], source_page, *trilinears, *barycentrics, *tripolars]),
-            })
+            },
+            'search_text': ' | '.join([active['center_id'], active['name'], source_page, *trilinears, *barycentrics, *tripolars]),
+        })
         active = None
 
     for line in html_to_lines(html):
@@ -149,13 +149,18 @@ def fetch_pages() -> tuple[list[dict], list[str]]:
     session = requests.Session()
     pages_seen: list[str] = []
     rows: list[dict] = []
+    missing_in_a_row = 0
     for part in range(1, MAX_PART + 1):
         page = page_name(part)
         url = BASE + page
         response = session.get(url, timeout=30)
         if response.status_code == 404:
-            break
+            missing_in_a_row += 1
+            if missing_in_a_row >= MAX_CONSECUTIVE_MISSING_PAGES:
+                break
+            continue
         response.raise_for_status()
+        missing_in_a_row = 0
         pages_seen.append(page)
         rows.extend(parse_page(response.text, page))
     return dedupe_centers(rows), pages_seen

@@ -1,7 +1,8 @@
 "use strict";
 (() => {
     const ETC_BASE_URL = 'https://faculty.evansville.edu/ck6/encyclopedia/';
-    const ETC_MAX_PART = 100;
+    const ETC_MAX_PART = 150;
+    const MAX_CONSECUTIVE_MISSING_PAGES = 3;
     const COORDINATE_LABELS = ['Trilinears', 'Barycentrics', 'Tripolars'];
     function pageNameForPart(part) {
         return part === 1 ? 'ETC.html' : `ETCPart${part}.html`;
@@ -77,8 +78,6 @@
     function buildCenter(active, sourcePage) {
         const blockText = normalizeSpace(active.lines.join(' '));
         const barycentrics = extractCoordinateRuns(blockText, 'Barycentrics');
-        if (!barycentrics.length)
-            return null;
         const trilinears = extractCoordinateRuns(blockText, 'Trilinears');
         const tripolars = extractCoordinateRuns(blockText, 'Tripolars');
         const additional = { trilinears, barycentrics, tripolars };
@@ -102,9 +101,7 @@
         const finish = () => {
             if (!active)
                 return;
-            const center = buildCenter(active, sourcePage);
-            if (center)
-                centers.push(center);
+            centers.push(buildCenter(active, sourcePage));
             active = null;
         };
         for (const line of lines) {
@@ -126,7 +123,7 @@
         const centerId = center.center_id || '';
         const name = center.name || '';
         const barycentrics = center.barycentrics || center.additional?.barycentrics || [];
-        if (!centerId || !name || !barycentrics.length)
+        if (!centerId || !name)
             return null;
         const trilinears = center.trilinears || center.additional?.trilinears || [];
         const tripolars = center.tripolars || center.additional?.tripolars || [];
@@ -161,17 +158,55 @@
         });
         return rows;
     }
+    function proxiedEtcUrl(page) {
+        return `https://api.allorigins.win/raw?url=${encodeURIComponent(ETC_BASE_URL + page)}`;
+    }
+    async function fetchEtcPageText(page) {
+        const urls = [ETC_BASE_URL + page, proxiedEtcUrl(page)];
+        const errors = [];
+        for (const url of urls) {
+            try {
+                const response = await fetch(url, { cache: 'no-store' });
+                if (response.status === 404)
+                    return null;
+                if (!response.ok) {
+                    errors.push(`${url}: HTTP ${response.status}`);
+                    continue;
+                }
+                return await response.text();
+            }
+            catch (err) {
+                errors.push(err instanceof Error ? err.message : String(err));
+            }
+        }
+        throw new Error(`${page}: ${errors.join('; ')}`);
+    }
     async function fetchLiveEtcCenters(onProgress) {
         const pages = [];
         const centers = [];
+        const pageErrors = [];
+        let missingInARow = 0;
         for (let part = 1; part <= ETC_MAX_PART; part += 1) {
             const page = pageNameForPart(part);
-            const response = await fetch(ETC_BASE_URL + page, { cache: 'no-store' });
-            if (response.status === 404)
-                break;
-            if (!response.ok)
-                throw new Error(`${page}: HTTP ${response.status}`);
-            const parsed = parseEtcHtml(await response.text(), page);
+            let html;
+            try {
+                html = await fetchEtcPageText(page);
+            }
+            catch (err) {
+                pageErrors.push(err instanceof Error ? err.message : String(err));
+                missingInARow += 1;
+                if (missingInARow >= MAX_CONSECUTIVE_MISSING_PAGES)
+                    break;
+                continue;
+            }
+            if (html === null) {
+                missingInARow += 1;
+                if (missingInARow >= MAX_CONSECUTIVE_MISSING_PAGES)
+                    break;
+                continue;
+            }
+            missingInARow = 0;
+            const parsed = parseEtcHtml(html, page);
             pages.push(page);
             centers.push(...parsed);
             onProgress?.({
@@ -180,7 +215,7 @@
                 source: 'Live ETC',
             });
         }
-        return { centers: dedupeCenters(centers), pages };
+        return { centers: dedupeCenters(centers), pages, pageErrors };
     }
     async function loadFallbackCenters(fallbackUrl = 'data/barycentric_index.json') {
         const response = await fetch(fallbackUrl, { cache: 'no-store' });
@@ -199,7 +234,7 @@
         catch (err) {
             const warning = err instanceof Error ? err.message : String(err);
             const centers = await loadFallbackCenters(options.fallbackUrl);
-            return { centers, pages: [], source: 'Fallback', warning };
+            return { centers, pages: [], pageErrors: [], source: 'Fallback', warning };
         }
     }
     window.EtcLiveParser = {

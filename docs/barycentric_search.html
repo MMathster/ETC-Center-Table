@@ -628,7 +628,7 @@ function evalCenterAt(id, p, t) {
     const r = fn(p);
     if (Array.isArray(r)) return r;
   }
-  return [p.cosT, p.sinT]; // fallback: tracks C
+  return [NaN, NaN]; // no usable barycentric formula
 }
 
 function buildLocus(id) {
@@ -747,7 +747,7 @@ function render() {
       <td class="col-center">${escapeHtml(c.center_id)}</td>
       <td class="col-name">${escapeHtml(c.name)}</td>
       <td class="col-mono" title="${escapeHtml(bary)}">${escapeHtml(bary)}</td>
-      <td><span class="badge badge--ccw">✓ Yes</span></td>`;
+      <td>${(c.barycentrics || []).length ? '<span class="badge badge--ccw">✓ Barycentric</span>' : '<span class="badge badge--cw">— No barycentric</span>'}</td>`;
     tr.addEventListener('mouseenter', e => showPopup(e, c));
     tr.addEventListener('mousemove',  e => movePopup(e));
     tr.addEventListener('mouseleave', hidePopup);
