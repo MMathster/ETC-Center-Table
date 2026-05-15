@@ -167,6 +167,10 @@ tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
 .detail-id{font-family:var(--mono);font-size:.82rem;color:var(--accent);font-weight:700}
 .detail-name{font-size:1.1rem;font-weight:800;color:var(--text);margin-top:.15rem}
 .detail-bary{font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-top:.3rem;line-height:1.5}
+.detail-extra{margin-top:.7rem;display:grid;gap:.55rem}
+.detail-extra-section{border:1px solid rgba(112,184,255,.16);border-radius:10px;background:rgba(8,19,33,.46);padding:.55rem .65rem}
+.detail-extra-title{font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.25rem}
+.detail-extra-list{display:grid;gap:.3rem;font-family:var(--mono);font-size:.72rem;color:var(--muted);line-height:1.45;word-break:break-word}
 .detail-close{background:none;border:1px solid var(--border);border-radius:6px;color:var(--soft);font-family:var(--font);font-size:.78rem;font-weight:700;padding:.28rem .7rem;cursor:pointer;transition:border-color .15s,color .15s;flex-shrink:0}
 .detail-close:hover{border-color:var(--accent);color:var(--text)}
 .detail-board-wrap{width:100%;height:360px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;position:relative}
@@ -210,10 +214,10 @@ tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
       <span class="title-etc">Barycentric Center Search</span>
       <span class="title-sub">ETC Center Table — Locus Catalog</span>
     </h1>
-    <p class="subtitle">Search and filter triangle centers from the Encyclopedia of Triangle Centers (ETC). Data is pre-loaded from the repository — no live network fetch required.</p>
+    <p class="subtitle">Search and filter triangle centers parsed live from the Encyclopedia of Triangle Centers (ETC), with a local fallback when browser access to ETC is unavailable.</p>
     <div class="stat-row">
-      <span class="stat-pill"><strong id="totalCount">102</strong>&nbsp;centers loaded</span>
-      <span class="stat-pill"><strong>JSON</strong>&nbsp;data format</span>
+      <span class="stat-pill"><strong id="totalCount">—</strong>&nbsp;centers loaded</span>
+      <span class="stat-pill"><strong id="sourceMode">Live ETC</strong>&nbsp;data source</span>
       <span class="stat-pill"><strong>JSXGraph</strong>&nbsp;live loci</span>
       <span class="stat-pill"><strong>Thales</strong>&nbsp;configuration</span>
     </div>
@@ -226,6 +230,7 @@ tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
         <div class="detail-id" id="detailId">—</div>
         <div class="detail-name" id="detailName">—</div>
         <div class="detail-bary" id="detailBary">—</div>
+        <div class="detail-extra" id="detailExtra"></div>
       </div>
       <button class="detail-close" onclick="closeDetail()">✕ Close</button>
     </div>
@@ -242,7 +247,7 @@ tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
 
   <div class="banner banner--success">
     <span>✓</span>
-    <span>Loaded static data — <strong id="loadedCount">102 centers</strong> from the Thales configuration analysis. Full ETC data (64 k+ centers) requires running the notebook pipeline first.</span>
+    <span><span id="loadStatus">Loading ETC pages directly…</span> <strong id="loadedCount">— centers</strong></span>
   </div>
 
   <div class="search-controls">
@@ -294,142 +299,54 @@ tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
   <div class="popup-footer">Click row to open full interactive viewer</div>
 </div>
 
+<script src="js/etc-live-parser.js"></script>
 <script>
 // ════════════════════════════════════════════════════════════════════════════
-//  ALL_CENTERS — Clean ASCII barycentric strings; all dirty unicode removed.
-//  Data changes per audit notes:
-//   · All superscripts (², ³, ⁴…) replaced with ^n
-//   · All unicode minus (−) replaced with -
-//   · All unicode dot (·) replaced with *
-//   · bc/ca/ab product tokens replaced with b*c/c*a/a*b
-//   · Annotation colons (trilinear a²:…) stripped from X(31)
-//   · X(12),(17),(20),(81),(114),(142),(236) corrected formulas
-//   · Explicit three-weight strings for all centers (no … shorthand ambiguity)
-//   · Bug 10 fix: X(7) uses (s-a) form, not lowercase sa shorthand
+//  LIVE ETC DATA — parsed by docs/ts/etc-live-parser.ts and exposed here.
 // ════════════════════════════════════════════════════════════════════════════
-const ALL_CENTERS = [
-  {center_id:"X(3)", name:"Circumcenter", barycentrics:["sin(2*A):sin(2*B):sin(2*C)"], search_text:"X(3) | Circumcenter | sin(2*A):sin(2*B):sin(2*C)"},
-  {center_id:"X(4)", name:"Orthocenter (= C in Thales)", barycentrics:["SA:SB:SC"], search_text:"X(4) | Orthocenter | SA:SB:SC"},
-  {center_id:"X(5)", name:"Nine-Point Center", barycentrics:["cos(B-C):cos(C-A):cos(A-B)"], search_text:"X(5) | Nine-Point Center | cos(B-C):cos(C-A):cos(A-B)"},
-  {center_id:"X(6)", name:"Symmedian Point", barycentrics:["a^2:b^2:c^2"], search_text:"X(6) | Symmedian Point | a^2:b^2:c^2"},
-  // Bug 10 fix: use (s-a) form — lowercase sa is NOT cycled by cycleExpr
-  {center_id:"X(7)", name:"Gergonne Point", barycentrics:["1/(s-a):1/(s-b):1/(s-c)"], search_text:"X(7) | Gergonne Point | 1/(s-a)"},
-  {center_id:"X(8)", name:"Nagel Point", barycentrics:["b+c-a:c+a-b:a+b-c"], search_text:"X(8) | Nagel Point | b+c-a"},
-  {center_id:"X(9)", name:"Mittenpunkt", barycentrics:["a*(b+c-a):b*(c+a-b):c*(a+b-c)"], search_text:"X(9) | Mittenpunkt | a*(b+c-a)"},
-  {center_id:"X(10)", name:"Spieker Center", barycentrics:["b+c:c+a:a+b"], search_text:"X(10) | Spieker Center | b+c"},
-  {center_id:"X(11)", name:"Feuerbach Point", barycentrics:["(b-c)^2*(b+c-a):(c-a)^2*(c+a-b):(a-b)^2*(a+b-c)"], search_text:"X(11) | Feuerbach Point"},
-  // X(12): corrected formula — a^2*(s-b)*(s-c) cyclic
-  {center_id:"X(12)", name:"Extouchpoint", barycentrics:["a^2*(s-b)*(s-c):b^2*(s-c)*(s-a):c^2*(s-a)*(s-b)"], search_text:"X(12) | Extouchpoint | a^2*(s-b)*(s-c)"},
-  {center_id:"X(13)", name:"Fermat Point 1", barycentrics:["1/(SA+sqrt(3)*S):1/(SB+sqrt(3)*S):1/(SC+sqrt(3)*S)"], search_text:"X(13) | Fermat Point 1 | 1/(SA+sqrt(3)*S)"},
-  {center_id:"X(14)", name:"Fermat Point 2", barycentrics:["1/(SA-sqrt(3)*S):1/(SB-sqrt(3)*S):1/(SC-sqrt(3)*S)"], search_text:"X(14) | Fermat Point 2 | 1/(SA-sqrt(3)*S)"},
-  {center_id:"X(15)", name:"Isogonic Point 1", barycentrics:["sin(A+pi/3):sin(B+pi/3):sin(C+pi/3)"], search_text:"X(15) | Isogonic Point 1 | sin(A+pi/3)"},
-  {center_id:"X(16)", name:"Isogonic Point 2", barycentrics:["sin(A-pi/3):sin(B-pi/3):sin(C-pi/3)"], search_text:"X(16) | Isogonic Point 2 | sin(A-pi/3)"},
-  // X(17): corrected — Napoleon Pt 1 ≠ X(13); distinct cyclic form
-  {center_id:"X(17)", name:"Napoleon Point 1", barycentrics:["sin(B+pi/3):sin(C+pi/3):sin(A+pi/3)"], search_text:"X(17) | Napoleon Point 1 | sin(B+pi/3)"},
-  {center_id:"X(18)", name:"Napoleon Point 2", barycentrics:["SA-sqrt(3)*S:SB-sqrt(3)*S:SC-sqrt(3)*S"], search_text:"X(18) | Napoleon Point 2 | SA-sqrt(3)*S"},
-  // X(19): tan(C)=∞ in Thales; locus is partial — shown with gap
-  {center_id:"X(19)", name:"Clawson Point (⚠ degenerate: tan C = ∞)", barycentrics:["tan(A):tan(B):tan(C)"], search_text:"X(19) | Clawson Point | tan(A):tan(B):tan(C)"},
-  // X(20): corrected formula — de Longchamps simplified
-  {center_id:"X(20)", name:"de Longchamps Point", barycentrics:["SA+SB-SC:SB+SC-SA:SC+SA-SB"], search_text:"X(20) | de Longchamps Point | SA+SB-SC"},
-  {center_id:"X(21)", name:"Schiffler Point", barycentrics:["1/(b+c):1/(c+a):1/(a+b)"], search_text:"X(21) | Schiffler Point | 1/(b+c)"},
-  {center_id:"X(22)", name:"Exeter Point", barycentrics:["a^2*(b^4+c^4-a^4):b^2*(c^4+a^4-b^4):c^2*(a^4+b^4-c^4)"], search_text:"X(22) | Exeter Point"},
-  // X(23): Far-Out Point — locus exits viewport; partial locus expected
-  {center_id:"X(23)", name:"Far-Out Point (partial locus)", barycentrics:["a^2*(a^4-b^2*c^2):b^2*(b^4-c^2*a^2):c^2*(c^4-a^2*b^2)"], search_text:"X(23) | Far-Out Point"},
-  {center_id:"X(25)", name:"Homothetic Center (orthic/tangential)", barycentrics:["a^2/SA:b^2/SB:c^2/SC"], search_text:"X(25) | Homothetic Center | a^2/SA"},
-  // X(31): Bug 9 fix — removed annotation (trilinear a^2:…) that contained colon
-  {center_id:"X(31)", name:"2nd Power Point", barycentrics:["a^3:b^3:c^3"], search_text:"X(31) | 2nd Power Point | a^3"},
-  {center_id:"X(32)", name:"3rd Power Point", barycentrics:["a^4:b^4:c^4"], search_text:"X(32) | 3rd Power Point | a^4"},
-  {center_id:"X(35)", name:"Intersection AP1 with BC", barycentrics:["a^2*(b^2+c^2-a^2-b*c):b^2*(c^2+a^2-b^2-c*a):c^2*(a^2+b^2-c^2-a*b)"], search_text:"X(35) | AP1 with BC"},
-  {center_id:"X(36)", name:"Inverse of Incenter in circumcircle", barycentrics:["a*(a^2-b^2-b*c-c^2):b*(b^2-c^2-c*a-a^2):c*(c^2-a^2-a*b-b^2)"], search_text:"X(36) | Inverse Incenter circ"},
-  // Bug 6 fix: bc→b*c, ab→a*b, ca→c*a
-  {center_id:"X(37)", name:"Crosspoint of X1, X2", barycentrics:["a*b+a*c:b*c+b*a:c*a+c*b"], search_text:"X(37) | Crosspoint X1 X2 | a*b+a*c"},
-  {center_id:"X(39)", name:"Brocard Midpoint", barycentrics:["a^2*(b^2+c^2):b^2*(c^2+a^2):c^2*(a^2+b^2)"], search_text:"X(39) | Brocard Midpoint"},
-  {center_id:"X(40)", name:"Bevan Point", barycentrics:["-a*(b^2+c^2-a^2-2*b*c):-b*(c^2+a^2-b^2-2*c*a):-c*(a^2+b^2-c^2-2*a*b)"], search_text:"X(40) | Bevan Point"},
-  {center_id:"X(41)", name:"Crosspoint of X1 and X6", barycentrics:["a^2*(b+c-a):b^2*(c+a-b):c^2*(a+b-c)"], search_text:"X(41) | Crosspoint X1 X6"},
-  {center_id:"X(42)", name:"Crosssum of X1 and X2", barycentrics:["a*(b+c):b*(c+a):c*(a+b)"], search_text:"X(42) | Crosssum X1 X2"},
-  {center_id:"X(43)", name:"X(1) of medial triangle", barycentrics:["b*c*(b+c-a):c*a*(c+a-b):a*b*(a+b-c)"], search_text:"X(43) | X1 of medial"},
-  {center_id:"X(44)", name:"X(1)-beth conjugate", barycentrics:["a*(b+c-2*a):b*(c+a-2*b):c*(a+b-2*c)"], search_text:"X(44) | beth conjugate"},
-  {center_id:"X(45)", name:"Complement of X(44)", barycentrics:["a*(2*b+2*c-a):b*(2*c+2*a-b):c*(2*a+2*b-c)"], search_text:"X(45) | Complement X44"},
-  {center_id:"X(46)", name:"X(4) of excentral triangle", barycentrics:["a*(cos(B)*cos(C)-cos(A)):b*(cos(C)*cos(A)-cos(B)):c*(cos(A)*cos(B)-cos(C))"], search_text:"X(46) | X4 excentral"},
-  {center_id:"X(55)", name:"Insimilicenter (circumcircle & incircle)", barycentrics:["a*(b+c-a):b*(c+a-b):c*(a+b-c)"], search_text:"X(55) | Insimilicenter"},
-  {center_id:"X(56)", name:"Exsimilicenter", barycentrics:["a/(b+c-a):b/(c+a-b):c/(a+b-c)"], search_text:"X(56) | Exsimilicenter"},
-  {center_id:"X(57)", name:"Isogonal conj of X(9)", barycentrics:["1/(b+c-a):1/(c+a-b):1/(a+b-c)"], search_text:"X(57) | Isogonal conj X9"},
-  {center_id:"X(58)", name:"Isogonal conj of X(10)", barycentrics:["a^2/(b+c):b^2/(c+a):c^2/(a+b)"], search_text:"X(58) | Isogonal conj X10"},
-  {center_id:"X(59)", name:"Isogonal conj of X(11)", barycentrics:["a/((s-b)*(s-c)):b/((s-c)*(s-a)):c/((s-a)*(s-b))"], search_text:"X(59) | Isogonal conj X11"},
-  // X(63): simpler equivalent; avoids tan A issues
-  {center_id:"X(63)", name:"Isogonal conj of X(19)", barycentrics:["a*cos(A):b*cos(B):c*cos(C)"], search_text:"X(63) | Isogonal conj X19 | a*cos(A)"},
-  // X(65): tan(C)=∞ in Thales — degenerate, shown with gap
-  {center_id:"X(65)", name:"Isogonal conj of X(21) (⚠ degenerate: tan C = ∞)", barycentrics:["a/(tan(B)+tan(C)):b/(tan(C)+tan(A)):c/(tan(A)+tan(B))"], search_text:"X(65) | Isogonal conj X21"},
-  {center_id:"X(69)", name:"Isotomic conj of X(25)", barycentrics:["b^2*c^2*(b^2+c^2-a^2):c^2*a^2*(c^2+a^2-b^2):a^2*b^2*(a^2+b^2-c^2)"], search_text:"X(69) | Isotomic conj X25"},
-  {center_id:"X(75)", name:"Isotomic conj of X(31)", barycentrics:["b*c:c*a:a*b"], search_text:"X(75) | Isotomic conj X31 | b*c"},
-  {center_id:"X(76)", name:"Isotomic conj of X(32)", barycentrics:["b^2*c^2:c^2*a^2:a^2*b^2"], search_text:"X(76) | Isotomic conj X32"},
-  {center_id:"X(79)", name:"Isogonal conj of X(35)", barycentrics:["1/(2*SA+b*c):1/(2*SB+c*a):1/(2*SC+a*b)"], search_text:"X(79) | Isogonal conj X35"},
-  {center_id:"X(80)", name:"Reflection of X1 over midpoint of X11", barycentrics:["(b+c-a)/(b-a+c):(c+a-b)/(c-b+a):(a+b-c)/(a-c+b)"], search_text:"X(80) | Refl X1 X11"},
-  // X(81): corrected — isog conj of X42 is a/(b+c), NOT b+c (that is X10)
-  {center_id:"X(81)", name:"Isogonal conj of X(42)", barycentrics:["a/(b+c):b/(c+a):c/(a+b)"], search_text:"X(81) | Isogonal conj X42 | a/(b+c)"},
-  {center_id:"X(82)", name:"Isogonal conj of X(38)", barycentrics:["a/(b^2+c^2):b/(c^2+a^2):c/(a^2+b^2)"], search_text:"X(82) | Isogonal conj X38"},
-  {center_id:"X(83)", name:"Isogonal conj of X(39)", barycentrics:["1/(b^2+c^2):1/(c^2+a^2):1/(a^2+b^2)"], search_text:"X(83) | Isogonal conj X39"},
-  {center_id:"X(85)", name:"Isotomic conj of X(41)", barycentrics:["b*c/(b+c-a):c*a/(c+a-b):a*b/(a+b-c)"], search_text:"X(85) | Isotomic conj X41"},
-  {center_id:"X(86)", name:"Isotomic conj of X(42)", barycentrics:["b*c*(b+c):c*a*(c+a):a*b*(a+b)"], search_text:"X(86) | Isotomic conj X42"},
-  {center_id:"X(88)", name:"Isogonal conj of X(44)", barycentrics:["a/(2*a-b-c):b/(2*b-c-a):c/(2*c-a-b)"], search_text:"X(88) | Isogonal conj X44"},
-  {center_id:"X(89)", name:"Isogonal conj of X(45)", barycentrics:["a/(2*b+2*c-a):b/(2*c+2*a-b):c/(2*a+2*b-c)"], search_text:"X(89) | Isogonal conj X45"},
-  {center_id:"X(98)", name:"Tarry Point", barycentrics:["SA*(SB-SC)^2:SB*(SC-SA)^2:SC*(SA-SB)^2"], search_text:"X(98) | Tarry Point"},
-  {center_id:"X(99)", name:"Steiner Point", barycentrics:["1/(b^2-c^2):1/(c^2-a^2):1/(a^2-b^2)"], search_text:"X(99) | Steiner Point"},
-  {center_id:"X(100)", name:"Anticomplement of Feuerbach", barycentrics:["1/(b-c):1/(c-a):1/(a-b)"], search_text:"X(100) | Anticomplement Feuerbach"},
-  {center_id:"X(101)", name:"Isog conj of X(514)", barycentrics:["a^2/(b-c):b^2/(c-a):c^2/(a-b)"], search_text:"X(101) | Isog conj X514"},
-  {center_id:"X(105)", name:"Isog conj of X(518)", barycentrics:["1/(a*(b+c)-b^2-c^2):1/(b*(c+a)-c^2-a^2):1/(c*(a+b)-a^2-b^2)"], search_text:"X(105) | Isog conj X518"},
-  {center_id:"X(110)", name:"Focus of Kiepert parabola", barycentrics:["a^2/(b^2-c^2):b^2/(c^2-a^2):c^2/(a^2-b^2)"], search_text:"X(110) | Focus Kiepert parabola"},
-  {center_id:"X(111)", name:"Parry Point", barycentrics:["a^2/(2*a^2-b^2-c^2):b^2/(2*b^2-c^2-a^2):c^2/(2*c^2-a^2-b^2)"], search_text:"X(111) | Parry Point"},
-  // X(114): corrected full formula (midpoint form expanded)
-  {center_id:"X(114)", name:"Center of Kiepert hyperbola", barycentrics:["SA*(SB-SC)^2+SB*(SC-SA)^2:SB*(SC-SA)^2+SC*(SA-SB)^2:SC*(SA-SB)^2+SA*(SB-SC)^2"], search_text:"X(114) | Center Kiepert hyperbola"},
-  // Bug 7 fix: (b^2-c^2)^2 — explicit, no superscript confusion
-  {center_id:"X(115)", name:"Center of Kiepert circumconic", barycentrics:["(b^2-c^2)^2:(c^2-a^2)^2:(a^2-b^2)^2"], search_text:"X(115) | Center Kiepert circumconic"},
-  {center_id:"X(116)", name:"Tripole of Euler line", barycentrics:["(SB-SC)^2:(SC-SA)^2:(SA-SB)^2"], search_text:"X(116) | Tripole Euler line"},
-  {center_id:"X(119)", name:"Complement of X(11)", barycentrics:["(b+c-a)*(b^2+c^2-a^2):(c+a-b)*(c^2+a^2-b^2):(a+b-c)*(a^2+b^2-c^2)"], search_text:"X(119) | Complement X11"},
-  {center_id:"X(120)", name:"Complement of X(105)", barycentrics:["b^2+c^2-a*(b+c):c^2+a^2-b*(c+a):a^2+b^2-c*(a+b)"], search_text:"X(120) | Complement X105"},
-  {center_id:"X(121)", name:"Complement of X(106)", barycentrics:["a*(b+c-2*a)^2:b*(c+a-2*b)^2:c*(a+b-2*c)^2"], search_text:"X(121) | Complement X106"},
-  // Bug 7 fix: (b^2-c^2)^2 explicit
-  {center_id:"X(125)", name:"Center of Jerabek hyperbola", barycentrics:["a^2*(b^2-c^2)^2*SA:b^2*(c^2-a^2)^2*SB:c^2*(a^2-b^2)^2*SC"], search_text:"X(125) | Center Jerabek hyperbola"},
-  {center_id:"X(126)", name:"Midpoint of X3 and X111", barycentrics:["a^2*(2*a^2-b^2-c^2):b^2*(2*b^2-c^2-a^2):c^2*(2*c^2-a^2-b^2)"], search_text:"X(126) | Midpoint X3 X111"},
-  {center_id:"X(127)", name:"Midpoint X3 and X112", barycentrics:["a^2*SA*(SB-SC)^2:b^2*SB*(SC-SA)^2:c^2*SC*(SA-SB)^2"], search_text:"X(127) | Midpoint X3 X112"},
-  {center_id:"X(140)", name:"Complement of X(5)", barycentrics:["a^2*(b^2+c^2)+b*c*(b^2+c^2-a^2):b^2*(c^2+a^2)+c*a*(c^2+a^2-b^2):c^2*(a^2+b^2)+a*b*(a^2+b^2-c^2)"], search_text:"X(140) | Complement X5"},
-  {center_id:"X(141)", name:"Complement of X(6)", barycentrics:["b^2+c^2-a^2:c^2+a^2-b^2:a^2+b^2-c^2"], search_text:"X(141) | Complement X6"},
-  // X(142): corrected — b*c*(a+b-c) cyclic (not the symmetric triple product)
-  {center_id:"X(142)", name:"Complement of X(7)", barycentrics:["b*c*(a+b-c):c*a*(b+c-a):a*b*(c+a-b)"], search_text:"X(142) | Complement X7"},
-  {center_id:"X(144)", name:"Anticomplement of X(7)", barycentrics:["(b-c)^2+a*(b+c-2*a):(c-a)^2+b*(c+a-2*b):(a-b)^2+c*(a+b-2*c)"], search_text:"X(144) | Anticomplement X7"},
-  {center_id:"X(145)", name:"Anticomplement of X(8)", barycentrics:["b+c-3*a:c+a-3*b:a+b-3*c"], search_text:"X(145) | Anticomplement X8"},
-  // X(162): a^3/(b^2-c^2) — b^2-c^2 may vanish; locus has singularity
-  {center_id:"X(162)", name:"Isog conj of X(525)", barycentrics:["a^3/(b^2-c^2):b^3/(c^2-a^2):c^3/(a^2-b^2)"], search_text:"X(162) | Isog conj X525"},
-  {center_id:"X(174)", name:"Isog conj of X(175)", barycentrics:["sin(A/2):sin(B/2):sin(C/2)"], search_text:"X(174) | Isog conj X175"},
-  {center_id:"X(175)", name:"Isog conj of X(174)", barycentrics:["1/sin(A/2):1/sin(B/2):1/sin(C/2)"], search_text:"X(175) | Isog conj X174"},
-  {center_id:"X(176)", name:"Isotomic conj of X(174)", barycentrics:["b*c/sin(A/2):c*a/sin(B/2):a*b/sin(C/2)"], search_text:"X(176) | Isotomic conj X174"},
-  {center_id:"X(178)", name:"Midcircle point", barycentrics:["cos(A/2):cos(B/2):cos(C/2)"], search_text:"X(178) | Midcircle point"},
-  {center_id:"X(181)", name:"Isog conj of X(314)", barycentrics:["a^2/((b+c)*(s-a)):b^2/((c+a)*(s-b)):c^2/((a+b)*(s-c))"], search_text:"X(181) | Isog conj X314"},
-  {center_id:"X(182)", name:"Midpoint of X3 and X6", barycentrics:["a^2*(b^2+c^2-a^2):b^2*(c^2+a^2-b^2):c^2*(a^2+b^2-c^2)"], search_text:"X(182) | Midpoint X3 X6"},
-  {center_id:"X(184)", name:"Crosssum of X3 and X6", barycentrics:["a^4*(b^2+c^2-a^2):b^4*(c^2+a^2-b^2):c^4*(a^2+b^2-c^2)"], search_text:"X(184) | Crosssum X3 X6"},
-  {center_id:"X(186)", name:"Inverse of X4 in circumcircle", barycentrics:["a^2*(a^4-b^4-c^4+b^2*c^2):b^2*(b^4-c^4-a^4+c^2*a^2):c^2*(c^4-a^4-b^4+a^2*b^2)"], search_text:"X(186) | Inverse X4 circumcircle"},
-  {center_id:"X(187)", name:"Schoute Center", barycentrics:["a^2*(2*a^2-b^2-c^2):b^2*(2*b^2-c^2-a^2):c^2*(2*c^2-a^2-b^2)"], search_text:"X(187) | Schoute Center"},
-  {center_id:"X(190)", name:"Isotomic conj of X(44)", barycentrics:["b*c*(b+c-2*a):c*a*(c+a-2*b):a*b*(a+b-2*c)"], search_text:"X(190) | Isotomic conj X44"},
-  {center_id:"X(192)", name:"Crosspoint of X1 and X75", barycentrics:["b*c*(c+a-b):c*a*(a+b-c):a*b*(b+c-a)"], search_text:"X(192) | Crosspoint X1 X75"},
-  {center_id:"X(193)", name:"Isotomic conj of X(69)", barycentrics:["a^2*(b^2+c^2)-b^2*c^2:b^2*(c^2+a^2)-c^2*a^2:c^2*(a^2+b^2)-a^2*b^2"], search_text:"X(193) | Isotomic conj X69"},
-  {center_id:"X(200)", name:"Isog conj of X(269)", barycentrics:["a*(b+c-a)^2:b*(c+a-b)^2:c*(a+b-c)^2"], search_text:"X(200) | Isog conj X269"},
-  {center_id:"X(210)", name:"Isog conj of X(1170)", barycentrics:["a*(b+c-a)^2:b*(c+a-b)^2:c*(a+b-c)^2"], search_text:"X(210) | Isog conj X1170"},
-  {center_id:"X(213)", name:"Crosspoint of X1, X42", barycentrics:["a^2*(b+c):b^2*(c+a):c^2*(a+b)"], search_text:"X(213) | Crosspoint X1 X42"},
-  {center_id:"X(214)", name:"Harmonic conjugate of X1", barycentrics:["a^2*(b+c-a)^2:b^2*(c+a-b)^2:c^2*(a+b-c)^2"], search_text:"X(214) | Harmonic conj X1"},
-  {center_id:"X(216)", name:"Kosnita Point", barycentrics:["SA*SB:SB*SC:SC*SA"], search_text:"X(216) | Kosnita Point | SA*SB"},
-  {center_id:"X(218)", name:"Isog conj of X(1445)", barycentrics:["a^2*(b+c-a)*(a*(b+c)-b*c):b^2*(c+a-b)*(b*(c+a)-c*a):c^2*(a+b-c)*(c*(a+b)-a*b)"], search_text:"X(218) | Isog conj X1445"},
-  {center_id:"X(220)", name:"Isog conj of X(279)", barycentrics:["a^2*(b+c-a)^2/(b*c):b^2*(c+a-b)^2/(c*a):c^2*(a+b-c)^2/(a*b)"], search_text:"X(220) | Isog conj X279"},
-  // X(222): use half-angle identity cos^2(A/2) = s*(s-a)/(b*c)
-  {center_id:"X(222)", name:"Isog conj of X(281)", barycentrics:["a*s*(s-a)/(b*c*(b+c-a)):b*s*(s-b)/(c*a*(c+a-b)):c*s*(s-c)/(a*b*(a+b-c))"], search_text:"X(222) | Isog conj X281"},
-  {center_id:"X(223)", name:"Isog conj of X(282)", barycentrics:["a*(b+c-a)/(b^2+c^2-a^2):b*(c+a-b)/(c^2+a^2-b^2):c*(a+b-c)/(a^2+b^2-c^2)"], search_text:"X(223) | Isog conj X282"},
-  {center_id:"X(226)", name:"Isog conj of X(284)", barycentrics:["b*c/(b+c-a):c*a/(c+a-b):a*b/(a+b-c)"], search_text:"X(226) | Isog conj X284"},
-  {center_id:"X(230)", name:"Crossdiff X2, X6 (Euler-line tripole)", barycentrics:["SA*SB:SB*SC:SC*SA"], search_text:"X(230) | Crossdiff X2 X6"},
-  {center_id:"X(232)", name:"Crossdiff X3, X6", barycentrics:["a^2*SA*(SB-SC)^2:b^2*SB*(SC-SA)^2:c^2*SC*(SA-SB)^2"], search_text:"X(232) | Crossdiff X3 X6"},
-  // Bug 7 fix: (b^2-c^2)^2 explicit
-  {center_id:"X(233)", name:"Nine-point circle inverse of X5", barycentrics:["a^4*(b^2-c^2)^2:b^4*(c^2-a^2)^2:c^4*(a^2-b^2)^2"], search_text:"X(233) | NPC inverse X5"},
-  // X(236): midpoint of X175 and X176 — corrected formula
-  {center_id:"X(236)", name:"Midpoint of X175 and X176", barycentrics:["(1+b*c)/sin(A/2):(1+c*a)/sin(B/2):(1+a*b)/sin(C/2)"], search_text:"X(236) | Midpoint X175 X176"}
-];
+let ALL_CENTERS = [];
+const ETCParser = window.EtcLiveParser;
+
+function escapeHtml(text) {
+  return ETCParser.escapeHtml(text);
+}
+
+function updateLoadStatus(message, count = ALL_CENTERS.length, source = null) {
+  const status = document.getElementById('loadStatus');
+  const loaded = document.getElementById('loadedCount');
+  const total = document.getElementById('totalCount');
+  if (status) status.textContent = message;
+  if (loaded) loaded.textContent = `${count.toLocaleString()} centers`;
+  if (total) total.textContent = count.toLocaleString();
+  if (source) document.getElementById('sourceMode').textContent = source;
+}
+
+function setCenters(centers) {
+  ALL_CENTERS = ETCParser.dedupeCenters(centers);
+  WEIGHT_FN_CACHE.clear();
+  filtered = [...ALL_CENTERS];
+  currentPage = 1;
+  applyFilters();
+}
+
+async function initializeCenters() {
+  updateLoadStatus('Loading ETC pages directly…', 0, 'Live ETC');
+  try {
+    const result = await ETCParser.loadCenters({
+      onProgress: ({ message, count, source }) => updateLoadStatus(message, count, source),
+    });
+    setCenters(result.centers);
+    if (result.source === 'Live ETC') {
+      updateLoadStatus(`Live ETC TypeScript parser loaded ${result.centers.length.toLocaleString()} unique centers from ${result.pages.length} page${result.pages.length === 1 ? '' : 's'}.`, result.centers.length, 'Live ETC');
+    } else {
+      updateLoadStatus(`Live ETC fetch unavailable in this browser (${result.warning}); showing local fallback.`, result.centers.length, 'Fallback');
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    setCenters([]);
+    updateLoadStatus(`Unable to load live ETC or fallback data (${message}).`, 0, 'Unavailable');
+  }
+}
 
 // ════════════════════════════════════════════════════════════════════════════
 //  GEOMETRY — Thales configuration
@@ -794,7 +711,10 @@ function applyFilters() {
     if (!q) return true;
     return c.center_id.toLowerCase().includes(q) ||
            c.name.toLowerCase().includes(q) ||
-           (c.barycentrics || []).some(b => b.toLowerCase().includes(q));
+           (c.search_text || '').toLowerCase().includes(q) ||
+           (c.barycentrics || []).some(b => b.toLowerCase().includes(q)) ||
+           (c.trilinears || []).some(t => t.toLowerCase().includes(q)) ||
+           (c.tripolars || []).some(t => t.toLowerCase().includes(q));
   });
   filtered.sort((a, b) =>
     sortCol === 'name'
@@ -813,8 +733,9 @@ function render() {
   const start = (currentPage - 1) * rowsPerPage;
   const slice = filtered.slice(start, start + rowsPerPage);
 
-  document.getElementById('countRow').innerHTML =
-    `Showing <strong>${start+1}–${Math.min(start+rowsPerPage,total)}</strong> of <strong>${total}</strong> centers`;
+  document.getElementById('countRow').innerHTML = total
+    ? `Showing <strong>${start+1}–${Math.min(start+rowsPerPage,total)}</strong> of <strong>${total}</strong> centers`
+    : 'Showing <strong>0</strong> of <strong>0</strong> centers';
 
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
@@ -823,9 +744,9 @@ function render() {
     const tr = document.createElement('tr');
     tr.dataset.id = c.center_id;
     tr.innerHTML = `
-      <td class="col-center">${c.center_id}</td>
-      <td class="col-name">${c.name}</td>
-      <td class="col-mono" title="${bary}">${bary}</td>
+      <td class="col-center">${escapeHtml(c.center_id)}</td>
+      <td class="col-name">${escapeHtml(c.name)}</td>
+      <td class="col-mono" title="${escapeHtml(bary)}">${escapeHtml(bary)}</td>
       <td><span class="badge badge--ccw">✓ Yes</span></td>`;
     tr.addEventListener('mouseenter', e => showPopup(e, c));
     tr.addEventListener('mousemove',  e => movePopup(e));
@@ -931,7 +852,8 @@ function openDetail(center) {
 
   document.getElementById('detailId').textContent   = center.center_id;
   document.getElementById('detailName').textContent = center.name;
-  document.getElementById('detailBary').textContent = (center.barycentrics || []).join('  ;  ') || '—';
+  document.getElementById('detailBary').textContent = (center.barycentrics || [])[0] || '—';
+  renderDetailExtra(center);
 
   const panel = document.getElementById('detailPanel');
   panel.classList.add('open');
@@ -956,6 +878,32 @@ function closeDetail() {
   document.getElementById('detailPanel').classList.remove('open');
 }
 
+
+function renderCoordinateSection(title, rows) {
+  if (!rows || !rows.length) return '';
+  return `
+    <div class="detail-extra-section">
+      <div class="detail-extra-title">${escapeHtml(title)}</div>
+      <div class="detail-extra-list">${rows.map(row => `<div>${escapeHtml(row)}</div>`).join('')}</div>
+    </div>`;
+}
+
+function renderDetailExtra(center) {
+  const extra = document.getElementById('detailExtra');
+  const trilinears = center.trilinears || center.additional?.trilinears || [];
+  const barycentrics = center.barycentrics || center.additional?.barycentrics || [];
+  const tripolars = center.tripolars || center.additional?.tripolars || [];
+  const source = center.source_url
+    ? `<div class="detail-extra-section"><div class="detail-extra-title">Source</div><div class="detail-extra-list"><div><a href="${escapeHtml(center.source_url)}" target="_blank" rel="noreferrer">${escapeHtml(center.source_page || center.source_url)}</a></div></div></div>`
+    : '';
+  extra.innerHTML = [
+    renderCoordinateSection('Trilinears', trilinears),
+    renderCoordinateSection('Barycentrics', barycentrics),
+    renderCoordinateSection('Tripolars', tripolars),
+    source,
+  ].join('') || '<div class="detail-extra-section"><div class="detail-extra-list"><div>No additional coordinate details available.</div></div></div>';
+}
+
 // ── Controls ──────────────────────────────────────────────────────────────
 document.getElementById('searchInput').addEventListener('input',  applyFilters);
 document.getElementById('rowsSelect') .addEventListener('change', applyFilters);
@@ -969,7 +917,7 @@ document.querySelectorAll('thead th[data-col]').forEach(th => {
   });
 });
 
-applyFilters();
+initializeCenters();
 </script>
 </body>
 </html>
