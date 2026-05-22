@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from pathlib import Path
-from typing import Iterable
 
 import requests
 from bs4 import BeautifulSoup, NavigableString, Tag
@@ -12,15 +12,28 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'docs' / 'data' / 'barycentric_index.json'
 BASE = 'https://faculty.evansville.edu/ck6/encyclopedia/'
-BARY_STOP = re.compile(r"\s+(?:where|for\b|which\b|See\s+also|Trilinears|Tripolars|Lines|Note|Also|Polar|Coordinates|equals?|Compare|The\s)", re.IGNORECASE)
-MATH_WORDS = frozenset(['sin','cos','tan','cot','sec','csc','sinh','cosh','tanh','sqrt','cbrt','acot','atan','asin','acos','atan2','exp','log','abs','sgn','sign','floor','ceil'])
+MAX_PART = 200
+MAX_CONSECUTIVE_MISSING_PAGES = 5
+PAGE_FETCH_RETRIES = 3
+PAGE_FETCH_BASE_DELAY_SECONDS = 0.25
+INTER_PAGE_DELAY_SECONDS = 0.12
+COORD_LABELS = ('Trilinears', 'Barycentrics', 'Tripolars')
+COORD_STOP = re.compile(
+    r"\s+(?:where|for\b|which\b|See\s+also|equals?|Compare|The\s).*",
+    re.IGNORECASE,
+)
 
 
 def normalize(text: str) -> str:
     return re.sub(r'\s+', ' ', text.replace('\xa0', ' ')).strip()
 
 
-def node_to_lines(center_node: Tag) -> list[str]:
+def page_name(part: int) -> str:
+    return 'ETC.html' if part == 1 else f'ETCPart{part}.html'
+
+
+def html_to_lines(html: str) -> list[str]:
+    soup = BeautifulSoup(html, 'html.parser')
     lines: list[str] = []
     buf: list[str] = []
 
@@ -32,108 +45,148 @@ def node_to_lines(center_node: Tag) -> list[str]:
 
     def visit(node) -> None:
         if isinstance(node, NavigableString):
-            txt = str(node).replace('\n', ' ')
-            if txt.strip():
-                buf.append(txt.strip())
-        elif isinstance(node, Tag):
-            if node.name == 'br':
-                flush()
-            elif node.name not in ('p', 'hr', 'h3', 'h2'):
-                for child in node.children:
-                    visit(child)
+            text = str(node).replace('\n', ' ')
+            if text.strip():
+                buf.append(text.strip())
+            return
+        if not isinstance(node, Tag):
+            return
+        tag = (node.name or '').lower()
+        if tag in {'script', 'style', 'noscript'}:
+            return
+        if tag in {'br', 'hr'}:
+            flush()
+            return
+        if tag in {'h1', 'h2', 'h3', 'h4', 'p', 'div', 'li', 'tr'}:
+            flush()
+        for child in node.children:
+            visit(child)
+        if tag in {'h1', 'h2', 'h3', 'h4', 'p', 'div', 'li', 'tr'}:
+            flush()
 
-    node = center_node.next_sibling
-    while node:
-        if isinstance(node, Tag) and node.name in ('h3', 'h2', 'hr', 'p'):
-            break
-        visit(node)
-        node = node.next_sibling
+    visit(soup.body or soup)
     flush()
     return lines
 
 
-def is_math_coord(raw: str) -> bool:
-    for part in raw.split(':'):
-        words = re.findall(r'[A-Za-z]{4,}', part)
-        prose = [w for w in words if w.lower() not in MATH_WORDS]
-        if len(prose) >= 2:
-            return False
-    return True
+def strip_tail(text: str) -> str:
+    return COORD_STOP.sub('', normalize(text)).rstrip('.,;').strip()
 
 
-def extract_funcs(lines: Iterable[str]) -> dict[str, list[str]]:
-    funcs: dict[str, list[str]] = {}
-    block = ' '.join(lines)
-    regex = re.compile(
-        r"\b([fghFGH])\s*\(\s*([a-zA-Z])\s*,\s*([a-zA-Z])\s*,\s*([a-zA-Z])\s*\)\s*=\s*(.*?)(?=\s*(?:;|\bfor\b|\bwhere\b|\bBarycentrics\b|\bTrilinears\b)|$)",
+def extract_coordinate_runs(block_text: str, label: str) -> list[str]:
+    labels = '|'.join(COORD_LABELS)
+    pattern = re.compile(
+        rf'(?:^|\s){label}\s+([\s\S]+)(?=(?:\s+(?:{labels})\s+)|(?:\s+X\(\d+\)\s*=)|$)',
         re.IGNORECASE,
     )
-    for match in regex.finditer(block):
-        name, v1, v2, v3, body = match.groups()
-        body = body.replace('[', '(').replace(']', ')').strip().rstrip(',.;')
-        funcs[name.lower()] = [v1, v2, v3, body]
-    return funcs
-
-
-def extract_bary_lines(lines: Iterable[str]) -> list[str]:
-    results: list[str] = []
-    bary_re = re.compile(r'^Barycentrics\s+(.+)', re.IGNORECASE)
-    prose_re = re.compile(r'^(?:for|of|are|see|that|in|at|the|and|by|from|to|is)\b', re.IGNORECASE)
-    xref_re = re.compile(r'X\s*\(\s*\d', re.IGNORECASE)
-    for line in lines:
-        match = bary_re.match(line)
-        if not match:
-            continue
-        raw = normalize(match.group(1)).rstrip(',.;')
-        if prose_re.match(raw) or xref_re.search(raw):
-            continue
-        raw = BARY_STOP.split(raw, maxsplit=1)[0].strip().rstrip(',.;')
-        if ':' not in raw or not is_math_coord(raw):
-            continue
-        if raw not in results:
-            results.append(raw)
-    return results
+    rows: list[str] = []
+    for match in pattern.finditer(block_text):
+        cleaned = strip_tail(match.group(1))
+        if cleaned and (label == 'Tripolars' or ':' in cleaned) and cleaned not in rows:
+            rows.append(cleaned)
+    return rows
 
 
 def parse_page(html: str, source_page: str) -> list[dict]:
-    soup = BeautifulSoup(html, 'html.parser')
     rows: list[dict] = []
-    for header in soup.find_all(['h3', 'h2']):
-        text = normalize(header.get_text(' ', strip=True))
-        match = re.search(r'(X\(\d+\))', text)
-        if not match:
-            continue
-        center_id = match.group(1)
-        name = text[text.find(center_id) + len(center_id):].lstrip(' :—-').strip() or center_id
-        lines = node_to_lines(header)
-        barycentrics = extract_bary_lines(lines)
-        if not barycentrics:
-            continue
+    active: dict | None = None
+    header_re = re.compile(r'^X\s*\(\s*(\d+)\s*\)\s*=\s*(.+)$', re.IGNORECASE)
+
+    def finish() -> None:
+        nonlocal active
+        if not active:
+            return
+        block = normalize(' '.join(active['lines']))
+        barycentrics = extract_coordinate_runs(block, 'Barycentrics')
+        trilinears = extract_coordinate_runs(block, 'Trilinears')
+        tripolars = extract_coordinate_runs(block, 'Tripolars')
         rows.append({
-            'center_id': center_id,
-            'name': name,
+            'center_id': active['center_id'],
+            'name': active['name'],
             'source_page': source_page,
+            'source_url': BASE + source_page,
             'barycentrics': barycentrics,
-            'funcs': extract_funcs(lines),
-            'search_text': ' | '.join([center_id, name, source_page, *barycentrics]),
+            'trilinears': trilinears,
+            'tripolars': tripolars,
+            'additional': {
+                'trilinears': trilinears,
+                'barycentrics': barycentrics,
+                'tripolars': tripolars,
+            },
+            'search_text': ' | '.join([active['center_id'], active['name'], source_page, *trilinears, *barycentrics, *tripolars]),
         })
+        active = None
+
+    for line in html_to_lines(html):
+        match = header_re.match(line)
+        if match:
+            finish()
+            center_id = f'X({int(match.group(1))})'
+            name = normalize(match.group(2)).lstrip('=:—- ').strip() or center_id
+            active = {'center_id': center_id, 'name': name, 'lines': []}
+        elif active:
+            active['lines'].append(line)
+    finish()
     return rows
+
+
+def numeric_id(center_id: str) -> int:
+    match = re.search(r'\d+', center_id)
+    return int(match.group()) if match else 0
+
+
+def dedupe_centers(rows: list[dict]) -> list[dict]:
+    by_id: set[str] = set()
+    deduped: list[dict] = []
+    for row in sorted(rows, key=lambda item: numeric_id(item['center_id'])):
+        if row['center_id'] in by_id:
+            continue
+        by_id.add(row['center_id'])
+        deduped.append(row)
+    return deduped
 
 
 def fetch_pages() -> tuple[list[dict], list[str]]:
     session = requests.Session()
     pages_seen: list[str] = []
     rows: list[dict] = []
-    for part in range(1, 38):
-        page = 'ETC.html' if part == 1 else f'ETCPart{part}.html'
+    missing_in_a_row = 0
+    for part in range(1, MAX_PART + 1):
+        page = page_name(part)
         url = BASE + page
-        response = session.get(url, timeout=30)
+        response = None
+        last_error: Exception | None = None
+        for attempt in range(1, PAGE_FETCH_RETRIES + 1):
+            try:
+                response = session.get(url, timeout=30)
+                last_error = None
+                break
+            except requests.RequestException as exc:
+                last_error = exc
+                if attempt < PAGE_FETCH_RETRIES:
+                    time.sleep(PAGE_FETCH_BASE_DELAY_SECONDS * (2 ** (attempt - 1)))
+
+        if response is None:
+            missing_in_a_row += 1
+            if missing_in_a_row >= MAX_CONSECUTIVE_MISSING_PAGES:
+                break
+            if last_error is not None:
+                print(f'WARN: {page} failed after retries: {last_error}')
+            continue
+
         if response.status_code == 404:
-            break
+            missing_in_a_row += 1
+            if missing_in_a_row >= MAX_CONSECUTIVE_MISSING_PAGES:
+                break
+            time.sleep(INTER_PAGE_DELAY_SECONDS)
+            continue
+
         response.raise_for_status()
+        missing_in_a_row = 0
         pages_seen.append(page)
         rows.extend(parse_page(response.text, page))
-    return rows, pages_seen
+        time.sleep(INTER_PAGE_DELAY_SECONDS)
+    return dedupe_centers(rows), pages_seen
 
 
 def main() -> None:
@@ -144,6 +197,7 @@ def main() -> None:
             'source': BASE,
             'pages_present': pages_seen,
             'total_centers': len(rows),
+            'notes': 'Fallback index for docs/barycentric_search.html when direct browser fetches to ETC are unavailable.',
         },
         'centers': rows,
     }
