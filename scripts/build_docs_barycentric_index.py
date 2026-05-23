@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from pathlib import Path
 
 import requests
@@ -11,11 +12,14 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'docs' / 'data' / 'barycentric_index.json'
 BASE = 'https://faculty.evansville.edu/ck6/encyclopedia/'
-MAX_PART = 150
-MAX_CONSECUTIVE_MISSING_PAGES = 3
+MAX_PART = 200
+MAX_CONSECUTIVE_MISSING_PAGES = 5
+PAGE_FETCH_RETRIES = 3
+PAGE_FETCH_BASE_DELAY_SECONDS = 0.25
+INTER_PAGE_DELAY_SECONDS = 0.12
 COORD_LABELS = ('Trilinears', 'Barycentrics', 'Tripolars')
 COORD_STOP = re.compile(
-    r"\s+(?:where|for\b|which\b|See\s+also|Lines|Note|Also|Polar|Coordinates|equals?|Compare|The\s).*",
+    r"\s+(?:where|for\b|which\b|See\s+also|equals?|Compare|The\s).*",
     re.IGNORECASE,
 )
 
@@ -72,7 +76,7 @@ def strip_tail(text: str) -> str:
 def extract_coordinate_runs(block_text: str, label: str) -> list[str]:
     labels = '|'.join(COORD_LABELS)
     pattern = re.compile(
-        rf'(?:^|\s){label}\s+([\s\S]*?)(?=(?:\s+(?:{labels})\s+)|(?:\s+X\(\d+\)\s*=)|$)',
+        rf'(?:^|\s){label}\s+([\s\S]+)(?=(?:\s+(?:{labels})\s+)|(?:\s+X\(\d+\)\s*=)|$)',
         re.IGNORECASE,
     )
     rows: list[str] = []
@@ -133,14 +137,11 @@ def numeric_id(center_id: str) -> int:
 
 def dedupe_centers(rows: list[dict]) -> list[dict]:
     by_id: set[str] = set()
-    by_name: set[str] = set()
     deduped: list[dict] = []
     for row in sorted(rows, key=lambda item: numeric_id(item['center_id'])):
-        name_key = normalize(row['name']).lower()
-        if row['center_id'] in by_id or name_key in by_name:
+        if row['center_id'] in by_id:
             continue
         by_id.add(row['center_id'])
-        by_name.add(name_key)
         deduped.append(row)
     return deduped
 
@@ -153,16 +154,38 @@ def fetch_pages() -> tuple[list[dict], list[str]]:
     for part in range(1, MAX_PART + 1):
         page = page_name(part)
         url = BASE + page
-        response = session.get(url, timeout=30)
+        response = None
+        last_error: Exception | None = None
+        for attempt in range(1, PAGE_FETCH_RETRIES + 1):
+            try:
+                response = session.get(url, timeout=30)
+                last_error = None
+                break
+            except requests.RequestException as exc:
+                last_error = exc
+                if attempt < PAGE_FETCH_RETRIES:
+                    time.sleep(PAGE_FETCH_BASE_DELAY_SECONDS * (2 ** (attempt - 1)))
+
+        if response is None:
+            missing_in_a_row += 1
+            if missing_in_a_row >= MAX_CONSECUTIVE_MISSING_PAGES:
+                break
+            if last_error is not None:
+                print(f'WARN: {page} failed after retries: {last_error}')
+            continue
+
         if response.status_code == 404:
             missing_in_a_row += 1
             if missing_in_a_row >= MAX_CONSECUTIVE_MISSING_PAGES:
                 break
+            time.sleep(INTER_PAGE_DELAY_SECONDS)
             continue
+
         response.raise_for_status()
         missing_in_a_row = 0
         pages_seen.append(page)
         rows.extend(parse_page(response.text, page))
+        time.sleep(INTER_PAGE_DELAY_SECONDS)
     return dedupe_centers(rows), pages_seen
 
 

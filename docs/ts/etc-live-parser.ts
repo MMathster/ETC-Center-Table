@@ -66,8 +66,11 @@ interface Window {
 
 (() => {
 const ETC_BASE_URL = 'https://faculty.evansville.edu/ck6/encyclopedia/';
-const ETC_MAX_PART = 150;
-const MAX_CONSECUTIVE_MISSING_PAGES = 3;
+const ETC_MAX_PART = 200;
+const MAX_CONSECUTIVE_MISSING_PAGES = 5;
+const PAGE_FETCH_RETRIES = 3;
+const PAGE_FETCH_BASE_DELAY_MS = 250;
+const INTER_PAGE_DELAY_MS = 120;
 const COORDINATE_LABELS = ['Trilinears', 'Barycentrics', 'Tripolars'] as const;
 type CoordinateLabel = (typeof COORDINATE_LABELS)[number];
 
@@ -81,7 +84,7 @@ function normalizeSpace(text: string | null | undefined = ''): string {
 
 function stripEtcTail(text: string): string {
   return normalizeSpace(text)
-    .replace(/\s+(?:where|for\b|which\b|See\s+also|Lines|Note|Also|Polar|Coordinates|equals?|Compare|The\s).*$/i, '')
+    .replace(/\s+(?:where|for\b|which\b|See\s+also|equals?|Compare|The\s).*$/i, '')
     .replace(/[.;,]+$/g, '')
     .trim();
 }
@@ -138,7 +141,7 @@ function extractCoordinateRuns(blockText: string, label: CoordinateLabel): strin
   const results: string[] = [];
   const labelAlternation = COORDINATE_LABELS.join('|');
   const pattern = new RegExp(
-    `(?:^|\\s)${label}\\s+([\\s\\S]*?)(?=(?:\\s+(?:${labelAlternation})\\s+)|(?:\\s+X\\(\\d+\\)\\s*=)|$)`,
+    `(?:^|\\s)${label}\\s+([\\s\\S]+)(?=(?:\\s+(?:${labelAlternation})\\s+)|(?:\\s+X\\(\\d+\\)\\s*=)|$)`,
     'gi',
   );
 
@@ -222,7 +225,6 @@ function normalizeCenter(center: Partial<EtcCenter>): EtcCenter | null {
 
 function dedupeCenters(centers: Partial<EtcCenter>[]): EtcCenter[] {
   const byId = new Set<string>();
-  const byName = new Set<string>();
   const rows: EtcCenter[] = [];
 
   centers
@@ -230,14 +232,16 @@ function dedupeCenters(centers: Partial<EtcCenter>[]): EtcCenter[] {
     .filter((center): center is EtcCenter => center !== null)
     .sort((a, b) => numericId(a.center_id) - numericId(b.center_id))
     .forEach(center => {
-      const nameKey = normalizeSpace(center.name).toLowerCase();
-      if (byId.has(center.center_id) || byName.has(nameKey)) return;
+      if (byId.has(center.center_id)) return;
       byId.add(center.center_id);
-      byName.add(nameKey);
       rows.push(center);
     });
 
   return rows;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function proxiedEtcUrl(page: string): string {
@@ -245,20 +249,25 @@ function proxiedEtcUrl(page: string): string {
 }
 
 async function fetchEtcPageText(page: string): Promise<string | null> {
-  const urls = [ETC_BASE_URL + page, proxiedEtcUrl(page)];
+  const urls = [proxiedEtcUrl(page), ETC_BASE_URL + page];
   const errors: string[] = [];
 
   for (const url of urls) {
-    try {
-      const response = await fetch(url, { cache: 'no-store' });
-      if (response.status === 404) return null;
-      if (!response.ok) {
-        errors.push(`${url}: HTTP ${response.status}`);
-        continue;
+    for (let attempt = 1; attempt <= PAGE_FETCH_RETRIES; attempt += 1) {
+      try {
+        const response = await fetch(url, { cache: 'default' });
+        if (response.status === 404) return null;
+        if (!response.ok) {
+          errors.push(`${url}: HTTP ${response.status} (attempt ${attempt})`);
+        } else {
+          return await response.text();
+        }
+      } catch (err) {
+        errors.push(`${url}: ${err instanceof Error ? err.message : String(err)} (attempt ${attempt})`);
       }
-      return await response.text();
-    } catch (err) {
-      errors.push(err instanceof Error ? err.message : String(err));
+      if (attempt < PAGE_FETCH_RETRIES) {
+        await sleep(PAGE_FETCH_BASE_DELAY_MS * (2 ** (attempt - 1)));
+      }
     }
   }
 
@@ -298,6 +307,8 @@ async function fetchLiveEtcCenters(onProgress?: LoadOptions['onProgress']): Prom
       count: centers.length,
       source: 'Live ETC',
     });
+
+    await sleep(INTER_PAGE_DELAY_MS);
   }
 
   return { centers: dedupeCenters(centers), pages, pageErrors };

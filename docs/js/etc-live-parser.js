@@ -1,8 +1,11 @@
 "use strict";
 (() => {
     const ETC_BASE_URL = 'https://faculty.evansville.edu/ck6/encyclopedia/';
-    const ETC_MAX_PART = 150;
-    const MAX_CONSECUTIVE_MISSING_PAGES = 3;
+    const ETC_MAX_PART = 200;
+    const MAX_CONSECUTIVE_MISSING_PAGES = 5;
+    const PAGE_FETCH_RETRIES = 3;
+    const PAGE_FETCH_BASE_DELAY_MS = 250;
+    const INTER_PAGE_DELAY_MS = 120;
     const COORDINATE_LABELS = ['Trilinears', 'Barycentrics', 'Tripolars'];
     function pageNameForPart(part) {
         return part === 1 ? 'ETC.html' : `ETCPart${part}.html`;
@@ -12,7 +15,7 @@
     }
     function stripEtcTail(text) {
         return normalizeSpace(text)
-            .replace(/\s+(?:where|for\b|which\b|See\s+also|Lines|Note|Also|Polar|Coordinates|equals?|Compare|The\s).*$/i, '')
+            .replace(/\s+(?:where|for\b|which\b|See\s+also|equals?|Compare|The\s).*$/i, '')
             .replace(/[.;,]+$/g, '')
             .trim();
     }
@@ -65,7 +68,7 @@
     function extractCoordinateRuns(blockText, label) {
         const results = [];
         const labelAlternation = COORDINATE_LABELS.join('|');
-        const pattern = new RegExp(`(?:^|\\s)${label}\\s+([\\s\\S]*?)(?=(?:\\s+(?:${labelAlternation})\\s+)|(?:\\s+X\\(\\d+\\)\\s*=)|$)`, 'gi');
+        const pattern = new RegExp(`(?:^|\\s)${label}\\s+([\\s\\S]+)(?=(?:\\s+(?:${labelAlternation})\\s+)|(?:\\s+X\\(\\d+\\)\\s*=)|$)`, 'gi');
         let match;
         while ((match = pattern.exec(blockText)) !== null) {
             const cleaned = stripEtcTail(match[1]);
@@ -142,41 +145,47 @@
     }
     function dedupeCenters(centers) {
         const byId = new Set();
-        const byName = new Set();
         const rows = [];
         centers
             .map(normalizeCenter)
             .filter((center) => center !== null)
             .sort((a, b) => numericId(a.center_id) - numericId(b.center_id))
             .forEach(center => {
-            const nameKey = normalizeSpace(center.name).toLowerCase();
-            if (byId.has(center.center_id) || byName.has(nameKey))
+            if (byId.has(center.center_id))
                 return;
             byId.add(center.center_id);
-            byName.add(nameKey);
             rows.push(center);
         });
         return rows;
+    }
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
     function proxiedEtcUrl(page) {
         return `https://api.allorigins.win/raw?url=${encodeURIComponent(ETC_BASE_URL + page)}`;
     }
     async function fetchEtcPageText(page) {
-        const urls = [ETC_BASE_URL + page, proxiedEtcUrl(page)];
+        const urls = [proxiedEtcUrl(page), ETC_BASE_URL + page];
         const errors = [];
         for (const url of urls) {
-            try {
-                const response = await fetch(url, { cache: 'no-store' });
-                if (response.status === 404)
-                    return null;
-                if (!response.ok) {
-                    errors.push(`${url}: HTTP ${response.status}`);
-                    continue;
+            for (let attempt = 1; attempt <= PAGE_FETCH_RETRIES; attempt += 1) {
+                try {
+                    const response = await fetch(url, { cache: 'default' });
+                    if (response.status === 404)
+                        return null;
+                    if (!response.ok) {
+                        errors.push(`${url}: HTTP ${response.status} (attempt ${attempt})`);
+                    }
+                    else {
+                        return await response.text();
+                    }
                 }
-                return await response.text();
-            }
-            catch (err) {
-                errors.push(err instanceof Error ? err.message : String(err));
+                catch (err) {
+                    errors.push(`${url}: ${err instanceof Error ? err.message : String(err)} (attempt ${attempt})`);
+                }
+                if (attempt < PAGE_FETCH_RETRIES) {
+                    await sleep(PAGE_FETCH_BASE_DELAY_MS * (2 ** (attempt - 1)));
+                }
             }
         }
         throw new Error(`${page}: ${errors.join('; ')}`);
@@ -214,6 +223,7 @@
                 count: centers.length,
                 source: 'Live ETC',
             });
+            await sleep(INTER_PAGE_DELAY_MS);
         }
         return { centers: dedupeCenters(centers), pages, pageErrors };
     }
