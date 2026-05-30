@@ -70,7 +70,7 @@
     }
     function extractCoordinateRuns(blockText, label) {
         const results = [];
-        const boundary = String.raw `(?:\s(?:${COORDINATE_LABELS.join('|')})\s+|\sX\(\d+\)\s*=|$)`;
+        const boundary = String.raw `(?:\s(?:${COORDINATE_LABELS.join('|')})\s+|\s+X\(\d+\)\s*=|$)`;
         const pattern = new RegExp(String.raw `\b${label}\s+([\s\S]*?)(?=${boundary})`, 'gi');
         let match;
         while ((match = pattern.exec(blockText)) !== null) {
