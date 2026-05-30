@@ -723,6 +723,10 @@ function cancelThumbnailQueue() {
   }
   thumbIdleHandle = null;
   thumbUsesTimeout = false;
+  // Unobserve all pending thumbnail elements
+  if (thumbObserver) {
+    document.querySelectorAll('.locus-thumb-wrap:not([data-rendered])').forEach(el => thumbObserver.unobserve(el));
+  }
 }
 
 function scheduleIdleTask(fn) {
@@ -794,14 +798,46 @@ function processThumbnailQueue(token, deadline) {
   }
 }
 
+// IntersectionObserver: only render thumbnails that enter the viewport.
+// This avoids computing loci for off-screen rows — critical for 72 k+ centers.
+const thumbObserver = (typeof IntersectionObserver !== 'undefined')
+  ? new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const el = entry.target;
+        if (el.dataset.rendered) continue;
+        el.dataset.rendered = '1';
+        thumbObserver.unobserve(el);
+        // Schedule actual render in idle time so it doesn't block scrolling
+        scheduleIdleTask(deadline => {
+          if (!el.isConnected) return;
+          el.innerHTML = renderLocusThumbnailSvg(el.dataset.id || '');
+          el.classList.remove('loading');
+        });
+      }
+    }, {
+      rootMargin: '150px 0px',  // pre-load 150 px before element enters viewport
+      threshold: 0,
+    })
+  : null;
+
 function queueLocusThumbnails() {
-  thumbQueue = Array.from(document.querySelectorAll('.locus-thumb-wrap')).map(el => ({
-    el,
-    id: el.dataset.id || '',
-  }));
-  if (!thumbQueue.length) return;
-  const token = thumbRenderToken;
-  scheduleIdleTask(deadline => processThumbnailQueue(token, deadline));
+  if (thumbObserver) {
+    // Preferred path: let IntersectionObserver decide what to render
+    document.querySelectorAll('.locus-thumb-wrap').forEach(el => {
+      delete el.dataset.rendered;  // reset so re-render works on page change
+      thumbObserver.observe(el);
+    });
+  } else {
+    // Fallback for browsers without IntersectionObserver (rare)
+    thumbQueue = Array.from(document.querySelectorAll('.locus-thumb-wrap')).map(el => ({
+      el,
+      id: el.dataset.id || '',
+    }));
+    if (!thumbQueue.length) return;
+    const token = thumbRenderToken;
+    scheduleIdleTask(deadline => processThumbnailQueue(token, deadline));
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════════════
