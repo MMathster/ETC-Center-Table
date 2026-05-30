@@ -143,7 +143,7 @@ function splitEtcLines(root: ParentNode): string[] {
 
 function extractCoordinateRuns(blockText: string, label: CoordinateLabel): string[] {
   const results: string[] = [];
-  const boundary = String.raw`(?:\s(?:${COORDINATE_LABELS.join('|')})\s+|\sX\(\d+\)\s*=|$)`;
+  const boundary = String.raw`(?:\s(?:${COORDINATE_LABELS.join('|')})\s+|\s+X\(\d+\)\s*=|$)`;
   const pattern = new RegExp(String.raw`\b${label}\s+([\s\S]*?)(?=${boundary})`, 'gi');
   let match: RegExpExecArray | null;
 
