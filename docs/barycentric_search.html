@@ -128,6 +128,10 @@ tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
 .badge--cw{background:rgba(255,100,80,.12);color:#f87171;border:1px solid rgba(255,100,80,.25)}
 .badge--euler{background:rgba(112,184,255,.12);color:var(--accent);border:1px solid rgba(112,184,255,.25)}
 
+.locus-thumb-wrap{width:64px;height:40px;border-radius:8px;border:1px solid rgba(112,184,255,.16);background:rgba(8,19,33,.42);display:grid;place-items:center;overflow:hidden}
+.locus-thumb-wrap svg{display:block;width:64px;height:40px}
+.locus-thumb-wrap.loading::before{content:'';width:20px;height:1px;background:rgba(143,168,202,.65);box-shadow:0 6px 0 rgba(143,168,202,.28),0 -6px 0 rgba(143,168,202,.28)}
+
 /* ── Pagination ── */
 .pagination{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-top:.8rem}
 .page-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:var(--font);font-size:.78rem;font-weight:700;padding:.35rem .75rem;cursor:pointer;transition:all .15s}
@@ -276,7 +280,7 @@ tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
           <th class="sorted" data-col="id">Center</th>
           <th data-col="name">Name</th>
           <th>Barycentric Weights</th>
-          <th>Has Locus</th>
+          <th>Locus</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -324,6 +328,8 @@ function updateLoadStatus(message, count = ALL_CENTERS.length, source = null) {
 function setCenters(centers) {
   ALL_CENTERS = ETCParser.dedupeCenters(centers);
   WEIGHT_FN_CACHE.clear();
+  LOCUS_CACHE.clear();
+  cancelThumbnailQueue();
   filtered = [...ALL_CENTERS];
   currentPage = 1;
   applyFilters();
@@ -465,6 +471,7 @@ const LOCUS_FORMULAS = {
 };
 
 const WEIGHT_FN_CACHE = new Map();
+const LOCUS_CACHE = new Map();
 
 // ════════════════════════════════════════════════════════════════════════════
 //  EXPRESSION NORMALISER
@@ -632,7 +639,10 @@ function evalCenterAt(id, p, t) {
 }
 
 function buildLocus(id) {
-  return buildLocusWfn((p, t) => evalCenterAt(id, p, t));
+  if (LOCUS_CACHE.has(id)) return LOCUS_CACHE.get(id);
+  const locus = buildLocusWfn((p, t) => evalCenterAt(id, p, t));
+  LOCUS_CACHE.set(id, locus);
+  return locus;
 }
 
 // ── θ helpers ────────────────────────────────────────────────────────────────
@@ -695,6 +705,105 @@ function makeThalesBoard(domId, state, centerId, compact) {
   return brd;
 }
 
+
+// ════════════════════════════════════════════════════════════════════════════
+//  SVG LOCUS THUMBNAILS — queued with requestIdleCallback
+// ════════════════════════════════════════════════════════════════════════════
+let thumbQueue = [];
+let thumbIdleHandle = null;
+let thumbUsesTimeout = false;
+let thumbRenderToken = 0;
+
+function cancelThumbnailQueue() {
+  thumbRenderToken += 1;
+  thumbQueue = [];
+  if (thumbIdleHandle !== null) {
+    if (thumbUsesTimeout) clearTimeout(thumbIdleHandle);
+    else if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(thumbIdleHandle);
+  }
+  thumbIdleHandle = null;
+  thumbUsesTimeout = false;
+}
+
+function scheduleIdleTask(fn) {
+  if (typeof window.requestIdleCallback === 'function') {
+    thumbUsesTimeout = false;
+    thumbIdleHandle = window.requestIdleCallback(fn, { timeout: 700 });
+  } else {
+    thumbUsesTimeout = true;
+    thumbIdleHandle = window.setTimeout(() => fn({ timeRemaining: () => 0 }), 24);
+  }
+}
+
+function svgCoordX(x) { return 32 + (x / 2.5) * 32; }
+function svgCoordY(y) { return 20 - (y / 2.5) * 20; }
+
+function locusPathData(xs, ys) {
+  let d = '';
+  let drawing = false;
+  for (let i = 0; i < xs.length; i++) {
+    const x = xs[i], y = ys[i];
+    if (!isFinite(x) || !isFinite(y)) { drawing = false; continue; }
+    const sx = svgCoordX(x).toFixed(1);
+    const sy = svgCoordY(y).toFixed(1);
+    d += drawing ? `L${sx},${sy}` : `M${sx},${sy}`;
+    drawing = true;
+  }
+  return d;
+}
+
+function locusHasFinitePoint(xs, ys) {
+  for (let i = 0; i < xs.length; i++) {
+    if (isFinite(xs[i]) && isFinite(ys[i])) return true;
+  }
+  return false;
+}
+
+function locusPlaceholderSvg() {
+  return '<svg viewBox="0 0 64 40" role="img" aria-label="No computable locus"><rect width="64" height="40" rx="7" fill="rgba(143,168,202,.08)"/><path d="M16 20H48" stroke="rgba(143,168,202,.55)" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4"/><text x="32" y="30" text-anchor="middle" fill="rgba(143,168,202,.72)" font-size="7" font-family="monospace">no locus</text></svg>';
+}
+
+function renderLocusThumbnailSvg(centerId) {
+  const center = findCenter(centerId);
+  if (!(centerId in LOCUS_FORMULAS) && !((center?.barycentrics || [])[0])) return locusPlaceholderSvg();
+  const [xs, ys] = buildLocus(centerId);
+  if (!locusHasFinitePoint(xs, ys)) return locusPlaceholderSvg();
+  const path = locusPathData(xs, ys);
+  return `<svg viewBox="0 0 64 40" role="img" aria-label="Locus thumbnail for ${escapeHtml(centerId)}">
+    <rect width="64" height="40" rx="7" fill="rgba(8,19,33,.42)"/>
+    <ellipse cx="32" cy="20" rx="12.8" ry="8" fill="none" stroke="#3fb950" stroke-width="1.2" opacity=".82"/>
+    <path d="${path}" fill="none" stroke="#f0b429" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function processThumbnailQueue(token, deadline) {
+  thumbIdleHandle = null;
+  const hasIdleBudget = typeof deadline.timeRemaining === 'function';
+  let rendered = 0;
+  while (thumbQueue.length && token === thumbRenderToken) {
+    if (hasIdleBudget && rendered > 0 && deadline.timeRemaining() < 6) break;
+    const item = thumbQueue.shift();
+    if (!item.el.isConnected) continue;
+    item.el.innerHTML = renderLocusThumbnailSvg(item.id);
+    item.el.classList.remove('loading');
+    rendered += 1;
+    if (!hasIdleBudget) break;
+  }
+  if (thumbQueue.length && token === thumbRenderToken) {
+    scheduleIdleTask(nextDeadline => processThumbnailQueue(token, nextDeadline));
+  }
+}
+
+function queueLocusThumbnails() {
+  thumbQueue = Array.from(document.querySelectorAll('.locus-thumb-wrap')).map(el => ({
+    el,
+    id: el.dataset.id || '',
+  }));
+  if (!thumbQueue.length) return;
+  const token = thumbRenderToken;
+  scheduleIdleTask(deadline => processThumbnailQueue(token, deadline));
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 //  TABLE STATE & RENDERING
 // ════════════════════════════════════════════════════════════════════════════
@@ -737,6 +846,8 @@ function render() {
     ? `Showing <strong>${start+1}–${Math.min(start+rowsPerPage,total)}</strong> of <strong>${total}</strong> centers`
     : 'Showing <strong>0</strong> of <strong>0</strong> centers';
 
+  cancelThumbnailQueue();
+
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   slice.forEach(c => {
@@ -747,7 +858,7 @@ function render() {
       <td class="col-center">${escapeHtml(c.center_id)}</td>
       <td class="col-name">${escapeHtml(c.name)}</td>
       <td class="col-mono" title="${escapeHtml(bary)}">${escapeHtml(bary)}</td>
-      <td>${(c.barycentrics || []).length ? '<span class="badge badge--ccw">✓ Barycentric</span>' : '<span class="badge badge--cw">— No barycentric</span>'}</td>`;
+      <td><div class="locus-thumb-wrap loading" data-id="${escapeHtml(c.center_id)}" aria-label="Locus thumbnail for ${escapeHtml(c.center_id)}"></div></td>`;
     tr.addEventListener('mouseenter', e => showPopup(e, c));
     tr.addEventListener('mousemove',  e => movePopup(e));
     tr.addEventListener('mouseleave', hidePopup);
@@ -756,6 +867,7 @@ function render() {
   });
 
   renderPagination(pages);
+  queueLocusThumbnails();
 }
 
 function renderPagination(pages) {

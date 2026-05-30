@@ -3,8 +3,8 @@
     const ETC_BASE_URL = 'https://faculty.evansville.edu/ck6/encyclopedia/';
     const ETC_MAX_PART = 200;
     const MAX_CONSECUTIVE_MISSING_PAGES = 5;
-    const PAGE_FETCH_RETRIES = 3;
-    const PAGE_FETCH_BASE_DELAY_MS = 250;
+    const MAX_FETCH_RETRIES = 3;
+    const BASE_RETRY_DELAY_MS = 350;
     const INTER_PAGE_DELAY_MS = 120;
     const COORDINATE_LABELS = ['Trilinears', 'Barycentrics', 'Tripolars'];
     function pageNameForPart(part) {
@@ -15,9 +15,12 @@
     }
     function stripEtcTail(text) {
         return normalizeSpace(text)
-            .replace(/\s+(?:where|for\b|which\b|See\s+also|equals?|Compare|The\s).*$/i, '')
+            .replace(/\s+(?:where|which\b|See\s+also|equals?|Compare|The\s).*$/i, '')
             .replace(/[.;,]+$/g, '')
             .trim();
+    }
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
     function escapeHtml(text = '') {
         const div = document.createElement('div');
@@ -67,8 +70,8 @@
     }
     function extractCoordinateRuns(blockText, label) {
         const results = [];
-        const labelAlternation = COORDINATE_LABELS.join('|');
-        const pattern = new RegExp(`(?:^|\\s)${label}\\s+([\\s\\S]+)(?=(?:\\s+(?:${labelAlternation})\\s+)|(?:\\s+X\\(\\d+\\)\\s*=)|$)`, 'gi');
+        const boundary = String.raw `(?:\s(?:${COORDINATE_LABELS.join('|')})\s+|\sX\(\d+\)\s*=|$)`;
+        const pattern = new RegExp(String.raw `\b${label}\s+([\s\S]*?)(?=${boundary})`, 'gi');
         let match;
         while ((match = pattern.exec(blockText)) !== null) {
             const cleaned = stripEtcTail(match[1]);
@@ -158,9 +161,6 @@
         });
         return rows;
     }
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
     function proxiedEtcUrl(page) {
         return `https://api.allorigins.win/raw?url=${encodeURIComponent(ETC_BASE_URL + page)}`;
     }
@@ -168,23 +168,21 @@
         const urls = [proxiedEtcUrl(page), ETC_BASE_URL + page];
         const errors = [];
         for (const url of urls) {
-            for (let attempt = 1; attempt <= PAGE_FETCH_RETRIES; attempt += 1) {
+            for (let attempt = 0; attempt < MAX_FETCH_RETRIES; attempt += 1) {
                 try {
                     const response = await fetch(url, { cache: 'default' });
                     if (response.status === 404)
                         return null;
                     if (!response.ok) {
-                        errors.push(`${url}: HTTP ${response.status} (attempt ${attempt})`);
+                        errors.push(`${url}: HTTP ${response.status} (attempt ${attempt + 1})`);
+                        await delay(BASE_RETRY_DELAY_MS * (attempt + 1));
+                        continue;
                     }
-                    else {
-                        return await response.text();
-                    }
+                    return await response.text();
                 }
                 catch (err) {
-                    errors.push(`${url}: ${err instanceof Error ? err.message : String(err)} (attempt ${attempt})`);
-                }
-                if (attempt < PAGE_FETCH_RETRIES) {
-                    await sleep(PAGE_FETCH_BASE_DELAY_MS * (2 ** (attempt - 1)));
+                    errors.push(`${url}: ${err instanceof Error ? err.message : String(err)} (attempt ${attempt + 1})`);
+                    await delay(BASE_RETRY_DELAY_MS * (attempt + 1));
                 }
             }
         }
@@ -223,12 +221,12 @@
                 count: centers.length,
                 source: 'Live ETC',
             });
-            await sleep(INTER_PAGE_DELAY_MS);
+            await delay(INTER_PAGE_DELAY_MS);
         }
         return { centers: dedupeCenters(centers), pages, pageErrors };
     }
     async function loadFallbackCenters(fallbackUrl = 'data/barycentric_index.json') {
-        const response = await fetch(fallbackUrl, { cache: 'no-store' });
+        const response = await fetch(fallbackUrl, { cache: 'default' });
         if (!response.ok)
             throw new Error(`fallback JSON HTTP ${response.status}`);
         const payload = (await response.json());

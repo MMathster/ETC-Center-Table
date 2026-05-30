@@ -14,12 +14,12 @@ OUTPUT = ROOT / 'docs' / 'data' / 'barycentric_index.json'
 BASE = 'https://faculty.evansville.edu/ck6/encyclopedia/'
 MAX_PART = 200
 MAX_CONSECUTIVE_MISSING_PAGES = 5
-PAGE_FETCH_RETRIES = 3
-PAGE_FETCH_BASE_DELAY_SECONDS = 0.25
-INTER_PAGE_DELAY_SECONDS = 0.12
+MAX_FETCH_RETRIES = 3
+BASE_RETRY_DELAY_SEC = 0.35
+INTER_PAGE_DELAY_SEC = 0.12
 COORD_LABELS = ('Trilinears', 'Barycentrics', 'Tripolars')
 COORD_STOP = re.compile(
-    r"\s+(?:where|for\b|which\b|See\s+also|equals?|Compare|The\s).*",
+    r"\s+(?:where|which\b|See\s+also|equals?|Compare|The\s).*",
     re.IGNORECASE,
 )
 
@@ -76,7 +76,7 @@ def strip_tail(text: str) -> str:
 def extract_coordinate_runs(block_text: str, label: str) -> list[str]:
     labels = '|'.join(COORD_LABELS)
     pattern = re.compile(
-        rf'(?:^|\s){label}\s+([\s\S]+)(?=(?:\s+(?:{labels})\s+)|(?:\s+X\(\d+\)\s*=)|$)',
+        rf'\b{label}\s+([\s\S]*?)(?=(?:\s(?:{labels})\s+|\sX\(\d+\)\s*=|$))',
         re.IGNORECASE,
     )
     rows: list[str] = []
@@ -146,6 +146,21 @@ def dedupe_centers(rows: list[dict]) -> list[dict]:
     return deduped
 
 
+def fetch_with_retry(session: requests.Session, url: str) -> requests.Response:
+    errors: list[str] = []
+    for attempt in range(1, MAX_FETCH_RETRIES + 1):
+        try:
+            response = session.get(url, timeout=30)
+            if response.status_code == 404:
+                return response
+            response.raise_for_status()
+            return response
+        except requests.RequestException as exc:
+            errors.append(f'attempt {attempt}: {exc}')
+            time.sleep(BASE_RETRY_DELAY_SEC * attempt)
+    raise RuntimeError(f'failed to fetch {url}: {"; ".join(errors)}')
+
+
 def fetch_pages() -> tuple[list[dict], list[str]]:
     session = requests.Session()
     pages_seen: list[str] = []
@@ -154,38 +169,16 @@ def fetch_pages() -> tuple[list[dict], list[str]]:
     for part in range(1, MAX_PART + 1):
         page = page_name(part)
         url = BASE + page
-        response = None
-        last_error: Exception | None = None
-        for attempt in range(1, PAGE_FETCH_RETRIES + 1):
-            try:
-                response = session.get(url, timeout=30)
-                last_error = None
-                break
-            except requests.RequestException as exc:
-                last_error = exc
-                if attempt < PAGE_FETCH_RETRIES:
-                    time.sleep(PAGE_FETCH_BASE_DELAY_SECONDS * (2 ** (attempt - 1)))
-
-        if response is None:
-            missing_in_a_row += 1
-            if missing_in_a_row >= MAX_CONSECUTIVE_MISSING_PAGES:
-                break
-            if last_error is not None:
-                print(f'WARN: {page} failed after retries: {last_error}')
-            continue
-
+        response = fetch_with_retry(session, url)
         if response.status_code == 404:
             missing_in_a_row += 1
             if missing_in_a_row >= MAX_CONSECUTIVE_MISSING_PAGES:
                 break
-            time.sleep(INTER_PAGE_DELAY_SECONDS)
             continue
-
-        response.raise_for_status()
         missing_in_a_row = 0
         pages_seen.append(page)
         rows.extend(parse_page(response.text, page))
-        time.sleep(INTER_PAGE_DELAY_SECONDS)
+        time.sleep(INTER_PAGE_DELAY_SEC)
     return dedupe_centers(rows), pages_seen
 
 
