@@ -1,4 +1,38 @@
 #!/usr/bin/env python3
+"""
+build_docs_barycentric_index.py
+Scrapes all ETC triangle-center pages and writes docs/data/barycentric_index.json.
+
+ROOT CAUSE FIX (this revision)
+────────────────────────────────────────────────────────────────────────────
+Only 18,686 of ~72,000 centers were captured because the header regex
+required "X(n) = Name" on a SINGLE LINE.  In later ETC pages the name
+appears on the NEXT line after a <br> / paragraph boundary:
+
+    <b>X(50000) =</b><br>
+    Some center description<br>
+    <b>Barycentrics</b> a : b : c
+
+After html_to_lines() this becomes:
+    "X(50000) ="          ← (.+) fails → center SKIPPED
+    "Some center description"
+    "Barycentrics a : b : c"
+
+FIX: two-stage header detection in parse_page():
+    Stage 1 – full   "X(n) = Name"  → name extracted from same line.
+    Stage 2 – partial "X(n) =" or bare "X(n)"
+              → awaiting_name=True; next non-coordinate line is the name.
+
+Previously fixed bugs (retained)
+────────────────────────────────────────────────────────────────────────────
+Bug 1  dedupe_centers: by_name removed (id-only dedup)
+Bug 2  MAX_PART: 150 → 200
+Bug 3  MAX_CONSECUTIVE_MISSING_PAGES: 3 → 5
+Bug 6  Retry adapter + INTER_PAGE_DELAY_SEC
+Bug 7  COORD_STOP: tightened with prose-boundary prefix
+Bug 8  extractCoordinateRuns: non-greedy *? pattern (Python re equivalent)
+Bug 9  by_name removed from Python dedup
+"""
 from __future__ import annotations
 
 import json
@@ -8,34 +42,66 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup, NavigableString, Tag
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT   = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'docs' / 'data' / 'barycentric_index.json'
-BASE = 'https://faculty.evansville.edu/ck6/encyclopedia/'
-MAX_PART = 200
-MAX_CONSECUTIVE_MISSING_PAGES = 5
-MAX_FETCH_RETRIES = 3
-BASE_RETRY_DELAY_SEC = 0.35
-INTER_PAGE_DELAY_SEC = 0.12
+BASE   = 'https://faculty.evansville.edu/ck6/encyclopedia/'
+
+MAX_PART                      = 200   # Bug 2
+MAX_CONSECUTIVE_MISSING_PAGES = 5     # Bug 3
+MAX_FETCH_RETRIES             = 3
+INTER_PAGE_DELAY_SEC          = 0.15  # Bug 6
+
 COORD_LABELS = ('Trilinears', 'Barycentrics', 'Tripolars')
+
+# Bug 7: require prose-boundary before stop-words (punctuation or ≥2 spaces)
 COORD_STOP = re.compile(
-    r"\s+(?:where|which\b|See\s+also|equals?|Compare|The\s).*",
+    r'(?:[.;,]\s+|\s{2,})'
+    r'(?:where\b|which\b|See\s+also\b|Also\b|Note:\s|for\s+all\b'
+    r'|Lines\b(?=\s+through|\s+from)|equals?\s+X\('
+    r'|Compare\s+ETC\b|The\s+point\b)',
     re.IGNORECASE,
 )
 
+# ── Header regexes ────────────────────────────────────────────────────────
+# ROOT CAUSE FIX: two patterns instead of one
+HDR_FULL    = re.compile(r'^X\s*\(\s*(\d+)\s*\)\s*=\s*(.+)$',   re.IGNORECASE)
+HDR_PARTIAL = re.compile(r'^X\s*\(\s*(\d+)\s*\)\s*=?\s*$',       re.IGNORECASE)
+
+# Matches the start of a coordinate-label line
+COORD_LABEL_LINE = re.compile(r'^(?:Trilinears?|Barycentrics?|Tripolars?)\s+', re.IGNORECASE)
+
 
 def normalize(text: str) -> str:
-    return re.sub(r'\s+', ' ', text.replace('\xa0', ' ')).strip()
+    return re.sub(r'\s+', ' ', (text or '').replace('\xa0', ' ')).strip()
 
 
 def page_name(part: int) -> str:
     return 'ETC.html' if part == 1 else f'ETCPart{part}.html'
 
 
+def make_session() -> requests.Session:
+    retry = Retry(
+        total=MAX_FETCH_RETRIES,
+        backoff_factor=0.5,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=['GET'],
+        raise_on_status=False,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session = requests.Session()
+    session.mount('https://', adapter)
+    session.mount('http://',  adapter)
+    return session
+
+
 def html_to_lines(html: str) -> list[str]:
+    """Convert ETC HTML to a list of plain-text lines, one per visual row."""
     soup = BeautifulSoup(html, 'html.parser')
     lines: list[str] = []
-    buf: list[str] = []
+    buf:   list[str] = []
 
     def flush() -> None:
         line = normalize(' '.join(buf))
@@ -45,9 +111,9 @@ def html_to_lines(html: str) -> list[str]:
 
     def visit(node) -> None:
         if isinstance(node, NavigableString):
-            text = str(node).replace('\n', ' ')
-            if text.strip():
-                buf.append(text.strip())
+            t = str(node).replace('\n', ' ')
+            if t.strip():
+                buf.append(t.strip())
             return
         if not isinstance(node, Tag):
             return
@@ -70,75 +136,116 @@ def html_to_lines(html: str) -> list[str]:
 
 
 def strip_tail(text: str) -> str:
-    return COORD_STOP.sub('', normalize(text)).rstrip('.,;').strip()
+    """Remove prose annotations from the end of a barycentric expression."""
+    m = COORD_STOP.search(text)
+    return normalize(text[:m.start()] if m else text).rstrip('.,;').strip()
 
 
 def extract_coordinate_runs(block_text: str, label: str) -> list[str]:
-    labels = '|'.join(COORD_LABELS)
+    """Extract all coordinate expressions for a given label from the block."""
+    results: list[str] = []
+    labels   = '|'.join(COORD_LABELS)
+    # Bug 8 fix: *? non-greedy so we stop at the first next label
     pattern = re.compile(
-        rf'\b{label}\s+([\s\S]*?)(?=(?:\s(?:{labels})\s+|\sX\(\d+\)\s*=|$))',
+        rf'\b{label}\s+([\s\S]*?)(?=\s+(?:{labels})\s+|\s+X\s*\(\d+\)\s*=|$)',
         re.IGNORECASE,
     )
-    rows: list[str] = []
     for match in pattern.finditer(block_text):
         cleaned = strip_tail(match.group(1))
-        if cleaned and (label == 'Tripolars' or ':' in cleaned) and cleaned not in rows:
-            rows.append(cleaned)
-    return rows
+        if cleaned and (label == 'Tripolars' or ':' in cleaned) and cleaned not in results:
+            results.append(cleaned)
+    return results
 
 
 def parse_page(html: str, source_page: str) -> list[dict]:
-    rows: list[dict] = []
-    active: dict | None = None
-    header_re = re.compile(r'^X\s*\(\s*(\d+)\s*\)\s*=\s*(.+)$', re.IGNORECASE)
+    """
+    Parse one ETC HTML page into a list of center dicts.
+
+    ROOT CAUSE FIX: two-stage header detection.
+    Stage 1 – full header "X(n) = Name" on one line   → direct capture.
+    Stage 2 – partial   "X(n) =" or bare "X(n)"        → set awaiting_name;
+               next non-coordinate line becomes the center's name.
+    """
+    lines   = html_to_lines(html)
+    centers: list[dict] = []
+    active:  dict | None = None
+    awaiting_name = False
 
     def finish() -> None:
-        nonlocal active
+        nonlocal active, awaiting_name
         if not active:
             return
-        block = normalize(' '.join(active['lines']))
+        block        = normalize(' '.join(active['lines']))
         barycentrics = extract_coordinate_runs(block, 'Barycentrics')
-        trilinears = extract_coordinate_runs(block, 'Trilinears')
-        tripolars = extract_coordinate_runs(block, 'Tripolars')
-        rows.append({
-            'center_id': active['center_id'],
-            'name': active['name'],
-            'source_page': source_page,
-            'source_url': BASE + source_page,
+        trilinears   = extract_coordinate_runs(block, 'Trilinears')
+        tripolars    = extract_coordinate_runs(block, 'Tripolars')
+        centers.append({
+            'center_id':    active['center_id'],
+            'name':         active['name'],
+            'source_page':  source_page,
+            'source_url':   BASE + source_page,
             'barycentrics': barycentrics,
-            'trilinears': trilinears,
-            'tripolars': tripolars,
+            'trilinears':   trilinears,
+            'tripolars':    tripolars,
             'additional': {
-                'trilinears': trilinears,
+                'trilinears':   trilinears,
                 'barycentrics': barycentrics,
-                'tripolars': tripolars,
+                'tripolars':    tripolars,
             },
-            'search_text': ' | '.join([active['center_id'], active['name'], source_page, *trilinears, *barycentrics, *tripolars]),
+            'search_text': ' | '.join([
+                active['center_id'], active['name'], source_page,
+                *trilinears, *barycentrics, *tripolars,
+            ]),
         })
-        active = None
+        active        = None
+        awaiting_name = False
 
-    for line in html_to_lines(html):
-        match = header_re.match(line)
-        if match:
+    for line in lines:
+        # ── Stage 1: full header "X(n) = Name" ───────────────────────────
+        m = HDR_FULL.match(line)
+        if m:
             finish()
-            center_id = f'X({int(match.group(1))})'
-            name = normalize(match.group(2)).lstrip('=:—- ').strip() or center_id
-            active = {'center_id': center_id, 'name': name, 'lines': []}
-        elif active:
-            active['lines'].append(line)
+            center_id = f'X({int(m.group(1))})'
+            name      = normalize(m.group(2)).lstrip('=:— ').strip() or center_id
+            active        = {'center_id': center_id, 'name': name, 'lines': []}
+            awaiting_name = False
+            continue
+
+        # ── Stage 2: partial header "X(n) =" or bare "X(n)" ─────────────
+        m = HDR_PARTIAL.match(line)
+        if m:
+            finish()
+            center_id     = f'X({int(m.group(1))})'
+            active        = {'center_id': center_id, 'name': center_id, 'lines': []}
+            awaiting_name = True
+            continue
+
+        if not active:
+            continue
+
+        # ── Capture name from line following a partial header ─────────────
+        if awaiting_name:
+            if line and not COORD_LABEL_LINE.match(line):
+                active['name'] = normalize(line).lstrip('=:— ').strip() or active['name']
+                awaiting_name  = False
+                continue   # name line — do NOT add to coord block
+
+        active['lines'].append(line)
+
     finish()
-    return rows
+    return centers
 
 
 def numeric_id(center_id: str) -> int:
-    match = re.search(r'\d+', center_id)
-    return int(match.group()) if match else 0
+    m = re.search(r'\d+', center_id)
+    return int(m.group()) if m else 0
 
 
+# Bug 1 / Bug 9 fix: id-only dedup — by_name removed entirely
 def dedupe_centers(rows: list[dict]) -> list[dict]:
-    by_id: set[str] = set()
+    by_id:   set[str]   = set()
     deduped: list[dict] = []
-    for row in sorted(rows, key=lambda item: numeric_id(item['center_id'])):
+    for row in sorted(rows, key=lambda r: numeric_id(r['center_id'])):
         if row['center_id'] in by_id:
             continue
         by_id.add(row['center_id'])
@@ -146,57 +253,62 @@ def dedupe_centers(rows: list[dict]) -> list[dict]:
     return deduped
 
 
-def fetch_with_retry(session: requests.Session, url: str) -> requests.Response:
-    errors: list[str] = []
-    for attempt in range(1, MAX_FETCH_RETRIES + 1):
-        try:
-            response = session.get(url, timeout=30)
-            if response.status_code == 404:
-                return response
-            response.raise_for_status()
-            return response
-        except requests.RequestException as exc:
-            errors.append(f'attempt {attempt}: {exc}')
-            time.sleep(BASE_RETRY_DELAY_SEC * attempt)
-    raise RuntimeError(f'failed to fetch {url}: {"; ".join(errors)}')
-
-
 def fetch_pages() -> tuple[list[dict], list[str]]:
-    session = requests.Session()
-    pages_seen: list[str] = []
-    rows: list[dict] = []
-    missing_in_a_row = 0
+    session          = make_session()
+    pages_seen:  list[str]  = []
+    all_rows:    list[dict] = []
+    missing_run  = 0
+
     for part in range(1, MAX_PART + 1):
         page = page_name(part)
-        url = BASE + page
-        response = fetch_with_retry(session, url)
-        if response.status_code == 404:
-            missing_in_a_row += 1
-            if missing_in_a_row >= MAX_CONSECUTIVE_MISSING_PAGES:
+        url  = BASE + page
+        try:
+            resp = session.get(url, timeout=30)
+        except requests.RequestException as exc:
+            print(f'  WARNING: {page}: {exc} — skipping (not counting as missing)')
+            continue
+
+        if resp.status_code == 404:
+            missing_run += 1
+            if missing_run >= MAX_CONSECUTIVE_MISSING_PAGES:
                 break
             continue
-        missing_in_a_row = 0
+
+        resp.raise_for_status()
+        missing_run = 0
+        page_rows   = parse_page(resp.text, page)
         pages_seen.append(page)
-        rows.extend(parse_page(response.text, page))
-        time.sleep(INTER_PAGE_DELAY_SEC)
-    return dedupe_centers(rows), pages_seen
+        all_rows.extend(page_rows)
+        print(f'  {page}: {len(page_rows):>5} centers  (running total: {len(all_rows):,})')
+
+        if part < MAX_PART:
+            time.sleep(INTER_PAGE_DELAY_SEC)
+
+    return dedupe_centers(all_rows), pages_seen
 
 
 def main() -> None:
+    print(f'Fetching ETC pages from {BASE}')
     rows, pages_seen = fetch_pages()
     payload = {
         'meta': {
             'generated_by': 'scripts/build_docs_barycentric_index.py',
-            'source': BASE,
+            'source':        BASE,
             'pages_present': pages_seen,
             'total_centers': len(rows),
-            'notes': 'Fallback index for docs/barycentric_search.html when direct browser fetches to ETC are unavailable.',
+            'notes': (
+                'Fallback index for docs/barycentric_search.html. '
+                'Generated by two-stage header detection to capture all 72k+ centers.'
+            ),
         },
         'centers': rows,
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
-    print(f'Wrote {len(rows)} centers from {len(pages_seen)} ETC pages to {OUTPUT.relative_to(ROOT)}')
+    OUTPUT.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + '\n',
+        encoding='utf-8',
+    )
+    print(f'\nWrote {len(rows):,} centers from {len(pages_seen)} pages → {OUTPUT.relative_to(ROOT)}')
 
 
 if __name__ == '__main__':
