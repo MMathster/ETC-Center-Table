@@ -57,6 +57,26 @@
   const COORDINATE_LABELS = ['Trilinears', 'Barycentrics', 'Tripolars'];
   const COORD_LABEL_LINE_RE = /^(?:Trilinears?|Barycentrics?|Tripolars?)\s+/i;
 
+  // FIX 11 [SAFETY]: bounds guard against spurious header matches.
+  // ETC's own site confirms X(72800) as the highest-numbered center as of
+  // this writing (centers are added in strictly increasing order, so this
+  // is also the current total count). A regex match producing an id
+  // outside [MIN_CENTER_ID, MAX_KNOWN_CENTER_ID] almost certainly comes
+  // from a citation, footnote, or corrupted fragment of text that happens
+  // to look like "X(<number>) = ..." rather than a genuine new center --
+  // e.g. a reference to some unrelated large number embedded in prose.
+  // Update MAX_KNOWN_CENTER_ID as ETC grows; a small buffer above the
+  // confirmed count is intentionally NOT added, since any match beyond the
+  // confirmed max is more likely a parsing artifact than a brand-new
+  // center that slipped in since this constant was last updated -- widen
+  // deliberately, not by accident.
+  const MIN_CENTER_ID = 1;
+  const MAX_KNOWN_CENTER_ID = 72800;
+
+  function isValidCenterId(n) {
+    return Number.isInteger(n) && n >= MIN_CENTER_ID && n <= MAX_KNOWN_CENTER_ID;
+  }
+
   const HDR_FULL    = /^X\s*\(\s*(\d+)\s*\)\s*=\s*(.+)$/i;
   const HDR_PARTIAL = /^X\s*\(\s*(\d+)\s*\)\s*=?\s*$/i;
   const TRIG_FUNCS  = 'sin|cos|tan|cot|sec|csc';
@@ -401,10 +421,12 @@
   }
 
   // HTML PARSER -- two-stage header detection + monotonic-id guard
+  //                + bounds guard (FIX 11) against spurious id matches
   function parseEtcHtml(html, sourcePage) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const lines = splitEtcLines(doc.body || doc);
     const result = [];
+    const rejectedIds = []; // FIX 11: out-of-range matches, for diagnostics
     let active = null;
     let activeNum = -1;
     let awaitingName = false;
@@ -420,7 +442,16 @@
       let m = HDR_FULL.exec(line);
       if (m) {
         const n = Number.parseInt(m[1], 10);
-        if (active === null || n > activeNum) {
+        // FIX 11: reject ids outside the confirmed valid range BEFORE the
+        // monotonic-id check -- a match like "X(999999999) = ..." picked up
+        // from a citation or corrupted fragment must not be treated as a
+        // header at all (it would otherwise satisfy n > activeNum trivially
+        // and hijack the parse, fragmenting whatever center is genuinely
+        // active into a spurious new one).
+        if (!isValidCenterId(n)) {
+          rejectedIds.push(`X(${n}) on ${sourcePage} (outside valid range 1-${MAX_KNOWN_CENTER_ID})`);
+          // fall through: treated as ordinary content, not a header
+        } else if (active === null || n > activeNum) {
           finish();
           activeNum = n;
           const name = normalizeSpace(m[2]).replace(/^[=:\u2014\-\s]+/, '') || `X(${n})`;
@@ -432,7 +463,9 @@
         m = HDR_PARTIAL.exec(line);
         if (m) {
           const n = Number.parseInt(m[1], 10);
-          if (active === null || n > activeNum) {
+          if (!isValidCenterId(n)) {
+            rejectedIds.push(`X(${n}) on ${sourcePage} (outside valid range 1-${MAX_KNOWN_CENTER_ID})`);
+          } else if (active === null || n > activeNum) {
             finish();
             activeNum = n;
             active = { center_id: `X(${n})`, name: `X(${n})`, lines: [] };
@@ -455,6 +488,10 @@
       active.lines.push(line);
     }
     finish();
+    // FIX 11: attach rejection diagnostics as a non-array-breaking property
+    // (does not affect .length, iteration, or any existing consumer that
+    // treats this as a plain EtcCenter[]) so callers can surface them.
+    result.rejectedIds = rejectedIds;
     return result;
   }
 
@@ -487,12 +524,32 @@
     centers
       .map(normalizeCenter)
       .filter(c => c !== null)
+      // FIX 11: also drop any individual center whose id somehow ended up
+      // out of the confirmed valid range (defense in depth -- parseEtcHtml
+      // already rejects these at match time, but dedupeCenters is also
+      // reachable directly with externally-supplied data, e.g. the
+      // fallback JSON, so the guard is repeated here independently).
+      .filter(c => isValidCenterId(numericId(c.center_id)))
       .sort((a, b) => numericId(a.center_id) - numericId(b.center_id))
       .forEach(center => {
         if (byId.has(center.center_id)) return;
         byId.add(center.center_id);
         rows.push(center);
       });
+
+    // FIX 11: aggregate sanity check. Since center ids are unique and
+    // bounded to [1, MAX_KNOWN_CENTER_ID], the deduped row count can never
+    // legitimately exceed that bound. If it does, something upstream is
+    // producing malformed/duplicate ids that collided past the dedup
+    // Set -- surface this loudly rather than silently returning bad data.
+    if (rows.length > MAX_KNOWN_CENTER_ID) {
+      console.warn(
+        `EtcLiveParser: deduped center count (${rows.length}) exceeds the ` +
+        `confirmed maximum (${MAX_KNOWN_CENTER_ID}). This should be ` +
+        `impossible given unique, bounded ids -- investigate upstream data.`
+      );
+    }
+
     return rows;
   }
 
@@ -554,6 +611,10 @@
       const parsed = parseEtcHtml(html, page);
       pages.push(page);
       centers.push(...parsed);
+      // FIX 11: surface any out-of-range id rejections from this page
+      if (parsed.rejectedIds && parsed.rejectedIds.length) {
+        parsed.rejectedIds.forEach(msg => pageErrors.push(`Rejected spurious header: ${msg}`));
+      }
       if (onProgress) {
         onProgress({
           message: `Parsed ${centers.length.toLocaleString()} centers from ${pages.length} ETC page${pages.length === 1 ? '' : 's'}\u2026`,
@@ -589,9 +650,11 @@
 
   window.EtcLiveParser = {
     ETC_BASE_URL,
+    MAX_KNOWN_CENTER_ID,
     pageNameForPart,
     normalizeSpace,
     escapeHtml,
+    isValidCenterId,
     parseEtcHtml,
     dedupeCenters,
     fetchLiveEtcCenters,
