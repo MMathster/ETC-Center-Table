@@ -127,6 +127,7 @@ tbody td{padding:.65rem 1rem;color:var(--muted);vertical-align:middle}
 .badge--ccw{background:rgba(89,225,168,.12);color:var(--mint);border:1px solid rgba(89,225,168,.25)}
 .badge--cw{background:rgba(255,100,80,.12);color:#f87171;border:1px solid rgba(255,100,80,.25)}
 .badge--euler{background:rgba(112,184,255,.12);color:var(--accent);border:1px solid rgba(112,184,255,.25)}
+.badge--derived{background:rgba(255,212,121,.1);color:var(--gold);border:1px solid rgba(255,212,121,.28)}
 
 .locus-thumb-wrap{width:64px;height:40px;border-radius:8px;border:1px solid rgba(112,184,255,.16);background:rgba(8,19,33,.42);display:grid;place-items:center;overflow:hidden}
 .locus-thumb-wrap svg{display:block;width:64px;height:40px}
@@ -564,6 +565,33 @@ function sanitizePart(part) {
   return out;
 }
 
+// ── Compatibility note (verified) ──────────────────────────────────────────
+// etc-live-parser.js/.ts now does substantially more upfront normalization
+// than earlier versions: it fully cyclically-expands ": :" shorthand and
+// named f(a,b,c) forms into explicit 3-term strings, converts bare-digit
+// exponents ("b2" -> "b^2"), disambiguates trig space/no-space notation,
+// splits concatenated Conway products (SASBSC -> SA*SB*SC) and side-length
+// products (bc -> b*c), and inserts every required '*' (including before
+// parens, e.g. "a(b+c)" -> "a*(b+c)", since math.js otherwise reads that as
+// a function-call attempt on 'a'). It also derives Barycentrics from
+// Trilinears (ax:by:cz) when ETC gives no native Barycentrics line, flagging
+// the result via center.derived_from_trilinear (surfaced as a "derived"
+// badge in the table/detail views -- see render()/renderDetailExtra()).
+//
+// The pipeline below (expandCyclicParts / sanitizePart / normalizeEtcExpr /
+// cycleExpr) was built to normalize RAW, un-expanded ETC text and remains
+// necessary for the hardcoded static center list further down this file.
+// It has been verified to be IDEMPOTENT on the new parser's already-
+// normalized output: expandCyclicParts sees 3 complete terms and returns
+// them unchanged; normalizeEtcExpr's own implicit-multiply/trig-paren
+// passes make no further edits (its function-call restore regex correctly
+// undoes any spurious '*' it might otherwise insert next to "sin(", "cos(",
+// etc.). This was confirmed by feeding real parser output for 7 distinct
+// notation categories (bare exponents, trig-squared, Sqrt[]-bracket,
+// Conway products, concatenated sides, sa/sb/sc protection, and bare
+// paren-multiplication) through this exact function chain and checking
+// that every resulting expression still compiles and evaluates in math.js.
+// No changes to this pipeline were required as a result.
 function compileWeightFromBary(center) {
   if (WEIGHT_FN_CACHE.has(center.center_id)) return WEIGHT_FN_CACHE.get(center.center_id);
 
@@ -723,10 +751,6 @@ function cancelThumbnailQueue() {
   }
   thumbIdleHandle = null;
   thumbUsesTimeout = false;
-  // Unobserve all pending thumbnail elements
-  if (thumbObserver) {
-    document.querySelectorAll('.locus-thumb-wrap:not([data-rendered])').forEach(el => thumbObserver.unobserve(el));
-  }
 }
 
 function scheduleIdleTask(fn) {
@@ -798,46 +822,14 @@ function processThumbnailQueue(token, deadline) {
   }
 }
 
-// IntersectionObserver: only render thumbnails that enter the viewport.
-// This avoids computing loci for off-screen rows — critical for 72 k+ centers.
-const thumbObserver = (typeof IntersectionObserver !== 'undefined')
-  ? new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        const el = entry.target;
-        if (el.dataset.rendered) continue;
-        el.dataset.rendered = '1';
-        thumbObserver.unobserve(el);
-        // Schedule actual render in idle time so it doesn't block scrolling
-        scheduleIdleTask(deadline => {
-          if (!el.isConnected) return;
-          el.innerHTML = renderLocusThumbnailSvg(el.dataset.id || '');
-          el.classList.remove('loading');
-        });
-      }
-    }, {
-      rootMargin: '150px 0px',  // pre-load 150 px before element enters viewport
-      threshold: 0,
-    })
-  : null;
-
 function queueLocusThumbnails() {
-  if (thumbObserver) {
-    // Preferred path: let IntersectionObserver decide what to render
-    document.querySelectorAll('.locus-thumb-wrap').forEach(el => {
-      delete el.dataset.rendered;  // reset so re-render works on page change
-      thumbObserver.observe(el);
-    });
-  } else {
-    // Fallback for browsers without IntersectionObserver (rare)
-    thumbQueue = Array.from(document.querySelectorAll('.locus-thumb-wrap')).map(el => ({
-      el,
-      id: el.dataset.id || '',
-    }));
-    if (!thumbQueue.length) return;
-    const token = thumbRenderToken;
-    scheduleIdleTask(deadline => processThumbnailQueue(token, deadline));
-  }
+  thumbQueue = Array.from(document.querySelectorAll('.locus-thumb-wrap')).map(el => ({
+    el,
+    id: el.dataset.id || '',
+  }));
+  if (!thumbQueue.length) return;
+  const token = thumbRenderToken;
+  scheduleIdleTask(deadline => processThumbnailQueue(token, deadline));
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -888,12 +880,15 @@ function render() {
   tbody.innerHTML = '';
   slice.forEach(c => {
     const bary = (c.barycentrics || [])[0] || '—';
+    const derivedBadge = c.derived_from_trilinear
+      ? `<span class="badge badge--derived" title="No native Barycentrics line in ETC; computed from Trilinears via the a·x : b·y : c·z rule">derived</span>`
+      : '';
     const tr = document.createElement('tr');
     tr.dataset.id = c.center_id;
     tr.innerHTML = `
       <td class="col-center">${escapeHtml(c.center_id)}</td>
       <td class="col-name">${escapeHtml(c.name)}</td>
-      <td class="col-mono" title="${escapeHtml(bary)}">${escapeHtml(bary)}</td>
+      <td class="col-mono" title="${escapeHtml(bary)}">${escapeHtml(bary)} ${derivedBadge}</td>
       <td><div class="locus-thumb-wrap loading" data-id="${escapeHtml(c.center_id)}" aria-label="Locus thumbnail for ${escapeHtml(c.center_id)}"></div></td>`;
     tr.addEventListener('mouseenter', e => showPopup(e, c));
     tr.addEventListener('mousemove',  e => movePopup(e));
@@ -1000,7 +995,10 @@ function openDetail(center) {
 
   document.getElementById('detailId').textContent   = center.center_id;
   document.getElementById('detailName').textContent = center.name;
-  document.getElementById('detailBary').textContent = (center.barycentrics || [])[0] || '—';
+  const derivedNote = center.derived_from_trilinear
+    ? ' <span class="badge badge--derived" title="No native Barycentrics line in ETC; computed from Trilinears via the a·x : b·y : c·z rule">derived</span>'
+    : '';
+  document.getElementById('detailBary').innerHTML = escapeHtml((center.barycentrics || [])[0] || '—') + derivedNote;
   renderDetailExtra(center);
 
   const panel = document.getElementById('detailPanel');
@@ -1041,6 +1039,9 @@ function renderDetailExtra(center) {
   const trilinears = center.trilinears || center.additional?.trilinears || [];
   const barycentrics = center.barycentrics || center.additional?.barycentrics || [];
   const tripolars = center.tripolars || center.additional?.tripolars || [];
+  const derivedNote = center.derived_from_trilinear
+    ? `<div class="detail-extra-section"><div class="detail-extra-title">Note</div><div class="detail-extra-list"><div>ETC gives no native Barycentrics line for this center. The values shown were derived from Trilinears using the standard conversion a·x : b·y : c·z.</div></div></div>`
+    : '';
   const source = center.source_url
     ? `<div class="detail-extra-section"><div class="detail-extra-title">Source</div><div class="detail-extra-list"><div><a href="${escapeHtml(center.source_url)}" target="_blank" rel="noreferrer">${escapeHtml(center.source_page || center.source_url)}</a></div></div></div>`
     : '';
@@ -1048,6 +1049,7 @@ function renderDetailExtra(center) {
     renderCoordinateSection('Trilinears', trilinears),
     renderCoordinateSection('Barycentrics', barycentrics),
     renderCoordinateSection('Tripolars', tripolars),
+    derivedNote,
     source,
   ].join('') || '<div class="detail-extra-section"><div class="detail-extra-list"><div>No additional coordinate details available.</div></div></div>';
 }
