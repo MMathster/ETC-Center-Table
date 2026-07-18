@@ -1,21 +1,20 @@
 // etc-live-parser.ts
 //
-// Complete rebuild incorporating structural findings from direct inspection of
-// ETC.html and ETCPart2.html (see etc_barycentric_notation_notes.html for the
-// full write-up). Every rule below is backed by a real example collected during
-// inspection and individually verified before being wired into the pipeline.
-// This TypeScript source is the type-annotated origin of etc-live-parser.js --
-// logic is kept in exact lockstep between the two; port carefully if editing.
+// Complete implementation built from direct inspection of ETC.html and
+// ETCPart2.html (structural findings) plus the University of Evansville's
+// current 42-part page structure (verified directly: Part 42 is a
+// placeholder -- "Part X(42) will be started in the future" -- while real
+// content currently extends somewhat beyond X(72800) and continues to grow
+// periodically). This TypeScript source is the type-annotated origin of
+// etc-live-parser.js -- logic is kept in exact lockstep between the two;
+// port carefully if editing.
 //
 // FIX 1 [CRITICAL] Monotonic-id header guard.
-//   Every center's own descriptive block contains dozens of sentences that
-//   BEGIN with its own header syntax, e.g. inside X(1)'s block:
-//     "X(1) = 3R*X(2) + r*X(3) + s*cot(w)*X(6)"
-//     "X(1) = isogonal conjugate of X(1)"
-//   A naive header regex treats every one of these as a NEW center, silently
-//   fragmenting real data. Because ETC lists centers in strictly increasing
-//   numeric order, a header is only genuine if its id is STRICTLY GREATER
-//   than the currently active center's id.
+//   Every center's own descriptive block contains sentences that BEGIN
+//   with its own header syntax. A naive header regex treats every one of
+//   these as a NEW center, fragmenting real data. Since ETC lists centers
+//   in strictly increasing numeric order, a header is only genuine if its
+//   id is STRICTLY GREATER than the currently active center's id.
 //
 // FIX 2 [CRITICAL] Two-stage header detection.
 //   Stage 1: "X(n) = Name" on one line.
@@ -23,35 +22,54 @@
 //   line (ETC's HTML often places a <br> between the id and the name).
 //
 // FIX 3 [CRITICAL] f(a,b,c):f(b,c,a):f(c,a,b), where f(a,b,c)=<expr>
-//   Resolved by simultaneous cyclic substitution of a,b,c (or A,B,C) into
-//   the definition to produce 3 concrete weights.
+//   Resolved by simultaneous cyclic substitution of a,b,c (or A,B,C).
 //
 // FIX 4 [CRITICAL] Trilinear -> Barycentric derivation (ax:by:cz) applied
 //   automatically when a center has Trilinears but no Barycentrics line.
 //
-// FIX 5 [CRITICAL] Bare-digit exponent disambiguation ("b2" = b^2), skipped
-//   entirely when '^' already appears anywhere in the string.
+// FIX 5 [CRITICAL] Bare-digit exponent disambiguation ("b2" = b^2). The
+//   whole-string "skip if any ^ present" gate has been REMOVED (it was
+//   overly broad and silently failed on MIXED-style expressions -- the
+//   regex's own local adjacency requirement already prevents double-
+//   processing of a term that already has "^" directly after its letter).
 //
 // FIX 6 [CRITICAL] Trig space/no-space disambiguation.
 //   "sin 2A" (space) = sin(2*A).  "cos2B" (no space) = (cosB)^2.
 //
-// FIX 7 [MODERATE] Conway SA/SB/SC squaring + concatenated-product split
-//   ("SASBSC" -> SA*SB*SC, "SA2" -> SA^2).
+// FIX 7 [MODERATE] Conway SA/SB/SC squaring + concatenated-product split.
+//   splitConwayProducts now runs BEFORE fixConwaySquares, and its trailing
+//   boundary changed from \b to (?![A-Za-z]) -- the strict \b failed
+//   whenever the run was immediately followed by a digit with no separator.
 //
 // FIX 8 [MODERATE] Sqrt[...]/Abs[...]/bare[...] bracket normalization.
 //
 // FIX 9 [MODERATE] Attribution-comment stripping ("(Name, date)").
 //
-// FIX 10 [MODERATE] insertMultiplyBeforeParen -- math.js treats "a(b+c)" as
-//   a FUNCTION CALL attempt (throws "'a' is not a function"), not implicit
-//   multiplication. Every letter/digit/close-paren directly touching an
-//   opening paren must get an explicit '*' inserted, EXCEPT for recognized
-//   function names (sin/cos/tan/cot/sec/csc/sqrt/abs), which are protected.
+// FIX 10 [MODERATE] insertMultiplyBeforeParen -- math.js treats "a(b+c)"
+//   as a FUNCTION CALL attempt, not implicit multiplication.
 //
-// TIER 3 (flagged, not automated -- see notes document):
-//   - Auxiliary cross-center references ("u : v : w = X(n)")
-//   - Fractional/irrational superscript collapse ("31/2" = 3^(1/2)?)
-//   - Ambiguous signed-exponent trailing digit ("(expr)- 2")
+// FIX 11 [NEW] Unicode superscript character handling. ETC's HTML encodes
+//   exponents in at least three ways: (a) <sup>2</sup> flattened to a bare
+//   ASCII digit (FIX 5); (b) a literal Unicode superscript character
+//   ("b²"), invisible to every prior rule; (c) explicit "^2". This adds
+//   handling for case (b): superscript glyphs convert to plain ASCII
+//   digits (no caret inserted, except for the unambiguous negative-
+//   exponent case, e.g. "a⁻²" -> "a^(-2)"), letting the existing bare-
+//   digit pipeline handle caret-insertion identically to case (a).
+//
+// FIX 12 [NEW] Relations/formulas extraction. Self-referential
+//   "X(<active id>) = ..." lines are captured into a dedicated
+//   `relations` array (deduped, capped at 30 per center).
+//
+// FIX 13 [NEW] No hardcoded maximum center id. A fixed ceiling would
+//   incorrectly reject genuine new centers as ETC continues to expand.
+//   Protection relies on strict line-start regex anchoring (verified
+//   against real placeholder/stub text) plus the monotonic-id guard.
+//
+// FIX 14 [NEW] Empty-page-as-miss heuristic. A page can return HTTP 200
+//   while containing zero real entries (verified: ETC pre-creates
+//   placeholder pages ahead of content). Treated the same as a missing
+//   page for the early-stopping counter.
 
 // ── Type declarations ──────────────────────────────────────────────────────
 
@@ -74,6 +92,11 @@ interface EtcCenter {
    *  (ax:by:cz rule) because the center provided no native Barycentrics
    *  line -- see FIX 4. */
   derived_from_trilinear: boolean;
+  /** Self-referential relation/formula lines captured from the center's
+   *  own descriptive block, e.g. "3R*X(2) + r*X(3) + s*cot(w)*X(6)" or
+   *  "isogonal conjugate of X(1)" (the "X(n) = " prefix already stripped).
+   *  Deduped and capped at parse time -- see buildCenter's RELATIONS_CAP. */
+  relations: string[];
   search_text: string;
 }
 
@@ -85,14 +108,7 @@ interface ParseAccumulator {
   center_id: string;
   name: string;
   lines: string[];
-}
-
-// Return type of parseEtcHtml: behaves exactly like EtcCenter[] (same
-// .length, iteration, array methods) but also carries FIX 11's diagnostic
-// list of header matches that were rejected for having an id outside the
-// confirmed valid range [1, MAX_KNOWN_CENTER_ID].
-interface ParsedCentersResult extends Array<EtcCenter> {
-  rejectedIds: string[];
+  relations: string[];
 }
 
 interface LoadProgress {
@@ -119,6 +135,7 @@ interface LoadOptions {
 
 interface EtcLiveParserInternal {
   normalizeCoordinateExpr: (raw: string) => string;
+  normalizeUnicodeSuperscripts: (raw: string) => string;
   cyclicTriple: (expr: string, useAngles: boolean) => [string, string, string];
   resolveNamedCyclicFunction: (rawLine: string, blockText: string) => [string, string, string] | null;
   deriveBarycentricsFromTrilinears: (trilinears: string[]) => string[];
@@ -126,12 +143,10 @@ interface EtcLiveParserInternal {
 
 interface EtcLiveParserApi {
   ETC_BASE_URL: string;
-  MAX_KNOWN_CENTER_ID: number;
   pageNameForPart: (part: number) => string;
   normalizeSpace: (text?: string | null) => string;
   escapeHtml: (text?: unknown) => string;
-  isValidCenterId: (n: number) => boolean;
-  parseEtcHtml: (html: string, sourcePage: string) => ParsedCentersResult;
+  parseEtcHtml: (html: string, sourcePage: string) => EtcCenter[];
   dedupeCenters: (centers: Partial<EtcCenter>[]) => EtcCenter[];
   fetchLiveEtcCenters: (onProgress?: LoadOptions['onProgress']) => Promise<LiveLoadResult>;
   loadFallbackCenters: (fallbackUrl?: string) => Promise<EtcCenter[]>;
@@ -148,29 +163,18 @@ interface Window {
 // ── Constants ────────────────────────────────────────────────────────────
 
 const ETC_BASE_URL = 'https://faculty.evansville.edu/ck6/encyclopedia/';
-const ETC_MAX_PART = 200;
+const ETC_MAX_PART = 200; // generous outer loop ceiling, not a real limit
 const MAX_CONSECUTIVE_MISSING_PAGES = 5;
 const PAGE_FETCH_RETRIES = 3;
 const PAGE_FETCH_BASE_DELAY_MS = 250;
 const INTER_PAGE_DELAY_MS = 120;
 const COORDINATE_LABELS = ['Trilinears', 'Barycentrics', 'Tripolars'] as const;
 const COORD_LABEL_LINE_RE = /^(?:Trilinears?|Barycentrics?|Tripolars?)\s+/i;
+const RELATIONS_CAP = 30;
 
-// FIX 11 [SAFETY]: bounds guard against spurious header matches. ETC's own
-// site confirms X(72800) as the highest-numbered center as of this writing
-// (centers are added in strictly increasing order, so this is also the
-// current total count). A regex match producing an id outside
-// [MIN_CENTER_ID, MAX_KNOWN_CENTER_ID] almost certainly comes from a
-// citation, footnote, or corrupted fragment of text that happens to look
-// like "X(<number>) = ..." rather than a genuine new center. Update
-// MAX_KNOWN_CENTER_ID as ETC grows; widen deliberately, not by accident.
-const MIN_CENTER_ID = 1;
-const MAX_KNOWN_CENTER_ID = 72800;
-
-function isValidCenterId(n: number): boolean {
-  return Number.isInteger(n) && n >= MIN_CENTER_ID && n <= MAX_KNOWN_CENTER_ID;
-}
-
+// See FIX 13: no hardcoded maximum center id is used. Protection against
+// spurious header matches relies purely on regex anchoring (below) and
+// the monotonic-id guard in parseEtcHtml.
 const HDR_FULL    = /^X\s*\(\s*(\d+)\s*\)\s*=\s*(.+)$/i;
 const HDR_PARTIAL = /^X\s*\(\s*(\d+)\s*\)\s*=?\s*$/i;
 const TRIG_FUNCS  = 'sin|cos|tan|cot|sec|csc';
@@ -243,6 +247,25 @@ function splitEtcLines(root: ParentNode): string[] {
 //  NORMALIZATION PIPELINE
 // ════════════════════════════════════════════════════════════════════════════
 
+// FIX 11: convert Unicode superscript glyphs to plain ASCII digits (no
+// caret inserted here except for the unambiguous negative-exponent case).
+function normalizeUnicodeSuperscripts(s: string): string {
+  const supDigitMap: Record<string, string> = {
+    '⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9',
+  };
+  // Negative superscript exponents are unambiguous (unlike bare ASCII
+  // "- 2", which could be ordinary subtraction) -- convert directly.
+  s = s.replace(/([A-Za-z0-9)])⁻([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (full, prefix: string, digits: string) => {
+    const ascii = digits.split('').map(ch => supDigitMap[ch]).join('');
+    return `${prefix}^(-${ascii})`;
+  });
+  // Positive superscripts: glyph -> plain digit only. Downstream steps
+  // handle caret-insertion exactly as they already do for tag-stripped
+  // bare digits, correctly distinguishing e.g. "sin²A" from "b²" for free.
+  s = s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, ch => supDigitMap[ch]);
+  return s;
+}
+
 // FIX 8: Sqrt[...] -> sqrt(...), Abs[...] -> abs(...), bare [...] -> (...)
 function normalizeBrackets(s: string): string {
   s = s.replace(/\bSqrt\[/gi, 'sqrt(').replace(/\bAbs\[/gi, 'abs(');
@@ -255,43 +278,36 @@ function normalizeBrackets(s: string): string {
   return out;
 }
 
-// FIX 7a: SA2/SB2/SC2 -> SA^2/SB^2/SC^2 (must run BEFORE generic exponent rule)
-function fixConwaySquares(s: string): string {
-  return s.replace(/\bS([ABC])(\d)(?!\d)/g, 'S$1^$2');
-}
-
-// FIX 7b: SASBSC (concatenated, no separator) -> SA*SB*SC
+// FIX 7: SASBSC (concatenated, no separator) -> SA*SB*SC. Trailing
+// boundary uses (?![A-Za-z]) rather than \b so the match correctly ends
+// even when immediately followed by a digit.
 function splitConwayProducts(s: string): string {
-  return s.replace(/\b(?:S[ABC]){2,}\b/g, m => {
+  return s.replace(/\b(?:S[ABC]){2,}(?![A-Za-z])/g, m => {
     const tokens = m.match(/S[ABC]/g) as string[];
     return tokens.join('*');
   });
 }
 
+// FIX 7: SA2/SB2/SC2 -> SA^2/SB^2/SC^2. Must run AFTER splitConwayProducts.
+function fixConwaySquares(s: string): string {
+  return s.replace(/\bS([ABC])(\d)(?!\d)/g, 'S$1^$2');
+}
+
 // Split concatenated runs of side-length letters a/b/c (no space, no
-// operator) into an explicit product: "bc" -> "b*c", "abc" -> "a*b*c".
-// Must NEVER touch "sa"/"sb"/"sc" (semiperimeter-difference tokens, which
-// start with lowercase 's' and are naturally excluded since 's' is not in
-// the [abc] character class this regex matches against).
+// operator) into an explicit product: "bc" -> "b*c". Must NEVER touch
+// "sa"/"sb"/"sc" (naturally excluded since 's' is not in [abc]).
 function splitConcatenatedSides(s: string): string {
   return s.replace(/\b([abc]{2,3})\b/g, m => m.split('').join('*'));
 }
 
-// Wrap bare trig arguments: "cos B" -> "cos(B)" (no digit involved -- digit-
-// bearing cases like "sin 2A" and "cos2B" are handled separately by
-// fixTrigDisambiguation, which runs before this and already inserts parens
-// for those, so this only catches the remaining bare-letter form).
+// Wrap bare trig arguments: "cos B" -> "cos(B)" (no digit involved).
 function wrapBareTrigArgs(s: string): string {
   return s.replace(new RegExp(`\\b(${TRIG_FUNCS})\\s+([ABC])\\b(?!\\()`, 'g'), '$1($2)');
 }
 
-// FIX 10: Insert '*' before an opening paren that directly follows an
-// operand (letter/digit/closing-paren) with ZERO whitespace -- e.g.
-// "a(b+c)" -> "a*(b+c)". Required because math.js treats "a(...)" as a
-// FUNCTION CALL attempt (throwing "'a' is not a function") rather than
-// silently inferring multiplication. Recognized function names are
-// protected via placeholder substitution so their genuine call syntax
-// (e.g. "sin(A)") is never touched.
+// FIX 10: insert '*' before an opening paren that directly follows an
+// operand with ZERO whitespace -- e.g. "a(b+c)" -> "a*(b+c)". Recognized
+// function names are protected via placeholder substitution.
 function insertMultiplyBeforeParen(s: string): string {
   const FUNCS = 'sin|cos|tan|cot|sec|csc|sqrt|abs';
   const funcCallRe = new RegExp(`\\b(?:${FUNCS})\\(`, 'g');
@@ -306,18 +322,8 @@ function insertMultiplyBeforeParen(s: string): string {
   return temp;
 }
 
-// Insert explicit '*' for implicit multiplication. ETC's PRIMARY signal for
-// multiplication in this domain is a plain SPACE between two operand tokens
-// (e.g. "b c (b + c - a)" means b*c*(b+c-a)) -- unlike many other math-text
-// domains, spaces here are not merely cosmetic. This must NOT fire around
-// actual operators (+, -, /, ^, etc.), which is why the lookahead only
-// checks for an upcoming operand character (letter/digit/open-paren),
-// leaving operator-adjacent whitespace untouched.
-//
-// Uses a lookahead (not a capturing/consuming group) for the "after"
-// character so consecutive gaps (e.g. "b c (") are ALL correctly handled in
-// a single pass -- a naive consuming regex would only catch every other gap
-// due to how global replace advances past matched text.
+// Insert explicit '*' for implicit multiplication signaled by a plain
+// space between two operand tokens.
 function addImplicitMultiply(s: string): string {
   s = wrapBareTrigArgs(s);
   s = s.replace(/([A-Za-z0-9)])\s+(?=[A-Za-z0-9(])/g, '$1*');
@@ -326,9 +332,6 @@ function addImplicitMultiply(s: string): string {
 }
 
 // FIX 6: trig space/no-space disambiguation.
-//   FUNC + digit + (arg) with NO space  -> (FUNC(arg))^digit
-//   FUNC + digit + variable  with NO space  -> (FUNC(variable))^digit
-//   FUNC + space + digit + variable  -> FUNC(digit*variable)
 function fixTrigDisambiguation(s: string): string {
   const F = TRIG_FUNCS;
   s = s.replace(new RegExp(`\\b(${F})(\\d)\\(([^()]*)\\)`, 'g'), '($1($3))^$2');
@@ -337,22 +340,15 @@ function fixTrigDisambiguation(s: string): string {
   return s;
 }
 
-// FIX 5: bare-digit exponent disambiguation. Skipped entirely if '^' present.
+// FIX 5: bare-digit exponent disambiguation. The whole-string "skip if
+// includes ^" gate has been REMOVED -- see FIX 5 note above.
 function fixBareExponents(s: string): string {
-  if (s.includes('^')) return s;
   s = s.replace(/\)(\d)(?!\d)/g, ')^$1');
   s = s.replace(/(?<![A-Za-z])([abcRS])(?![A-Za-z])(\d)(?!\d)/g, '$1^$2');
   return s;
 }
 
 // Insert '*' for direct digit-to-letter adjacency with ZERO whitespace.
-// Covers two distinct real cases with one rule:
-//   (a) "2bc"     (bare coefficient prefix)      -> "2*bc"
-//   (b) "b^2c^2"  (exponent digit touching the next term's letter,
-//                  produced by fixBareExponents just above) -> "b^2*c^2"
-// Must run AFTER fixBareExponents (so exponent digits already exist) and
-// BEFORE splitConcatenatedSides (so tokens like "bc" gain a proper word-
-// boundary once separated from a preceding digit).
 function fixDigitLetterAdjacency(s: string): string {
   return s.replace(/(\d)(?=[A-Za-z])/g, '$1*');
 }
@@ -361,33 +357,23 @@ function fixDigitLetterAdjacency(s: string): string {
 function normalizeCoordinateExpr(raw: string): string {
   let s = raw;
   s = stripEtcTail(s);
+  s = normalizeUnicodeSuperscripts(s);          // FIX 11
   s = normalizeBrackets(s);
-  s = fixConwaySquares(s);
-  s = splitConwayProducts(s);
-  s = fixTrigDisambiguation(s);
-  s = fixBareExponents(s);
+  s = splitConwayProducts(s);                   // FIX 7 (reordered)
+  s = fixConwaySquares(s);                      // FIX 7
+  s = fixTrigDisambiguation(s);                 // FIX 6
+  s = fixBareExponents(s);                      // FIX 5 (gate removed)
   s = fixDigitLetterAdjacency(s);
-  // Split concatenated a/b/c side-length runs ("bc" -> "b*c") now that any
-  // digit-adjacency has already been separated by a '*' above, giving these
-  // tokens the word-boundaries the regex requires.
   s = splitConcatenatedSides(s);
-  // CRITICAL: insert explicit '*' between remaining fused tokens (e.g.
-  // space-separated juxtaposition "b c" -> "b*c", or "a(b+c)" -> "a*(b+c)").
-  // Without this, two problems occur: (a) the expression is not valid
-  // math.js syntax, and (b) cyclic substitution's \b-word-boundary matching
-  // silently fails to find a letter directly adjacent to another token with
-  // no separator.
-  s = addImplicitMultiply(s);
+  s = addImplicitMultiply(s);                   // FIX 10
   return s.trim();
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  CYCLIC SUBSTITUTION (used for ": :" shorthand AND named f(a,b,c) forms)
+//  CYCLIC SUBSTITUTION
 // ════════════════════════════════════════════════════════════════════════════
 
 function cyclicSubstitute(expr: string, mapping: Record<string, string>): string {
-  // Simultaneous substitution via placeholders (avoids double-substitution
-  // when e.g. a->b and b->c would otherwise chain incorrectly).
   const placeholders: Record<string, string> = {};
   let temp = expr;
   Object.keys(mapping).forEach((k, i) => {
@@ -411,7 +397,6 @@ function cyclicTriple(expr: string, useAngles: boolean): [string, string, string
 
 // ════════════════════════════════════════════════════════════════════════════
 //  FIX 3: named cyclic-function pattern
-//    "f(a,b,c) : f(b,c,a) : f(c,a,b), where f(a,b,c) = <expr>"
 // ════════════════════════════════════════════════════════════════════════════
 
 const NAMED_CYCLIC_REF = /^([a-zA-Z]\w*)\(([abcABC]),\s*([abcABC]),\s*([abcABC])\)\s*:/;
@@ -446,11 +431,8 @@ function resolveNamedCyclicFunction(rawLine: string, blockText: string): [string
     if (innerDef) resolvedExpr = `${coeffVar}*(${innerDef})`;
   }
 
-  // CRITICAL: normalize (un-fuse bare-digit exponents, trig-function
-  // notation, brackets, Conway products) BEFORE cyclic substitution. Fused
-  // tokens like "a2" or "cos2B" have NO word-boundary around the inner
-  // letter, so a naive substitution silently fails to touch them --
-  // normalizing first inserts the separators that make substitution reliable.
+  // Normalize BEFORE cyclic substitution -- fused tokens have no
+  // word-boundary until normalized, so substitution would silently miss them.
   const normalizedExpr = normalizeCoordinateExpr(resolvedExpr);
   return cyclicTriple(normalizedExpr, useAngles);
 }
@@ -474,7 +456,6 @@ function extractCoordinateRuns(blockText: string, label: string): string[] {
 
     const namedTriple = resolveNamedCyclicFunction(rawRun, blockText);
     if (namedTriple) {
-      // Already normalized+substituted inside resolveNamedCyclicFunction
       const normalized = namedTriple.join(' : ');
       if (!results.includes(normalized)) results.push(normalized);
       continue;
@@ -487,12 +468,8 @@ function extractCoordinateRuns(blockText: string, label: string): string[] {
     const parts = cleaned.split(':').map(p => p.trim());
     let weights: string[];
     if (parts.length >= 3 && parts[1] && parts[2]) {
-      // Full three terms already given -- normalize each independently
       weights = parts.map(normalizeCoordinateExpr);
     } else if (parts.length >= 1 && parts[0]) {
-      // ": :" cyclic shorthand -- normalize the SINGLE term FIRST (this
-      // un-fuses bare exponents/trig notation so word-boundaries exist),
-      // THEN cyclically substitute the already-normalized expression.
       const useAngles = /\b[ABC]\b/.test(parts[0]) && !/\b[abc]\b/.test(parts[0]);
       const normalizedFirst = normalizeCoordinateExpr(parts[0]);
       weights = cyclicTriple(normalizedFirst, useAngles);
@@ -532,6 +509,16 @@ function buildCenter(active: ParseAccumulator, sourcePage: string): EtcCenter {
     derivedFromTrilinear = barycentrics.length > 0;
   }
 
+  // FIX 12: relations/formulas -- dedupe and cap for storage efficiency.
+  const seenRelations = new Set<string>();
+  const relations: string[] = [];
+  for (const r of active.relations || []) {
+    if (seenRelations.has(r)) continue;
+    seenRelations.add(r);
+    relations.push(r);
+    if (relations.length >= RELATIONS_CAP) break;
+  }
+
   const additional: AdditionalCenterInfo = { trilinears, barycentrics, tripolars };
   return {
     center_id: active.center_id,
@@ -542,6 +529,7 @@ function buildCenter(active: ParseAccumulator, sourcePage: string): EtcCenter {
     trilinears,
     tripolars,
     additional,
+    relations,
     derived_from_trilinear: derivedFromTrilinear,
     search_text: [active.center_id, active.name, sourcePage, ...trilinears, ...barycentrics, ...tripolars].join(' | '),
   };
@@ -549,17 +537,16 @@ function buildCenter(active: ParseAccumulator, sourcePage: string): EtcCenter {
 
 // ════════════════════════════════════════════════════════════════════════════
 //  HTML PARSER -- two-stage header detection + monotonic-id guard
-//                + bounds guard (FIX 11) against spurious id matches
+//                + relations/formulas extraction
 // ════════════════════════════════════════════════════════════════════════════
 
-function parseEtcHtml(html: string, sourcePage: string): ParsedCentersResult {
+function parseEtcHtml(html: string, sourcePage: string): EtcCenter[] {
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const lines = splitEtcLines(doc.body || doc);
   const result: EtcCenter[] = [];
-  const rejectedIds: string[] = []; // FIX 11: out-of-range matches, for diagnostics
   let active: ParseAccumulator | null = null;
-  let activeNum = -1;          // FIX 1: tracks the currently-active center's numeric id
-  let awaitingName = false;    // FIX 2: true when the name is expected on the next line
+  let activeNum = -1;
+  let awaitingName = false;
 
   const finish = (): void => {
     if (!active) return;
@@ -572,39 +559,32 @@ function parseEtcHtml(html: string, sourcePage: string): ParsedCentersResult {
     let m = HDR_FULL.exec(line);
     if (m) {
       const n = Number.parseInt(m[1], 10);
-      // FIX 11: reject ids outside the confirmed valid range BEFORE the
-      // monotonic-id check -- a match like "X(999999999) = ..." picked up
-      // from a citation or corrupted fragment must not be treated as a
-      // header at all (it would otherwise satisfy n > activeNum trivially
-      // and hijack the parse, fragmenting whatever center is genuinely
-      // active into a spurious new one).
-      if (!isValidCenterId(n)) {
-        rejectedIds.push(`X(${n}) on ${sourcePage} (outside valid range 1-${MAX_KNOWN_CENTER_ID})`);
-        // fall through: treated as ordinary content, not a header
-      } else if (active === null || n > activeNum) {
-        // FIX 1: only treat as a NEW header if n is strictly greater than
-        // the currently active center's id (or no active center yet).
-        // Self-referential relation lines inside a center's own block
-        // (e.g. "X(1) = isogonal conjugate of X(1)") repeat the SAME id
-        // and must NOT be treated as new headers.
+      // FIX 1: only treat as a NEW header if n is strictly greater than
+      // the currently active center's id. No fixed numeric ceiling is
+      // used (FIX 13).
+      if (active === null || n > activeNum) {
         finish();
         activeNum = n;
         const name = normalizeSpace(m[2]).replace(/^[=:\u2014\-\s]+/, '') || `X(${n})`;
-        active = { center_id: `X(${n})`, name, lines: [] };
+        active = { center_id: `X(${n})`, name, lines: [], relations: [] };
         awaitingName = false;
         continue;
       }
-      // else: self-referential -- falls through to be appended as content
+      // FIX 12: self-referential (same id as active) -- capture as a
+      // relation/formula, then fall through to also keep it in the
+      // general content buffer.
+      if (active && n === activeNum) {
+        const desc = normalizeSpace(m[2]).replace(/^[=:\u2014\-\s]+/, '');
+        if (desc) active.relations.push(desc);
+      }
     } else {
       m = HDR_PARTIAL.exec(line);
       if (m) {
         const n = Number.parseInt(m[1], 10);
-        if (!isValidCenterId(n)) {
-          rejectedIds.push(`X(${n}) on ${sourcePage} (outside valid range 1-${MAX_KNOWN_CENTER_ID})`);
-        } else if (active === null || n > activeNum) {
+        if (active === null || n > activeNum) {
           finish();
           activeNum = n;
-          active = { center_id: `X(${n})`, name: `X(${n})`, lines: [] };
+          active = { center_id: `X(${n})`, name: `X(${n})`, lines: [], relations: [] };
           awaitingName = true;
           continue;
         }
@@ -618,20 +598,14 @@ function parseEtcHtml(html: string, sourcePage: string): ParsedCentersResult {
       if (line.length > 0 && !COORD_LABEL_LINE_RE.test(line)) {
         active.name = normalizeSpace(line).replace(/^[=:\u2014\-\s]+/, '') || active.name;
         awaitingName = false;
-        continue; // name line -- do not add to coordinate content
+        continue;
       }
     }
 
     active.lines.push(line);
   }
   finish();
-  // FIX 11: attach rejection diagnostics -- ParsedCentersResult behaves
-  // exactly like EtcCenter[] for every existing consumer (.length,
-  // iteration, array methods all unaffected) while carrying this extra
-  // typed property for callers that want to surface the rejections.
-  const withDiagnostics = result as ParsedCentersResult;
-  withDiagnostics.rejectedIds = rejectedIds;
-  return withDiagnostics;
+  return result;
 }
 
 // ── Normalise + deduplicate (id-only; center_id is the true unique key) ────
@@ -644,7 +618,9 @@ function normalizeCenter(center: Partial<EtcCenter>): EtcCenter | null {
   const barycentrics = center.barycentrics || center.additional?.barycentrics || [];
   const trilinears   = center.trilinears   || center.additional?.trilinears   || [];
   const tripolars    = center.tripolars    || center.additional?.tripolars    || [];
+  const relations    = center.relations    || [];
   const sourcePage   = center.source_page  || '';
+
   return {
     center_id: centerId,
     name,
@@ -654,11 +630,14 @@ function normalizeCenter(center: Partial<EtcCenter>): EtcCenter | null {
     trilinears,
     tripolars,
     additional: { trilinears, barycentrics, tripolars },
+    relations,
     derived_from_trilinear: !!center.derived_from_trilinear,
-    search_text: center.search_text || [centerId, name, sourcePage, ...trilinears, ...barycentrics, ...tripolars].join(' | '),
+    search_text: center.search_text
+      || [centerId, name, sourcePage, ...trilinears, ...barycentrics, ...tripolars].join(' | '),
   };
 }
 
+// FIX 13: no fixed maximum id/count is enforced here by design.
 function dedupeCenters(centers: Partial<EtcCenter>[]): EtcCenter[] {
   const byId = new Set<string>();
   const rows: EtcCenter[] = [];
@@ -666,36 +645,17 @@ function dedupeCenters(centers: Partial<EtcCenter>[]): EtcCenter[] {
   centers
     .map(normalizeCenter)
     .filter((c): c is EtcCenter => c !== null)
-    // FIX 11: also drop any individual center whose id somehow ended up
-    // out of the confirmed valid range (defense in depth -- parseEtcHtml
-    // already rejects these at match time, but dedupeCenters is also
-    // reachable directly with externally-supplied data, e.g. the fallback
-    // JSON, so the guard is repeated here independently).
-    .filter(c => isValidCenterId(numericId(c.center_id)))
     .sort((a, b) => numericId(a.center_id) - numericId(b.center_id))
     .forEach(center => {
-      if (byId.has(center.center_id)) return; // id-only uniqueness
+      if (byId.has(center.center_id)) return;
       byId.add(center.center_id);
       rows.push(center);
     });
 
-  // FIX 11: aggregate sanity check. Since center ids are unique and bounded
-  // to [1, MAX_KNOWN_CENTER_ID], the deduped row count can never
-  // legitimately exceed that bound. If it does, something upstream is
-  // producing malformed/duplicate ids that collided past the dedup Set --
-  // surface this loudly rather than silently returning bad data.
-  if (rows.length > MAX_KNOWN_CENTER_ID) {
-    console.warn(
-      `EtcLiveParser: deduped center count (${rows.length}) exceeds the ` +
-      `confirmed maximum (${MAX_KNOWN_CENTER_ID}). This should be ` +
-      `impossible given unique, bounded ids -- investigate upstream data.`
-    );
-  }
-
   return rows;
 }
 
-// ── Network helpers ──────────────────────────────────────────────────────
+// ── Network helpers ────────────────────────────────────────────────────────
 
 function proxiedEtcUrl(page: string): string {
   return `https://api.allorigins.win/raw?url=${encodeURIComponent(ETC_BASE_URL + page)}`;
@@ -731,6 +691,7 @@ function pageNameForPart(part: number): string {
   return part === 1 ? 'ETC.html' : `ETCPart${part}.html`;
 }
 
+// FIX 14: empty-page-as-miss heuristic.
 async function fetchLiveEtcCenters(onProgress?: LoadOptions['onProgress']): Promise<LiveLoadResult> {
   const pages: string[] = [];
   const centers: EtcCenter[] = [];
@@ -755,14 +716,20 @@ async function fetchLiveEtcCenters(onProgress?: LoadOptions['onProgress']): Prom
       continue;
     }
 
-    missingInARow = 0;
     const parsed = parseEtcHtml(html, page);
     pages.push(page);
     centers.push(...parsed);
-    // FIX 11: surface any out-of-range id rejections from this page
-    if (parsed.rejectedIds.length) {
-      parsed.rejectedIds.forEach(msg => pageErrors.push(`Rejected spurious header: ${msg}`));
+
+    // FIX 14: a page can return HTTP 200 while containing no real entries
+    // (verified: ETC pre-creates placeholder pages ahead of content).
+    if (parsed.length === 0) {
+      pageErrors.push(`${page}: fetched successfully but contained no parseable centers (likely a placeholder page)`);
+      missingInARow += 1;
+      if (missingInARow >= MAX_CONSECUTIVE_MISSING_PAGES) break;
+      continue;
     }
+    missingInARow = 0;
+
     onProgress?.({
       message: `Parsed ${centers.length.toLocaleString()} centers from ${pages.length} ETC page${pages.length === 1 ? '' : 's'}\u2026`,
       count: centers.length,
@@ -797,19 +764,17 @@ async function loadCenters(options: LoadOptions = {}): Promise<CenterLoadResult>
 
 window.EtcLiveParser = {
   ETC_BASE_URL,
-  MAX_KNOWN_CENTER_ID,
   pageNameForPart,
   normalizeSpace,
   escapeHtml,
-  isValidCenterId,
   parseEtcHtml,
   dedupeCenters,
   fetchLiveEtcCenters,
   loadFallbackCenters,
   loadCenters,
-  // Exposed for testing / debugging the normalization pipeline directly
   _internal: {
     normalizeCoordinateExpr,
+    normalizeUnicodeSuperscripts,
     cyclicTriple,
     resolveNamedCyclicFunction,
     deriveBarycentricsFromTrilinears,
